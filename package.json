@@ -1,0 +1,53 @@
+{
+  "name": "taskapsule",
+  "description": "Task management app with Electron + Vue + Spring Boot",
+  "author": "Comardom",
+  "version": "0.0.1",
+  "main": "electron/dist/main.js",
+  "scripts": {
+    "dev:frontend": "cd frontend && pnpm dev",
+    "dev:backend": "cd backend && ./gradlew bootRun",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev": "run-p dev:frontend dev:backend dev:electron",
+    "build:frontend": "cd frontend && pnpm build",
+    "build:backend": "cd backend && ./gradlew build",
+    "build:electron": "tsc -p electron",
+    "dist": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend && pnpm build:electron && electron-builder"
+  },
+  "build": {
+    "appId": "com.taskapsule.app",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+    "electron/dist/**/*"
+    ],
+    "extraResources": [
+    {
+      "from": "frontend/dist",
+      "to": "frontend/dist"
+      },
+      {
+        "from": "backend/build/libs/backend-0.0.1-SNAPSHOT.jar",
+        "to": "backend.jar"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "cross-env": "^10.1.0",
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3"
+  }
+}

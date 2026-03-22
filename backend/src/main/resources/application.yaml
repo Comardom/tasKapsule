@@ -1,0 +1,30 @@
+server:
+  port: 9999
+
+
+spring:
+  application:
+    name: backend
+
+  # 数据源配置
+  datasource:
+    url: jdbc:sqlite:${user.home}/.taskapsule/data/app.db
+    driver-class-name: org.sqlite.JDBC
+
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        # 让 Hibernate 使用 SQLite 的命名策略（可选）
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+
+# 日志配置（便于调试）
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
