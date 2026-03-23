@@ -35,6 +35,4 @@ Thumbs.db
 *.tmp
 
 # JRE bundles (already included via extraResources, don't commit)
-jre/linux_x64/
-jre/win_x64/
-jre/mac_arm/
+jre/
