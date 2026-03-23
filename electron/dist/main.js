@@ -55,9 +55,31 @@ function createWindow() {
 electron_1.app.whenReady().then(() => {
     // 后端 jar 在生产模式下放到 resources/backend.jar
     const jarPath = path.join(process.resourcesPath, 'backend.jar');
-    backendProcess = (0, child_process_1.spawn)('java', ['-jar', jarPath]);
-    backendProcess.stdout.on('data', data => console.log(`Backend: ${data}`));
-    backendProcess.stderr.on('data', data => console.error(`Backend Error: ${data}`));
+    // backendProcess = spawn('java', ['-jar', jarPath])
+    let javaPath;
+    switch (process.platform) {
+        case 'win32':
+            javaPath = path.join(process.resourcesPath, 'jre/win_x64/bin/java.exe');
+            break;
+        case 'darwin':
+            javaPath = path.join(process.resourcesPath, 'jre/mac_arm/bin/java');
+            break;
+        case 'linux':
+            javaPath = path.join(process.resourcesPath, 'jre/linux_x64/bin/java');
+            break;
+        default:
+            throw new Error('Unsupported platform: ' + process.platform);
+    }
+    backendProcess = (0, child_process_1.spawn)(javaPath, ['-jar', jarPath], {
+        cwd: process.resourcesPath,
+        stdio: 'inherit'
+    });
+    if (backendProcess.stdout) {
+        backendProcess.stdout.on('data', data => console.log(`Backend: ${data}`));
+    }
+    if (backendProcess.stderr) {
+        backendProcess.stderr.on('data', data => console.error(`Backend Error: ${data}`));
+    }
     electron_1.ipcMain.handle('open-file', async () => {
         const { canceled, filePaths } = await electron_1.dialog.showOpenDialog({ properties: ['openFile'] });
         if (canceled || filePaths.length === 0)
