@@ -1,0 +1,40 @@
+# Node.js / Frontend
+node_modules/
+frontend/node_modules/
+electron/node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Frontend build output
+frontend/dist/
+electron/dist/
+
+# Electron release builds
+release/
+*.AppImage
+*.exe
+*.dmg
+
+# Backend / Gradle
+backend/build/
+backend/.gradle/
+backend/out/
+.gradle/
+build/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.iml
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# JRE bundles (already included via extraResources, don't commit)
+jre/linux_x64/
+jre/win_x64/
+jre/mac_arm/
