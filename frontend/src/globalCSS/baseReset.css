@@ -1,0 +1,19 @@
+/* 消除浏览器默认间距，解决 100vh 溢出问题 */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* 确保父级有高度，flex: 1 才能撑开 */
+}
+/* 统一盒模型，防止 padding 撑破布局 */
+* {
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none;/* 去掉下划线 */
+  color: inherit;/* 颜色继承自父元素 */
+}
+
+img {
+  max-width: 100%;/* 防止图片撑破容器 */
+  display: block;/* 消除底部缝隙 */
+}

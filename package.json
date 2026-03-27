@@ -15,45 +15,54 @@
     "dist": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend && pnpm build:electron && electron-builder"
   },
   "build": {
-    "appId": "com.taskapsule.app",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
+  "appId": "com.taskapsule.app",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
     "electron/dist/**/*"
-    ],
-    "extraResources": [
+  ],
+  "extraResources": [
     {
       "from": "frontend/dist",
       "to": "frontend/dist"
-      },
-      {
-        "from": "backend/build/libs/backend-0.0.2.jar",
-        "to": "backend.jar"
-      },
-      {
-        "from": "jre/linux_x64",
-        "to": "jre/linux_x64"
-      },
+    },
+    {
+      "from": "backend/build/libs/backend-0.0.2.jar",
+      "to": "backend.jar"
+    }
+  ],
+  "win": {
+    "target": "nsis",
+    "extraResources": [
       {
         "from": "jre/win_x64",
-        "to": "jre/win_x64"
-      },
+        "to": "jre"
+      }
+    ]
+  },
+  "mac": {
+    "target": "dmg",
+    "extraResources": [
       {
         "from": "jre/mac_arm",
-        "to": "jre/mac_arm"
+        "to": "jre"
       }
-    ],
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+    ]
   },
+  "linux": {
+    "target": "AppImage",
+    "executableArgs": [
+      "--no-sandbox"
+    ],
+    "extraResources": [
+      {
+        "from": "jre/linux_x64",
+        "to": "jre"
+      }
+    ]
+  }
+},
   "devDependencies": {
     "@types/node": "^25.5.0",
     "cross-env": "^10.1.0",
