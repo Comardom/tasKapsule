@@ -1,5 +1,6 @@
 # frontend
-前端要越过浏览器沙箱的话需要写preload.ts！
+前端要越过浏览器沙箱的话需要写preload.ts！\
+端口号9998不可改变，细节在[vite.config.ts](vite.config.ts)的server块中
 ## Project Setup
 ```sh
 cd frontend
@@ -21,18 +22,4 @@ pnpm dev
 pnpm build
 ```
 ## 操作文件内容(在script setup里面用)：
-```vue
-import { openFile, saveFile } from '@/utils/fileApi'
-
-async function handleOpenFile() {
-  const content = await openFile()
-  console.log('文件内容:', content)
-}
-
-async function handleSaveFile() {
-  const success = await saveFile('要保存的内容')
-  if (success) {
-    console.log('文件保存成功')
-  }
-}
-```
+调用[fileHandleFunctions.ts](src/utils/fileHandleFunctions.ts)

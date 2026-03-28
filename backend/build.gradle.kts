@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.taskapsule"
-version = "0.0.3"
+version = "0.0.4"
 description = "backend"
 
 java {
@@ -27,10 +27,6 @@ repositories {
 }
 
 dependencies {
-	//exposed
-	implementation("org.jetbrains.exposed:exposed-core:0.53.0")
-	implementation("org.jetbrains.exposed:exposed-dao:0.53.0")
-	implementation("org.jetbrains.exposed:exposed-jdbc:0.53.0")
 	//SQLite驱动
 	implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 	//对应application.yaml
@@ -42,7 +38,6 @@ dependencies {
 	implementation("tools.jackson.module:jackson-module-kotlin")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

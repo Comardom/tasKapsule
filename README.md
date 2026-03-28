@@ -3,8 +3,47 @@
 
 
 ---
-
 # 更新
+
+## [2026-03-28] - 0.0.4
+###  更新内容
+#### 整体性调整（electron和前后端对接）
+* 修改前端端口为9998,后端为9999<br /><br />
+* 对electron/main.ts进行了重整，并且加入了大量的注释
+  * 并且加入了杀掉9999端口进程的功能，保证程序始终使用9999端口<br /><br />
+* 针对日志捕捉做出了改进：
+  * electron/main.ts中whenReady()的backendProcess中stdio参数修改为pipe
+  * backend/src/resources/application.yaml的logging块补充了配置
+  * 后端controller包的DatabaseConfig类使用slf4j的logger保存日志<br /><br />
+* 后端加入了RESTful API和前端跨域联动（CORS跨域资源共享）
+  * 后端controller包的HomeController类加入了检测后端加载的/health API
+  * 前端在backendHealthCheck.ts中调用此API<br /><br />
+* frontend/vite.config.ts的defineConfig中加入了server块
+  * 前端端口号定为9998
+  * 确定为不可自动切换，防止CORS出问题<br /><br />
+* 前端loadingPageController.ts通过调用前端backendHealthCheck.ts检查后端
+  * 如果后端没有加载完成，通过v-if渲染loading页面
+  * 加载好了以后通过异步的检测告知前端渲染应该渲染的界面<br /><br />
+#### 前端调整
+* 前端通过pnpm安装了axios<br /><br />
+* 因为前端是Vue-SPA架构，不需要router，所以frontend/src/router/被弃用
+  * 相对应地，frontend/src/main.ts中app.use(router)也被弃用<br /><br />
+* frontend/src/main.ts进行了重整和注释加入
+  * 改变了“等待后端加载完成再挂载前端”的逻辑为IIFE异步执行前端挂载
+  * 被立即挂载的App.vue调用loadingPageController.ts探测后端<br /><br />
+* App.vue的文件读写逻辑被封装进fileHandleFunctions.ts中
+  * fileHandleFunctions.ts通过调用fileApi.ts接触底层磁盘读写
+  * 底层磁盘读写权限通过electron/preload.ts开放<br /><br />
+* App.vue的CSS封装进frontend/src/globalCSS/中
+  * 针对html和body的底层大修改放在baseReset.css
+  * 针对主页的外观定制放在baseNiceStyle.css<br /><br />
+* App.vue经过改进后仅保留import、简单的ts语句、template中的vue组件调用<br /><br />
+* App.vue调用的vue组件放在frontend/src/components中<br /><br />
+* 修正了frontend/README.md<br /><br />
+#### 后端调整
+* 后端controller包的DatabaseConfig类SQLite的文件创建逻辑进行微调<br /><br />
+* backend/build.gradle.kts中删除了lombok依赖和exposed中间件<br /><br />
+---
 
 ## [2026-03-27] - 0.0.3
 ###  更新内容
@@ -115,44 +154,3 @@ pnpm exec tsc -p electron
 pnpm dist
 
 ```
----
-
-原文：
-安装好环境以后记得验证！！不懂的问AI
-
-node.js：
-安装nvm管理node版本
-怎么安装自己上网查
-安装并使用lts/krypton版本（v24.14.0）
-
-
-jdk：
-安装sdkman（非Windows）
-配置系统环境变量JAVA_HOME 指向需要的版本，并更新 PATH（Windows）
-应当使用21.0.10-oracle，如果无法下载到oracle版本，其他的21.0.10也是一样的
-
-
-node包管理器：
-我们统一使用npm+pnpm
-npm一般会跟随node.js一并安装，如果发现没有安装再单独下载（nvm install-latest-npm）
-npm install -g pnpm（此处如果提示要求升级，复制提示的命令粘贴运行即可）
-然后运行pnpm setup
-pnpm install -g @vue/cli
-
-
-SQLite：
-用包管理器装（非Windows）
-powershell运行choco install sqlite（Windows）
-
-
-vue使用的功能：TS、Router（单页面应用开发）、 Pinia（状态管理）
-
-
-前端测试：
-cd frontend
-pnpm install
-pnpm dev
-
-vue的ts配置：
-cd frontend
-pnpm add -D vue-tsc typescript
