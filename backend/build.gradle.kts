@@ -59,3 +59,7 @@ allOpen {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+// 固定 Spring Boot 打包出来的文件名
+tasks.bootJar {
+    archiveFileName.set("backend-server.jar")
+}

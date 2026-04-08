@@ -14,6 +14,7 @@ class DatabaseConfig {
 
     @PostConstruct
     fun initDatabaseDirectory(){
+        logger.info("[STAGE] DB_INIT: 正在初始化数据库目录...")
         // 统一路径获取
         val userHome = System.getProperty("user.home")
         val dbDirPath = "$userHome/.taskapsule/data"
@@ -22,12 +23,12 @@ class DatabaseConfig {
         // 确保目录存在
         if (!dbDir.exists()) {
             if (dbDir.mkdirs()) {
-                logger.info("Successfully created database directory at: {}", dbDirPath)
+                logger.info("[STAGE] DB_SUCCESS: 数据库目录创建成功")
             } else {
-                logger.error("Failed to create database directory at: {}", dbDirPath)
+                logger.error("[STAGE] DB_ERROR: 目录创建失败")
             }
         } else {
-            logger.debug("Database directory already exists: {}", dbDirPath)
+            logger.info("[STAGE] DB_READY: 数据库目录已就绪")
         }
     }
 }

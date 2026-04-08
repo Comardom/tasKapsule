@@ -6,8 +6,7 @@ import * as path from 'path'
 import { spawn, ChildProcess } from 'child_process'
 // fs: Node.js 文件系统模块，用于读写文件、判断文件是否存在、修改权限等
 import * as fs from 'fs'
-// execSync: 同步执行 Shell 命令，常用于需要立即获取返回结果的操作（如检查端口
-import { execSync } from 'child_process';
+import {killPort} from "./killPort";
 
 
 // 解决部分 Linux 环境下的 GPU 兼容性报错
@@ -16,10 +15,12 @@ app.commandLine.appendSwitch('disable-software-rasterizer');
 
 // 定义全局变量，用于存储 Java 后端进程对象，方便在应用关闭时销毁它
 let backendProcess: ChildProcess | null = null
+// 提升 win 的作用域，方便在日志回调中使用
+let mainWindow: BrowserWindow | null = null
 
 function createWindow() {
     //创建窗口并且引入preload.js,其实是用ts写的，但是编译成js以后，通过__dirname引入的
-    const win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
         webPreferences: {
@@ -35,7 +36,7 @@ function createWindow() {
     // process.resourcesPath 在生产环境下指向安装目录下的 resources 文件夹
     const indexPath = path.join(process.resourcesPath, 'frontend', 'dist', 'index.html')
     // 加载 Vue 打包后的静态资源文件
-    win.loadURL(`file://${indexPath}`)
+    mainWindow.loadURL(`file://${indexPath}`)
     // path.resolve 用于将路径解析为绝对路径，方便在调试日志中查看确切位置
     console.log('Frontend path:', path.resolve(process.resourcesPath, 'frontend', 'dist','index.html'))
 }
@@ -53,9 +54,19 @@ app.whenReady().then(() => {
 
     // 定义 Java 路径
     const javaExe = process.platform === 'win32' ? 'java.exe' : 'java';
-    const javaPath = isProd
-    ? path.join(resPath, 'jre', 'bin', javaExe)
-    : path.join(resPath, 'jre', 'linux_x64', 'bin', javaExe);
+    let javaPath: string;
+    if (isProd) {
+        javaPath = path.join(resPath, 'jre', 'bin', javaExe);
+    } else {
+    // 开发环境下，根据当前操作系统去寻找对应的 jre 目录
+        const platformFolder =
+            process.platform === 'win32' ? 'win_x64' :
+                process.platform === 'darwin' ? 'mac_arm' : 'linux_x64';
+        javaPath = path.join(resPath, 'jre', platformFolder, 'bin', javaExe);
+    }
+    // const javaPath = isProd
+    // ? path.join(resPath, 'jre', 'bin', javaExe)
+    // : path.join(resPath, 'jre', 'linux_x64', 'bin', javaExe);
 
     // 定义后端 JAR 路径 (根据 package.json 的 "to": "backend.jar" 配置)
     const jarPath = path.join(resPath, 'backend.jar');
@@ -83,8 +94,12 @@ app.whenReady().then(() => {
                 try {
                     // 0o755 是八进制表示法：所有者读写执行，组/其他人读取执行
                     fs.chmodSync(javaPath, 0o755);
-                } catch (err) {
-                    console.error('Failed to chmod java:', err);
+                } catch (err : any) {
+                    if (err.code === 'EROFS') {
+                        console.log('检测到只读文件系统（可能是 AppImage），跳过权限修改。请确保打包时已赋予 JRE 执行权限。');
+                    } else {
+                        console.error('修改权限失败:', err);
+                    }
                 }
             }
         }
@@ -94,6 +109,7 @@ app.whenReady().then(() => {
         }
     }
 
+
     // 启动子进程：启动 Spring Boot 后端
     // stdio: 'pipe' (默认) 会创建管道。
     backendProcess = spawn(javaPath, ['-jar', jarPath], {
@@ -101,12 +117,27 @@ app.whenReady().then(() => {
         stdio: 'pipe'// 修改为 pipe 才能捕获 stdout/stderr 日志
     });
 
-    // 日志监听：将 Java 的控制台输出重定向到 Electron 的控制台
     if (backendProcess.stdout) {
-        backendProcess.stdout.on('data', data => console.log(`Backend: ${data}`));
+        backendProcess.stdout.on('data', (data: Buffer) => {
+            const line = data.toString();
+            console.log(`Backend: ${line}`);
+
+            // 匹配 [STAGE] 标签
+            // 匹配格式: [STAGE] KEY: 内容
+            const match = line.match(/\[STAGE\]\s*(\w+):\s*(.*)/);
+            if (match && mainWindow) {
+                const stageText = match[2].trim();
+                // 通过 IPC 发送给渲染进程
+                mainWindow.webContents.send('jvm-status-update', stageText);
+            }
+        });
     }
+
     if (backendProcess.stderr) {
-        backendProcess.stderr.on('data', data => console.error(`Backend Error: ${data}`));
+        backendProcess.stderr.on('data', data =>{
+            const errLog = data.toString();
+            console.error(`Backend Error: ${errLog}`);
+        });
     }
 
     // IPC 通信句柄 (给前端 Vue 使用)
@@ -136,29 +167,4 @@ app.on('will-quit', () => {
 })
 
 
-// 杀死占用特定端口的进程
-function killPort(port: number) {
-  try {
-      //先尝试查看端口对应的pid（cmd是一段shell命令）
-    const cmd = process.platform === 'win32'
-      ? `netstat -ano | findstr :${port}`
-      : `lsof -i :${port} -t`;
 
-    //运行cmd这段shell命令，把结果变成字符串然后去掉头尾的空格
-    const pid = execSync(cmd).toString().trim();
-
-    if (pid) {
-        // 如果是 Linux 且 lsof 返回了多个 PID，pid 字符串会包含换行符
-      const pids = pid.split('\n');
-      pids.forEach(p => {
-          const killCmd = process.platform === 'win32'
-            ? `taskkill /F /PID ${p}`
-            : `kill -9 ${p}`;
-          execSync(killCmd);
-          console.log(`已清理端口 ${port} 的占用进程: ${p}`);
-      });
-    }
-  } catch (e) {
-    // 报错通常意味着端口没被占用，正常忽略
-  }
-}

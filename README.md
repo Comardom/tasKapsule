@@ -6,12 +6,35 @@
 
 # 更新
 
+## [2026-04-08] - 0.0.6
+* 前端改进了Loading页面，采用了第三方开源控件
+* 在前端README加入了鸣谢
+* 改进了前后端的Loading连接
+  * 在后端的各类中加入了用于前端显示的日志
+    * HomeController.kt中加入logger
+    * 其他的是加入报错文本
+  * electron/main.ts进行大的修改以适配日志
+    * 改造stdout的读取，加入了对输出头的正则表达式的日志读取
+    * 把原本负责权限管理的块中加入了对于EROFS的检测
+    * createWindow()中的win改成了全局mainWindow
+  * electron/preload.ts增加了对于监听主进程
+  * frontend/env.d.ts增加前后端连接（日志传递）的内容
+  * frontend中loadingPageController.ts加入了监听与移除监听
+  * 各vue稍作改造加入Loading信息的传入
+* 修复了package.json中旧的后端版本号不符的问题
+* BackendApplication.kt中加入了创建数据库所在文件夹的创建逻辑
+  * 防止Spring加载中途报错
+  * 因为Spring的@PostConstruct不一定会最先执行，而是会先报错
+* electron/main.ts的killPort功能分离了出去
+* 加入了一些ORM测试的kt文件
+
+---
+
 ## [2026-03-28] - 0.0.5
 * 加入了Apache 2.0开源许可证，版权归贡献者所有
 
 ---
 
-# 更新
 
 ## [2026-03-28] - 0.0.4
 ###  更新内容
@@ -116,8 +139,6 @@ choco install sqlite
 
 ## Vue 使用的功能
 - TypeScript (TS)
-- Router（单页面应用开发）
-- Pinia（状态管理）
 
 ---
 
