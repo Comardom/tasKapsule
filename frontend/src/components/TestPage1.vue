@@ -5,7 +5,7 @@ import Footer from "@/components/CopyrightFooter.vue";
 <template>
   <div class="test-page-container">
     <main>
-      <h1>测试页面：主页</h1>
+      <h1>测试页面：个人页</h1>
       <p>
         这是一个测试界面捏
       </p>
@@ -29,7 +29,7 @@ import Footer from "@/components/CopyrightFooter.vue";
   flex: 1;            /* 撑满 App.vue 里的 main */
   display: flex;      /* 变成 flex 容器，好让内部的 main (flex: 1) 生效 */
   flex-direction: column;
-  width: 100%;        /* 确保宽度也铺满 */
+  /*width: 100%;*/        /* 确保宽度也铺满 */
 }
 main {
   flex: 1;

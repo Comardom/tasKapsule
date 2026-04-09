@@ -13,3 +13,8 @@
   /*仅单屏应用可用此选项！也就是说只有主页面的最外层div采用*/
   overflow: hidden;
 }
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
