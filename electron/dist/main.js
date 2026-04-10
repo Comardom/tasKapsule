@@ -45,6 +45,10 @@ const killPort_1 = require("./killPort");
 // 解决部分 Linux 环境下的 GPU 兼容性报错
 electron_1.app.commandLine.appendSwitch('disable-gpu');
 electron_1.app.commandLine.appendSwitch('disable-software-rasterizer');
+// 关闭硬件加速
+// if (process.platform === 'linux') {
+//     app.disableHardwareAcceleration();
+// }
 // 定义全局变量，用于存储 Java 后端进程对象，方便在应用关闭时销毁它
 let backendProcess = null;
 // 提升 win 的作用域，方便在日志回调中使用
@@ -65,7 +69,13 @@ function createWindow() {
     // process.resourcesPath 在生产环境下指向安装目录下的 resources 文件夹
     const indexPath = path.join(process.resourcesPath, 'frontend', 'dist', 'index.html');
     // 加载 Vue 打包后的静态资源文件
-    mainWindow.loadURL(`file://${indexPath}`);
+    if (fs.existsSync(indexPath)) {
+        mainWindow.loadFile(indexPath); // 使用 loadFile 替代 loadURL
+    }
+    else {
+        console.error("Index file not found at:", indexPath);
+    }
+    // mainWindow.loadURL(`file://${indexPath}`)
     // path.resolve 用于将路径解析为绝对路径，方便在调试日志中查看确切位置
     console.log('Frontend path:', path.resolve(process.resourcesPath, 'frontend', 'dist', 'index.html'));
 }
@@ -112,16 +122,17 @@ electron_1.app.whenReady().then(() => {
             // Linux 权限处理：Node.js spawn 启动二进制文件需要 755 (可执行) 权限
             if (process.platform !== 'win32') {
                 try {
-                    // 0o755 是八进制表示法：所有者读写执行，组/其他人读取执行
-                    fs.chmodSync(javaPath, 0o755);
+                    const stats = fs.statSync(javaPath);
+                    const isExecutable = !!(stats.mode & 100); // 检查是否有执行权限
+                    if (!isExecutable) {
+                        fs.chmodSync(javaPath, 0o755);
+                    }
                 }
                 catch (err) {
-                    if (err.code === 'EROFS') {
-                        console.log('检测到只读文件系统（可能是 AppImage），跳过权限修改。请确保打包时已赋予 JRE 执行权限。');
+                    if (err.code !== 'EROFS') {
+                        console.error('权限检查/修改失败:', err);
                     }
-                    else {
-                        console.error('修改权限失败:', err);
-                    }
+                    console.error('RROFS', err);
                 }
             }
         }

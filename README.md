@@ -6,6 +6,11 @@
 
 # 更新
 
+## [2026-04-10] - 0.0.10
+* 消除electron/main.ts的修改权限报错（只是显示上的逻辑错误）
+* electron/main.ts使用loadFile替代loadURL
+
+---
 ## [2026-04-10] - 0.0.9
 * 规定了release和jre文件夹的位置
 * 加入了jre的下载方式
