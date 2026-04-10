@@ -2,20 +2,23 @@
   "name": "taskapsule",
   "description": "Task management app with Electron + Vue + Spring Boot",
   "author": "Comardom",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",
     "dev:backend": "cd backend && ./gradlew bootRun",
+    "dev:backend:win": "cd backend && .\\gradlew.bat bootRun",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev": "run-p dev:frontend dev:backend dev:electron",
     "build:frontend": "cd frontend && pnpm build",
     "build:backend": "cd backend && ./gradlew build -x test",
+    "build:backend:win": "cd backend && .\\gradlew.bat build -x test",
     "build:electron": "tsc -p electron",
-    "dist": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend && pnpm build:electron && electron-builder"
+    "dist": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend && pnpm build:electron && electron-builder",
+    "dist:win": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:win && pnpm build:electron && electron-builder"
   },
   "build": {
-  "appId": "com.taskapsule.app",
+  "appId": "xyz.taskapsule",
   "directories": {
     "output": "release"
   },
