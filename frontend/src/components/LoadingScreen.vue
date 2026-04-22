@@ -15,10 +15,20 @@ import "../globalCSS/baseNiceStyle.css"
 
 <style scoped>
 .loading-wrapper {
-  display: flex;
-  flex-direction: column;
+  /*display: flex;*/
+  display: grid;
+  place-content: center;
+  place-items: center;
+  /*flex-direction: column;
   justify-content: center;
-  align-items: center;
-  height: 100vh; /* 撑满屏幕高度 */
+  align-items: center;*/
+  /* 撑满屏幕高度，使用 dvb */
+  block-size: 100dvb;
+  inline-size: 100%;
+  /* gap替代子元素的 margin */
+  gap: 1.5rem;
+}
+.status-msg {
+  margin: 0; /* 清除默认间距 */
 }
 </style>

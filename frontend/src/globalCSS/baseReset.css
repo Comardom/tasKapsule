@@ -1,19 +1,24 @@
-/* 消除浏览器默认间距，解决 100vh 溢出问题 */
+/* 统一盒模型 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 移除默认间距，使用逻辑属性 */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; /* 确保父级有高度，flex: 1 才能撑开 */
+  /*这里的dvb是动态块级视图，block类似于height*/
+  min-block-size: 100dvb;
+  overflow-x: hidden;
+
 }
-/* 统一盒模型，防止 padding 撑破布局 */
-* {
-  box-sizing: border-box;
-}
+
 a {
   text-decoration: none;/* 去掉下划线 */
   color: inherit;/* 颜色继承自父元素 */
 }
 
 img {
-  max-width: 100%;/* 防止图片撑破容器 */
+  max-inline-size: 100%;/* 防止图片撑破容器 */
   display: block;/* 消除底部缝隙 */
 }

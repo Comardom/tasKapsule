@@ -27,10 +27,10 @@ const BEIAN_LINKS = {
 
       <div class="footer-content">
         <p class="copyright">
-          <span class="record-link">&copy; {{props.year}} {{props.owner}}所有</span>
+          <span>&copy; {{props.year}} {{props.owner}}所有</span>
           <span class="separator"> | </span>
-          <span class="record-link">
-            联系邮箱：<a :href="`mailto:${props.email}`">{{ props.email }}</a>
+          <span>联系邮箱：
+            <a class="record-link" :href="`mailto:${props.email}`">{{ props.email }}</a>
           </span>
         </p>
 
@@ -67,63 +67,67 @@ const BEIAN_LINKS = {
 
 .footer-divider {
   border: none;
-  border-top: 1px solid #ddd;
+   border-block-start: 1px solid var(--theme-border-button);
   /* 清除默认 margin，防止撑开高度 */
   /* 只留向下的间距 */
-  margin: 0 0 20px;
+  margin-block: 0 1.25rem;
+  inline-size: 100%;
 }
 
 .footer-content {
   text-align: center;
-  font-size: 14px;
-  color: #666;
+  font-size: 0.875rem;
+  color: var(--theme-color);
+  opacity: 0.9;
 
 }
 
 .copyright {
-  margin-bottom: 8px;
+  /* 逻辑属性：下方外边距 */
+  margin-block-end: 0.5rem;
 }
 
 .record-links {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .record-link {
-  color: #666;
+  color: var(--theme-color);
   text-decoration: none;
-  transition: color 0.3s;
+  /*transition: color 0.3s;*/
 }
 
 .record-link:hover {
-  color: #1890ff;
+  color: var(--theme-link);
   text-decoration: underline;
+  text-underline-offset: 0.25rem;
 }
 
 .separator {
-  color: #ccc;
+  color: var(--theme-border-button);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .footer-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
   }
 
   .copyright {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0.25rem;
   }
 
   .record-links {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .separator {

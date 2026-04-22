@@ -27,6 +27,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
+        autoHideMenuBar: true, // 设置为自动隐藏
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             // contextIsolation: 开启上下文隔离（安全核心），防止前端脚本直接访问 Node API

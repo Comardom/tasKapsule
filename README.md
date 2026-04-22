@@ -5,6 +5,23 @@
 ---
 
 # 更新
+
+
+## [2026-04-22] - 0.0.12
+* 自动隐藏菜单（按 Alt 键显示）
+* axios因CVE更新至1.15.0
+* 对所有css进行了修整，尽量使用逻辑属性
+* baseReset.css加入了盒模型
+* 加入了themeVariables.css，以便于控制亮色、暗色模式
+* baseNiceStyle.css根据themeVariables.css进行适配
+* 亮色、暗色模式的存储设定为localStorage，使用theme.ts控制，其中使用了pinia状态管理
+* CopyrightFooter.vue对暗色模式进行了适配
+* frontend/index.html在head中加入了读取localStorage的js，防止闪光弹
+* LoadingScreen.vue从flexbox改成了grid，去除旧的字体限制
+* App.vue照例对功能进行修改测试
+* DESIGN.md按流程删除已经达成的目标
+
+---
 ## [2026-04-10] - 0.0.11
 * 增加了对于Windows的支持
 * 修正了Electron应用的包名

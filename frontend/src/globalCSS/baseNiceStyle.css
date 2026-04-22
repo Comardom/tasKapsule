@@ -1,20 +1,63 @@
 #app-all {
-  background: repeating-linear-gradient(
-      to right,
-      #f0f0f0,
-      #f0f0f0 2px,
-      #ffffff 2px,
-      #ffffff 4px
-  );
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  /*仅单屏应用可用此选项！也就是说只有主页面的最外层div采用*/
-  overflow: hidden;
+    background: repeating-linear-gradient(
+            to right,
+            var(--theme-bg-stripe-1),
+            var(--theme-bg-stripe-1) var(--stripe-width),
+            var(--theme-bg-stripe-2) var(--stripe-width),
+            var(--theme-bg-stripe-2) calc(var(--stripe-width) * 2)
+    );
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+
+    /* 逻辑属性：最小块级尺寸（高度） */
+    min-block-size: 100dvb;
+    /* 逻辑属性：行内尺寸（宽度） */
+    inline-size: 100%;
+
+    /*仅单屏应用可用此选项！也就是说只有主页面的最外层div采用*/
+    overflow: hidden;
+
+    transition: background 0.4s ease, color 0.4s ease;
+}
+/* 针对特定文本元素添加动画 */
+h1, h2, h3, p, span, a, .record-link {
+    transition: color 0.4s ease;
+}
+
+button, input {
+    /* 按钮需要变颜色和背景，单独写 */
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 main {
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+button, input, textarea {
+  background-color: var(--theme-bg-button);
+  color: var(--theme-color-button);
+  border: 1px solid var(--theme-border-button);
+  /*transition: all 0.3s ease;*/
+
+  /* 逻辑属性内边距 */
+  padding-block: 0.4rem;
+  padding-inline: 0.8rem;
+}
+button:hover {
+  background-color: var(--theme-bg-button-hover);
+}
+a {
+  color: var(--theme-link);
+  /* 除非特定需要，不在这里写 text-decoration，已经在 reset 处理过 */
+  &:hover {
+    opacity: 0.85;
+  }
+}
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+h1, h2, h3, p, span {
+  color: var(--theme-color);
 }

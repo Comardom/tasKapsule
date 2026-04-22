@@ -4,15 +4,13 @@ import Footer from "@/components/CopyrightFooter.vue";
 
 <template>
   <div class="test-page-container">
-    <main>
+    <section class="content-area">
       <h1>测试页面：主页</h1>
-      <p>
-        这是一个测试界面捏
-      </p>
+      <p>这是一个测试界面捏</p>
       <div class="slot-container">
         <slot />
       </div>
-    </main>
+    </section>
     <Footer
       year="2026"
       owner="Comardom"
@@ -29,14 +27,15 @@ import Footer from "@/components/CopyrightFooter.vue";
   flex: 1;            /* 撑满 App.vue 里的 main */
   display: flex;      /* 变成 flex 容器，好让内部的 main (flex: 1) 生效 */
   flex-direction: column;
-  width: 100%;        /* 确保宽度也铺满 */
+  inline-size: 100%;
 }
-main {
+.content-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center; /* 让内容垂直居中，适合单页展示 */
   align-items: center;
-  padding: 20px;
+  padding-block: 2dvb;
+  padding-inline: 2dvi;
 }
 </style>
