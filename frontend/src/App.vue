@@ -11,6 +11,7 @@ const themeStore = useThemeStore();
 import LoadingScreen from "@/components/LoadingScreen.vue";
 import TestPage from "@/components/TestPage.vue";
 import TestPage1 from "@/components/TestPage1.vue";
+import TestPinia from "@/components/TestPinia.vue";
 
 import { loadingPageController } from '@/utils/loadingPageController.ts'
 const {isBackendReady, loadingText} = loadingPageController();
@@ -36,17 +37,22 @@ const changePage = () => {
     <LoadingScreen v-if="!isBackendReady" :status-text="loadingText" />
     <main v-if="isBackendReady">
       <TestPage v-show="currentPage === WhatPage.MainPage" >
-        <button @click="changePage">当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页</button>
+        <button @click="changePage">
+          当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页
+        </button>
         <button @click="themeStore.toggleTheme" class="theme-btn">
           {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
         </button>
       </TestPage>
-      <TestPage1 v-show="currentPage === WhatPage.ProfilePage" >
-        <button @click="changePage">当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页</button>
+<!--      <TestPage1 v-show="currentPage === WhatPage.ProfilePage" >
+        <button @click="changePage">
+          当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页
+        </button>
         <button @click="themeStore.toggleTheme" class="theme-btn">
           {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
         </button>
-      </TestPage1>
+      </TestPage1>-->
+      <TestPinia v-show="currentPage === WhatPage.ProfilePage" ></TestPinia>
     </main>
   </div>
 </template>

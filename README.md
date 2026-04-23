@@ -6,6 +6,23 @@
 
 # 更新
 
+
+
+
+
+
+
+## [2026-04-23] - 0.0.14
+* 后端加入了Capsule表
+* 前端加入了utils/apiServices.ts统一接收业务api
+* 前端加入了pinia的stores/capsule.ts用来连接了 UI 界面和后端 API
+* 后端删掉了之前的测试文件（Test1）
+* 后端加入了Capsule(Repository/Controller).kt作为胶囊的DB.Table
+* 加入TestPinia.vue监测数据库状态
+* App.vue照例对功能进行修改测试
+* 前后端数据库打通！好耶
+
+---
 ## [2026-04-22] - 0.0.13
 * 更新了几个无关紧要的文件，以便消除GitHub仓库主页上的Init Commit字样
 
@@ -156,7 +173,8 @@
 ## JDK
 - 非 Windows：安装 **sdkman**
 - Windows：配置系统环境变量 `JAVA_HOME` 指向需要的版本，并更新 `PATH`
-- 要用 **21.0.10-oracle**，如果无法下载到 oracle 版本，其他的 **21.0.10** 也可以
+- 下载JDK请去Adoptium网站，使用Java21
+### 注意！！！一定要看/jre/README.md！！！
 
 ---
 
@@ -169,7 +187,7 @@
   npm install -g pnpm
   pnpm setup
 - 安装 Vue CLI：
-  pnpm install -g @vue/cli"
+  pnpm install -g @vue/cli
 
 
 ---
@@ -186,6 +204,7 @@ choco install sqlite
 
 ## Vue 使用的功能
 - TypeScript (TS)
+- Pinia
 
 ---
 
