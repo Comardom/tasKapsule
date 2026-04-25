@@ -11,7 +11,21 @@
 
 
 
+## [2026-04-25] - 0.0.15
+* frontend/main.ts进行改动
+  * 加入三个全局css文件，内部所有Vue页面都会导入这些css
+  * 重新启用了路由
+* 所有Vue文件的三个全局css导入都删掉了
+* App.vue的页面切换从v-if改成路由切换，旧的封存
+* 前端router/index.ts加入了子页面
+* UI确立
+  * Centro作为主页，内部加入Calendar和CapsuleShelf等组件
+  * EgoMe作为个人页面
+* 标注了LoadingScreen的文字来源
+* 修改baseNiceStyle.css使button文字纵向居中
+* 修正了TestPinia页面的部分错误
 
+---
 ## [2026-04-23] - 0.0.14
 * 后端加入了Capsule表
 * 前端加入了utils/apiServices.ts统一接收业务api

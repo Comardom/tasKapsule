@@ -10,7 +10,7 @@ export function loadingPageController() {
     onMounted(async () => {
         console.log('[App.vue] 开始探测后端...');
 
-        // 监听来自 Electron 的 JVM 状态更新
+        // 监听来自 Electron 的 JVM 状态更新，状态每次更新都会触发更新，状态来自electron/preload.ts
         if (window.electronAPI) {
             window.electronAPI.onJvmStatus((status: string) => {
                 loadingText.value = status;
@@ -42,6 +42,6 @@ export function loadingPageController() {
     // 暴露给组件使用
     return {
         isBackendReady,
-        loadingText // 暴露给外部
+        loadingText
     };
 }

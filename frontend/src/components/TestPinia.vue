@@ -12,7 +12,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="middle">
+    <slot />
     <input
       type="date"
       :value="capsuleStore.selectedDate"
@@ -39,3 +40,13 @@ onMounted(() => {
   </div>
 </template>
 
+<style scoped>
+.middle {
+  display: grid;
+  place-content: center;
+  place-items: center;
+  block-size: 100dvb;
+  inline-size: 100%;
+  gap: 1.5rem;
+}
+</style>

@@ -10,8 +10,8 @@ import {killPort} from "./killPort";
 
 
 // 解决部分 Linux 环境下的 GPU 兼容性报错
-app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('disable-software-rasterizer');
+// app.commandLine.appendSwitch('disable-gpu');
+// app.commandLine.appendSwitch('disable-software-rasterizer');
 // 关闭硬件加速
 // if (process.platform === 'linux') {
 //     app.disableHardwareAcceleration();
@@ -90,7 +90,10 @@ app.whenReady().then(() => {
             // 如果 JRE 丢失，获取 resources 目录列表，生成详细错误提示
             const dirContent = fs.readdirSync(resPath);
             const jreExists = fs.existsSync(path.join(resPath, 'jre'));
-            let subContent = jreExists ? fs.readdirSync(path.join(resPath, 'jre')).join(', ') : '未发现jre文件夹';
+            let subContent =
+                jreExists
+                    ? fs.readdirSync(path.join(resPath, 'jre')).join(', ')
+                    : '未发现jre文件夹';
 
             dialog.showErrorBox(
                 'JVM 启动失败',
@@ -130,6 +133,11 @@ app.whenReady().then(() => {
         stdio: 'pipe'// 修改为 pipe 才能捕获 stdout/stderr 日志
     });
 
+    // 下面这俩是匹配后端的输出流的，
+    // 得到信息传给preload.ts，
+    // 然后再传给frontend/src/utils/loadingPageController.ts，
+    // 然后通过return传给frontend/src/App.vue，
+    // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data: Buffer) => {
             const line = data.toString();

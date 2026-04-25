@@ -1,58 +1,35 @@
 <script setup lang="ts">
-import {computed , ref} from "vue";
-
-import "@/globalCSS/baseReset.css"
-import '@/globalCSS/themeVariables.css'
-import '@/globalCSS/baseNiceStyle.css'
+import router from "@/router";
 
 import { useThemeStore } from "@/stores/theme.ts";
 const themeStore = useThemeStore();
 
 import LoadingScreen from "@/components/LoadingScreen.vue";
-import TestPage from "@/components/TestPage.vue";
-import TestPage1 from "@/components/TestPage1.vue";
-import TestPinia from "@/components/TestPinia.vue";
 
 import { loadingPageController } from '@/utils/loadingPageController.ts'
 const {isBackendReady, loadingText} = loadingPageController();
 
-enum WhatPage {
-  MainPage,
-  ProfilePage
+function goTo(path: string) {
+  router.push(path)
 }
-const currentPage = ref<WhatPage>(WhatPage.MainPage);
-const buttonText = computed(() => {
-  return currentPage.value === WhatPage.MainPage ? '个人' : '主';
-});
-const changePage = () => {
-  currentPage.value =
-      currentPage.value === WhatPage.MainPage
-          ? WhatPage.ProfilePage
-          : WhatPage.MainPage;
-};
 </script>
 
 <template>
   <div id="app-all">
     <LoadingScreen v-if="!isBackendReady" :status-text="loadingText" />
     <main v-if="isBackendReady">
-      <TestPage v-show="currentPage === WhatPage.MainPage" >
-        <button @click="changePage">
-          当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页
-        </button>
-        <button @click="themeStore.toggleTheme" class="theme-btn">
+      <nav class="global-nav"><!--测试用的切换顶栏-->
+<!--        注意这里的按钮文字不同会导致按钮高度不同、位置不同，不要中英混用-->
+        <button @click="goTo('/')">Centro</button>
+        <button @click="goTo('/test')">主页</button>
+        <button @click="goTo('/test1')">个人</button>
+        <button @click="goTo('/test-pinia')">TestPinia</button>
+        <button @click="goTo('/ego-me')">EgoMe</button>
+        <button @click="themeStore.toggleTheme">
           {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
         </button>
-      </TestPage>
-<!--      <TestPage1 v-show="currentPage === WhatPage.ProfilePage" >
-        <button @click="changePage">
-          当前是{{WhatPage[currentPage]}}, 去{{buttonText}}页
-        </button>
-        <button @click="themeStore.toggleTheme" class="theme-btn">
-          {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
-        </button>
-      </TestPage1>-->
-      <TestPinia v-show="currentPage === WhatPage.ProfilePage" ></TestPinia>
+      </nav>
+      <router-view /><!--根据当前 URL 自动渲染对应页面组件-->
     </main>
   </div>
 </template>

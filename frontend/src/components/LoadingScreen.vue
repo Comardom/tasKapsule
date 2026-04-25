@@ -4,6 +4,7 @@ defineProps<{
 }>();
 import LoadingRectangle from "./LoadingRectangle.vue";
 import "../globalCSS/baseReset.css"
+import '@/globalCSS/themeVariables.css'
 import "../globalCSS/baseNiceStyle.css"
 </script>
 <template>

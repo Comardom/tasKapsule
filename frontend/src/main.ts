@@ -1,17 +1,20 @@
 import { createApp  } from 'vue'
 import { createPinia } from 'pinia'
+import router from "@/router";
 
 import App from './App.vue'
-//控制全局视图的
-import '../src/globalCSS/baseReset.css'
+//控制全局视图
+import '@/globalCSS/baseReset.css'
+import '@/globalCSS/themeVariables.css'
+import '@/globalCSS/baseNiceStyle.css'
+
 
 console.log('--- [Main.ts] 脚本开始加载 ---');
 
 
 const app = createApp(App);
 app.use(createPinia());
-//SPA架构，不采用路由
-// app.use(router)
+app.use(router);
 
 
 // 使用 IIFE 立即执行异步初始化逻辑

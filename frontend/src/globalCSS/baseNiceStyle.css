@@ -21,10 +21,13 @@
     transition: background 0.4s ease, color 0.4s ease;
 }
 /* 针对特定文本元素添加动画 */
-h1, h2, h3, p, span, a, .record-link {
+h1, h2, h3, p, span, a, .record-link, small {
     transition: color 0.4s ease;
 }
-
+button {
+    cursor: pointer;
+    vertical-align: middle;
+}
 button, input {
     /* 按钮需要变颜色和背景，单独写 */
     transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
@@ -58,6 +61,6 @@ a {
   background-color: var(--selection-bg);
   color: var(--selection-text);
 }
-h1, h2, h3, p, span {
+h1, h2, h3, p, span, small {
   color: var(--theme-color);
 }
