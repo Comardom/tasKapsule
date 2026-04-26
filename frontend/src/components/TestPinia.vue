@@ -45,8 +45,7 @@ onMounted(() => {
   display: grid;
   place-content: center;
   place-items: center;
-  block-size: 100dvb;
-  inline-size: 100%;
-  gap: 1.5rem;
+  block-size: 100svb;
+  inline-size: 100svi;
 }
 </style>

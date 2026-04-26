@@ -18,13 +18,14 @@ function goTo(path: string) {
   <div id="app-all">
     <LoadingScreen v-if="!isBackendReady" :status-text="loadingText" />
     <main v-if="isBackendReady">
-      <nav class="global-nav"><!--测试用的切换顶栏-->
+      <nav class="global-nav" style="position: absolute;"><!--测试用的切换顶栏-->
 <!--        注意这里的按钮文字不同会导致按钮高度不同、位置不同，不要中英混用-->
         <button @click="goTo('/')">Centro</button>
         <button @click="goTo('/test')">主页</button>
         <button @click="goTo('/test1')">个人</button>
         <button @click="goTo('/test-pinia')">TestPinia</button>
         <button @click="goTo('/ego-me')">EgoMe</button>
+        <button @click="goTo('/clock-vibe')">ClockVibe</button>
         <button @click="themeStore.toggleTheme">
           {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
         </button>

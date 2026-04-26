@@ -43,8 +43,8 @@ const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
 const killPort_1 = require("./killPort");
 // 解决部分 Linux 环境下的 GPU 兼容性报错
-electron_1.app.commandLine.appendSwitch('disable-gpu');
-electron_1.app.commandLine.appendSwitch('disable-software-rasterizer');
+// app.commandLine.appendSwitch('disable-gpu');
+// app.commandLine.appendSwitch('disable-software-rasterizer');
 // 关闭硬件加速
 // if (process.platform === 'linux') {
 //     app.disableHardwareAcceleration();
@@ -58,6 +58,7 @@ function createWindow() {
     mainWindow = new electron_1.BrowserWindow({
         width: 1200,
         height: 800,
+        autoHideMenuBar: true, // 设置为自动隐藏
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             // contextIsolation: 开启上下文隔离（安全核心），防止前端脚本直接访问 Node API
@@ -113,7 +114,9 @@ electron_1.app.whenReady().then(() => {
             // 如果 JRE 丢失，获取 resources 目录列表，生成详细错误提示
             const dirContent = fs.readdirSync(resPath);
             const jreExists = fs.existsSync(path.join(resPath, 'jre'));
-            let subContent = jreExists ? fs.readdirSync(path.join(resPath, 'jre')).join(', ') : '未发现jre文件夹';
+            let subContent = jreExists
+                ? fs.readdirSync(path.join(resPath, 'jre')).join(', ')
+                : '未发现jre文件夹';
             electron_1.dialog.showErrorBox('JVM 启动失败', `预期 Java 路径: ${javaPath}\n\n` +
                 `resources 目录下有: ${dirContent.join(', ')}\n` +
                 `jre 目录下有: ${subContent}`);
@@ -146,6 +149,11 @@ electron_1.app.whenReady().then(() => {
         cwd: resPath, // 将工作目录设为 resources 目录，方便后端读写相对路径的文件
         stdio: 'pipe' // 修改为 pipe 才能捕获 stdout/stderr 日志
     });
+    // 下面这俩是匹配后端的输出流的，
+    // 得到信息传给preload.ts，
+    // 然后再传给frontend/src/utils/loadingPageController.ts，
+    // 然后通过return传给frontend/src/App.vue，
+    // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data) => {
             const line = data.toString();

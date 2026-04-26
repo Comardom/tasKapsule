@@ -10,7 +10,17 @@
 
 
 
+## [2026-04-26] - 0.0.16
+* App.vue的nav改成absolute，防止影响主要内容
+* 删掉了pinia的示例文件stores/counter.ts
+* 对时间读取操作提取成utils/TimeManager.ts
+* 初步构建了Calendar的外观和功能
+  * 内部使用Cell.vue
+  * 增添了一个前端可用的timeManager.ts
+  * 对日历星期标注进行不同语言的分离，放在nameOfDaysOfWeek.ts
+* 修复了electron/main.ts的错误
 
+---
 ## [2026-04-25] - 0.0.15
 * frontend/main.ts进行改动
   * 加入三个全局css文件，内部所有Vue页面都会导入这些css
@@ -219,6 +229,7 @@ choco install sqlite
 ## Vue 使用的功能
 - TypeScript (TS)
 - Pinia
+- Router
 
 ---
 
