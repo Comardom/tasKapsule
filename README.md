@@ -21,7 +21,14 @@
 
 
 
+## [2026-05-11] - 0.0.21
+* loadingPageController.ts中加入失败重试次数上限
+* 修复了日历界面注入CSS变量不生效时的塌陷问题
+* 修复了electron/main.ts中的拼写错误和catch块的逻辑错误
+* 后端胶囊状态改成了枚举而不是字符串
+* 修复了electron/main.ts的pnpm dev逻辑错误
 
+---
 ## [2026-05-10] - 0.0.20
 * 前后端版本号更新
 * AGENTS.md以及issues.md更新

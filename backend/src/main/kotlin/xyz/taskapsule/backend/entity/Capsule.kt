@@ -5,6 +5,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+
+enum class CapsuleStatus {
+    PENDING, COMPLETED
+}
+
+
 @Entity
 @Table(name = "capsules")
 class Capsule(
@@ -31,7 +37,8 @@ class Capsule(
     var durationMinutes: Int = 0,
 
     @Column(nullable = false)
-    var status: String = "PENDING",
+    @Enumerated(EnumType.STRING)
+    var status: CapsuleStatus = CapsuleStatus.PENDING,
 
     @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()

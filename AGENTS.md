@@ -80,9 +80,21 @@ block-size: var(--this-month-height-in-dvi, auto);
 
 The `auto` fallback also prevents height collapse before `onMounted` fires.
 
-### Loading screen has no timeout (by default)
+### Loading screen has timeout ✅ fixed
 
-`loadingPageController.ts` polls `/health` in a `while (!ready)` loop. If the backend never starts, this loops forever. To add timeout: count retries, cap at a max (e.g. 120 × 1s = 2 minutes), set `loadingText` to an error message and stop polling when exceeded.
+`loadingPageController.ts` now caps retries at `MAX_RETRIES = 120` (2 minutes). On timeout, sets `loadingText` to an error message and stops polling. No changes needed to consumer components.
+
+### Dev mode backend management ✅ fixed
+
+`electron/main.ts` lines 58–62: when `!isProd` (development), Electron creates the window immediately and returns — skipping `killPort(9999)` and `spawn()`. The backend is managed independently by `./gradlew bootRun` via `dev:backend`. No double-backend conflict.
+
+### Backend: Capsule status enum ✅ fixed
+
+`Capsule.kt` now uses `enum class CapsuleStatus { PENDING, COMPLETED }` with `@Enumerated(EnumType.STRING)` on the `status` field. The database stores the same `"PENDING"`/`"COMPLETED"` strings — no data migration needed. Compile-time enforcement prevents typos.
+
+### Timezone data lives in `frontend/src/data/timezones.ts`
+
+Calendar.vue imports `timeZoneOptions` from the shared data file. The `v-for` uses `:key="\`tz-${index}\`"` to avoid Vue's duplicate-key warnings from overlapping city-name and UTC-offset entries.
 
 ### Backend: Jackson module coordinate
 

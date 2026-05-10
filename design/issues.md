@@ -11,21 +11,22 @@
 
 ## P1 — 功能不正确或有明显缺陷
 
-| # | 文件 | 行 | 问题 |
-|---|---|---|---|
-| 5 | `loadingPageController.ts` | 21 | `while (!ready)` 无超时上限，后端永不启动则永久卡加载页 |
-| 6 | `Calendar.vue` | 95→221 | `timeZoneOptions` 约 20+ 个重复 value，Vue `v-for :key` 报警告 |
-| 7 | `Calendar.vue` | 327 | `block-size: var(--this-month-height-in-dvi)` 缺 fallback，改 `var(..., auto)` |
-| 8 | `electron/main.ts` | 119 | `console.error('RROFS',err)` 拼写错误且无条件执行 |
-| 9 | `electron/main.ts` | 82 | 开发模式 jarPath 指向项目根 `backend.jar`，实际 JAR 在 `backend/build/libs/backend-server.jar` |
-| 10 | `Capsule.kt` | 34 | `status` 是裸 String 而非 enum，拼写错误不会被拦截 |
-| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST 而非 NULLS LAST |
-| 12 | `electron/main.ts` + `pnpm dev` | — | dev 脚本同时启动 Gradle bootRun 和 spawn JAR，双后端冲突 |
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 5 | `loadingPageController.ts` | 21 | `while (!ready)` 无超时上限 | ✅ 已修 |
+| 6 | `Calendar.vue` | 95→221 | `timeZoneOptions` 约 20+ 个重复 value，改 `:key` 唯一 + 数据外推到 `data/timezones.ts` | ✅ 已修 |
+| 7 | `Calendar.vue` | 327 | `block-size: var(--this-month-height-in-dvi)` 缺 fallback | ✅ 已修 |
+| 8 | `electron/main.ts` | 119 | `console.error('RROFS',err)` 拼写错误且无条件执行 | ✅ 已修 |
+| 9 | `electron/main.ts` | 82 | 开发模式 jarPath 错误 → 被 P1-12 连带解决 | ✅ 已修 |
+| 10 | `Capsule.kt` | 34 | `status` 裸 String → 改为 `enum class CapsuleStatus` + `@Enumerated(STRING)` | ✅ 已修 |
+| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY NULL FIRST → 挪到 P2 | ⏸️ 延后 |
+| 12 | `electron/main.ts` + `pnpm dev` | — | dev 双后端冲突 → 加 `if (!isProd) return` 跳过 spawn | ✅ 已修 |
 
 ## P2 — 代码质量 / 体验问题
 
 | # | 文件 | 行 | 问题 |
 |---|---|---|---|
+| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST |
 | 13 | `TimeManager.ts` | 42–47 | `\|\|` 把 0 当 falsy，应用 `??` |
 | 14 | `apiService.ts` | 11–13 | 所有 API 返回值是 `any[]`/`any`，无类型安全 |
 | 15 | `backendHealthCheck.ts` | 5 | `axios.get` 无 timeout |

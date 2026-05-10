@@ -18,15 +18,22 @@ export function loadingPageController() {
         }
 
         let ready = false;
-        while (!ready) {
+        let retries = 0;
+        const MAX_RETRIES = 120;
+        while (!ready && retries < MAX_RETRIES) {
             try {
                 ready = await checkBackendHealth();
             } catch (e) {
                 ready = false;
             }
             if (!ready) {
+                retries++;
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
+        }
+        if (!ready) {
+            loadingText.value = '后端启动超时，请检查 Java 环境或重启应用';
+            return;  // 不设 isBackendReady = true，加载页永远显示错误信息
         }
         console.log('[App.vue] 后端已就绪。');
         isBackendReady.value = true;

@@ -31,9 +31,9 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             // contextIsolation: 开启上下文隔离（安全核心），防止前端脚本直接访问 Node API
-                                  contextIsolation: true,
+            contextIsolation: true,
             // nodeIntegration: 关闭 Node 集成（安全核心），前端必须通过 preload 暴露的方法与主进程通信
-                                  nodeIntegration: false
+            nodeIntegration: false
         }
     })
 
@@ -43,7 +43,7 @@ function createWindow() {
     // 加载 Vue 打包后的静态资源文件
     if (fs.existsSync(indexPath)) {
         mainWindow.loadFile(indexPath); // 使用 loadFile 替代 loadURL
-        } else {
+    } else {
         console.error("Index file not found at:", indexPath);
     }
     // mainWindow.loadURL(`file://${indexPath}`)
@@ -55,6 +55,11 @@ function createWindow() {
 app.whenReady().then(() => {
     // 获取当前环境：app.isPackaged 为 true 表示是打包后的生产环境，false 为开发环境
     const isProd = app.isPackaged;
+    if (!isProd) {
+        // 开发模式：Electron 只负责开窗口，后端由 ./gradlew bootRun 独立管理
+        createWindow();
+        return;  // ← 关键：不执行后面的 javaPath/jarPath 检查和 spawn
+    }
     // 资源根目录：生产环境下是 process.resourcesPath，开发环境下是项目根目录
     const resPath = isProd ? process.resourcesPath : path.join(__dirname, '../../');
 
@@ -68,7 +73,7 @@ app.whenReady().then(() => {
     if (isProd) {
         javaPath = path.join(resPath, 'jre', 'bin', javaExe);
     } else {
-    // 开发环境下，根据当前操作系统去寻找对应的 jre 目录
+        // 开发环境下，根据当前操作系统去寻找对应的 jre 目录
         const platformFolder =
             process.platform === 'win32' ? 'win_x64' :
                 process.platform === 'darwin' ? 'mac_arm' : 'linux_x64';
@@ -113,10 +118,11 @@ app.whenReady().then(() => {
                         fs.chmodSync(javaPath, 0o755);
                     }
                 } catch (err: any) {
-                    if (err.code !== 'EROFS') {
+                    if (err.code === 'EROFS') {
+                        console.warn('文件系统只读，无法修改 Java 权限（AppImage 中属正常）');
+                    } else {
                         console.error('权限检查/修改失败:', err);
                     }
-                    console.error('RROFS',err);
                 }
             }
         }
