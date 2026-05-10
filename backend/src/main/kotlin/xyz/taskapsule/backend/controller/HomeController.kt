@@ -31,8 +31,7 @@ class HomeController {
             "status" to "UP",
             "message" to "Application is running normally",
             "runtime" to "Java ${System.getProperty("java.version")}",
-            "database" to "SQLite (Connected)"
+            "database" to "SQLite"
         )
     }
 }
-

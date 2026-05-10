@@ -84,6 +84,18 @@ The `auto` fallback also prevents height collapse before `onMounted` fires.
 
 `loadingPageController.ts` polls `/health` in a `while (!ready)` loop. If the backend never starts, this loops forever. To add timeout: count retries, cap at a max (e.g. 120 × 1s = 2 minutes), set `loadingText` to an error message and stop polling when exceeded.
 
+### Backend: Jackson module coordinate
+
+Line 38 of `backend/build.gradle.kts`: the Jackson Kotlin module is declared as `tools.jackson.module:jackson-module-kotlin`. While it currently resolves (version 3.1.0), the canonical namespace is `com.fasterxml.jackson.module`. If the build ever fails to resolve it, change to `com.fasterxml.jackson.module:jackson-module-kotlin`.
+
+### Backend: Production startup guards on electron/main.ts
+
+Lines 87–126 of `electron/main.ts`: in production mode, if `javaPath` or `jarPath` is missing, `dialog.showErrorBox` fires but execution falls through to `spawn()` anyway, causing an `ENOENT` crash. Each error dialog branch needs a `return` to prevent the crash. (Tracked in `design/issues.md` #2.)
+
+## Issue tracker
+
+`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Check it before starting significant work to avoid re-investigating known problems.
+
 ## Project layout
 
 ```
@@ -106,7 +118,8 @@ tasKapsule/
 │       └── config/     # DatabaseConfig ([STAGE] logging)
 ├── jre/                # Bundled JRE per platform (win_x64, mac_arm, linux_x64)
 └── design/             # Design specs
-    └── color.md        # Calendar color reference (fabric-texture palette)
+    ├── color.md        # Calendar color reference (fabric-texture palette)
+    └── issues.md       # Known issues tracker (P0–P3 priority)
 ```
 
 ## Key conventions

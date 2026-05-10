@@ -37,12 +37,11 @@ Thumbs.db
 # JRE bundles (already included via extraResources, don't commit)
 jre/
 
-# 设计用图（参照图）不上传
-design/
-*.jpg
-*.png
-*.webp
-*.jpeg
+# design文件夹里面的设计用图（参照图）不上传
+design/*.jpg
+design/*.png
+design/*.webp
+design/*.jpeg
 
 #这个不用上传
-.kotlin
+.kotlin/

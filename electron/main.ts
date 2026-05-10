@@ -101,6 +101,7 @@ app.whenReady().then(() => {
                 `resources 目录下有: ${dirContent.join(', ')}\n` +
                 `jre 目录下有: ${subContent}`
             );
+            return;
         } else {
             // Linux 权限处理：Node.js spawn 启动二进制文件需要 755 (可执行) 权限
             if (process.platform !== 'win32') {
@@ -122,6 +123,7 @@ app.whenReady().then(() => {
 
         if (!fs.existsSync(jarPath)) {
             dialog.showErrorBox('后端丢失', `找不到后端文件: ${jarPath}`);
+            return;
         }
     }
 

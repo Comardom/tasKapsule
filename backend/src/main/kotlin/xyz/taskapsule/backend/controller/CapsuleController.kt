@@ -1,5 +1,6 @@
 package xyz.taskapsule.backend.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -23,7 +24,11 @@ import java.time.LocalDate
 //"/capsules": 代表操作的资源对象是“胶囊”。
 @RequestMapping("/api/v1/capsules")
 @CrossOrigin(origins = ["http://localhost:9998", "app://localhost"])
+
 class CapsuleController(private val repository: CapsuleRepository) {
+
+    private val logger = LoggerFactory.getLogger(CapsuleController::class.java)
+
 
     // 获取特定日期的胶囊列表
     // 访问路径示例: GET /api/v1/capsules?date=2025-05-20
@@ -34,6 +39,7 @@ class CapsuleController(private val repository: CapsuleRepository) {
             repository.findByTargetDateOrderByStartTimeAsc(targetDate)
         } catch (e: Exception) {
             // 如果日期格式不对，返回空列表或者报错
+            logger.error("获取胶囊失败，日期参数: $date", e)
             emptyList()
         }
     }
