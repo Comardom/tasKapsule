@@ -30,7 +30,7 @@ const blockStyle = computed(() => ({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: var(--theme-color) 1px solid;
+  border: var(--calendar-grid-line) 1px solid;
   cursor: pointer;
 }
 </style>

@@ -1,6 +1,7 @@
 /* src/globalCSS/themeVariables.css */
 
 :root {
+  color-scheme: light;
   /* 亮色模式变量 */
   --theme-bg-stripe-1: #f0f0f0;
   --theme-bg-stripe-2: #ffffff;
@@ -17,9 +18,35 @@
 
   --selection-bg: #cccccc;
   --selection-text: #000000;
+
+  /* ── 日历面板留白 ── */
+  --calendar-frame-bg: #F0F0F0;
+  --calendar-frame-bg-alt: #EDEDED;
+
+  /* ── 当月格子 ── */
+  --calendar-cell-bg: #F3F3F3;
+  --calendar-cell-bg-alt: #F2F2F2;
+  --calendar-cell-text: #666666;
+  --calendar-cell-text-small: #C8CBD2;
+
+  /* ── 非本月格子 ── */
+  --calendar-cell-other-bg: #E1E1E1;
+  --calendar-cell-other-bg-alt: #E3E3E3;
+  --calendar-cell-other-text: #FFFFFF;
+  --calendar-cell-other-text-small: #FEFEFE;
+
+  /* ── 当天格子 ── */
+  --calendar-today-bg-start: #7198F0;
+  --calendar-today-bg-mid:   #628CED;
+  --calendar-today-bg-end:   #4E78E8;
+  --calendar-today-text: #FFFFFF;
+
+  /* ── 格线 ── */
+  --calendar-grid-line: #DADBDF;
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
   /* 暗色模式变量覆盖 */
   --theme-bg-stripe-1: #1a1a1a;
   --theme-bg-stripe-2: #2b2b2b;
@@ -35,4 +62,29 @@
 
   --selection-bg: #555555;
   --selection-text: #ffffff;
+
+  /* ── 日历面板留白 ── */
+  --calendar-frame-bg: #1C1C20;
+  --calendar-frame-bg-alt: #1A1A1E;
+
+  /* ── 当月格子 ── */
+  --calendar-cell-bg: #2C2C32;
+  --calendar-cell-bg-alt: #2A2A30;
+  --calendar-cell-text: #B0B0B8;
+  --calendar-cell-text-small: #6A6A72;
+
+  /* ── 非本月格子 ── */
+  --calendar-cell-other-bg: #1E1E22;
+  --calendar-cell-other-bg-alt: #202024;
+  --calendar-cell-other-text: #3E3E46;
+  --calendar-cell-other-text-small: #34343C;
+
+  /* ── 当天格子 ── */
+  --calendar-today-bg-start: #5B7CE0;
+  --calendar-today-bg-mid:   #4A6AD5;
+  --calendar-today-bg-end:   #3D5AC8;
+  --calendar-today-text: #FFFFFF;
+
+  /* ── 格线 ── */
+  --calendar-grid-line: #3A3A40;
 }

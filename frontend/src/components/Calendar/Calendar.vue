@@ -303,7 +303,7 @@ const timeZoneOptions = ref([
   block-size: var(--full-block-size);
   /*这个是宽度*/
   inline-size: var(--full-inline-size);
-  background-color: var(--theme-color);
+  background-color: var(--calendar-frame-bg);
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
 }
 .calendar-header{
@@ -321,7 +321,7 @@ const timeZoneOptions = ref([
   place-content: center;
   place-items: center;
   grid-template-columns: repeat(7, 1fr);
-  background-color: var(--selection-bg);
+  background-color: var(--calendar-cell-bg);
   /*这个是高度，由TS控制*/
   /*noinspection CssUnresolvedCustomProperty*/
   block-size: var(--this-month-height-in-dvi);
@@ -339,7 +339,12 @@ const timeZoneOptions = ref([
   inline-size: var(--full-inline-size);
 }
 .today{
-  background-color: var(--theme-link);
-  color: var(--theme-color);
+  background: linear-gradient(
+      to bottom,
+      var(--calendar-today-bg-start),
+      var(--calendar-today-bg-mid),
+      var(--calendar-today-bg-end)
+  );
+  color: var(--calendar-today-text);
 }
 </style>

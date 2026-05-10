@@ -8,7 +8,11 @@
 
 
 
+## [2026-05-10] - 0.0.18
+* 对日历部分的配色进行了更新和完善
+* 在root中加入了color-scheme:light/dark;的chromium配置
 
+---
 ## [2026-05-10] - 0.0.17
 * 引入了AGENTS.md便于扫描项目
 * 修复了index.html的localStorage加载key错误

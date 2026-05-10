@@ -1,3 +1,5 @@
+<!-- noinspection ALL -->
+
 # AGENTS.md
 
 ## Architecture
@@ -63,6 +65,10 @@ If you change the `[STAGE]` log format in the Kotlin controllers, the loading sc
 ### Theme: index.html and store use the same localStorage key
 
 Both `index.html` (inline anti-FOUC script) and `stores/theme.ts` read/write key `'app-theme'`. Keep them in sync.
+
+### Native widget dark mode via `color-scheme`
+
+`themeVariables.css` sets `color-scheme: dark` on `[data-theme='dark']`. This tells Chromium to render native widgets (scrollbars, `<select>` dropdowns, `<input type="date">` panels) in dark mode automatically. It only affects unstyled browser chrome — any CSS you've explicitly set (`background-color`, `color`, `border`) takes priority and is not overridden. Do not remove `color-scheme: dark`.
 
 ### `--this-month-height-in-dvi` CSS variable false positive
 
@@ -176,8 +182,8 @@ Calendar-specific variables (from `design/color.md`, to be added to `themeVariab
 
 | Variable | Light | Dark | Used by |
 |---|---|---|---|
-| `--calendar-border-bg` | `#F0F0F0` | `#1C1C20` | `.calendar` outer background |
-| `--calendar-border-bg-alt` | `#EDEDED` | `#1A1A1E` | Optional fabric grain |
+| `--calendar-frame-bg` | `#F0F0F0` | `#1C1C20` | `.calendar` panel background |
+| `--calendar-frame-bg-alt` | `#EDEDED` | `#1A1A1E` | Optional fabric grain |
 | `--calendar-cell-bg` | `#F3F3F3` | `#2C2C32` | `Cell.thisMonth` background |
 | `--calendar-cell-bg-alt` | `#F2F2F2` | `#2A2A30` | Fabric grain alternate |
 | `--calendar-cell-text` | `#666666` | `#B0B0B8` | This-month text color |
