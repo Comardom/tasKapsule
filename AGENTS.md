@@ -88,9 +88,13 @@ The `auto` fallback also prevents height collapse before `onMounted` fires.
 
 Line 38 of `backend/build.gradle.kts`: the Jackson Kotlin module is declared as `tools.jackson.module:jackson-module-kotlin`. While it currently resolves (version 3.1.0), the canonical namespace is `com.fasterxml.jackson.module`. If the build ever fails to resolve it, change to `com.fasterxml.jackson.module:jackson-module-kotlin`.
 
-### Backend: Production startup guards on electron/main.ts
+### Backend: Production startup guards on electron/main.ts ✅ fixed
 
-Lines 87–126 of `electron/main.ts`: in production mode, if `javaPath` or `jarPath` is missing, `dialog.showErrorBox` fires but execution falls through to `spawn()` anyway, causing an `ENOENT` crash. Each error dialog branch needs a `return` to prevent the crash. (Tracked in `design/issues.md` #2.)
+Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` checks now `return` after `dialog.showErrorBox`, preventing the `ENOENT` crash that previously occurred when spawn() ran with invalid paths.
+
+### Backend: CapsuleController exception logging ✅ fixed
+
+`CapsuleController.kt` now logs caught exceptions via `logger.error(...)` before returning the empty list. The log output appears in Electron's stderr capture, making date-parse failures and DB errors visible during debugging.
 
 ## Issue tracker
 
