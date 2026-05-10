@@ -3,7 +3,7 @@
   <head>
       <script>
           // 这里的逻辑要最快执行
-          const theme = localStorage.getItem('theme') || 'dark';
+          const theme = localStorage.getItem('app-theme') || 'dark';
           if (theme === 'dark') {
               document.documentElement.classList.add('dark');
               document.documentElement.setAttribute('data-theme', 'dark');

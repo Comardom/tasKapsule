@@ -9,7 +9,21 @@
 
 
 
+## [2026-05-10] - 0.0.17
+* 引入了AGENTS.md便于扫描项目
+* 修复了index.html的localStorage加载key错误
+* 修复了router中createWebHistory的错误
+* pinia加入了locale.ts管理地区，用于i18n
+* 更新了前端日历界面
+  * 可以切换时区和语言
+  * 晚上过十二点自动刷新
+  * 月初月末检查并刷新月历
+  * 修复了日历各层级高度问题
+  * 刷新日历、计算高度、定时刷新都做成了函数方便使用
+* 修复了loadingScreen多余的全局变量引用
+* 对前端util/TimeManager.ts进行了修复
 
+---
 ## [2026-04-26] - 0.0.16
 * App.vue的nav改成absolute，防止影响主要内容
 * 删掉了pinia的示例文件stores/counter.ts

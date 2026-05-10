@@ -1,3 +1,5 @@
+// 对于计算星期几这件事情来说，小时不重要，所以统一定一个“我传入的年月日对应的早上零点钟”作为一个“假的时间”便于构造对象
+// 并且所有和小时无关的函数都采用UTC时间计算，特此说明
 export class TimeManager {
     private date: Date;
     private timeZone: string = 'Asia/Shanghai';
@@ -47,23 +49,30 @@ export class TimeManager {
         };
     }
 
+    // 获取格式化后的今天几号（转换时区后的日期）
+    get今天几号(): number {
+        const formatted = this.getFormatted();
+        return formatted.day;
+    }
+
+
     // 获取星期几（0=周日）
     get当天曜日() {
         const formatted = this.getFormatted();
-        const tempDate = new Date(formatted.year, formatted.month, formatted.day);
-        return tempDate.getDay();
+        const tempDate = new Date(Date.UTC(formatted.year, formatted.month, formatted.day));
+        return tempDate.getUTCDay()
     }
 
     // 获取指定年月日的星期几
     get曜日ByYMD(year: number, month: number, day: number): number {
-        const date = new Date(year, month, day);
-        return date.getDay(); // 0=周日, 1=周一, ..., 6=周六
+        const date = new Date(Date.UTC(year, month, day));
+        return date.getUTCDay(); // 0=周日, 1=周一, ..., 6=周六
     }
 
 
     // 获取指定年月的天数
     get此月天数ByYM(year: number, month: number): number {
-        return new Date(year, month + 1, 0).getDate();
+        return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     }
 
     // 获取当月第一天是星期几
@@ -81,13 +90,13 @@ export class TimeManager {
     get当月天数(): number {
         const formatted = this.getFormatted();
         // 下个月的第 0 天 = 这个月的最后一天
-        return new Date(formatted.year, formatted.month + 1, 0).getDate();
+        return new Date(Date.UTC(formatted.year, formatted.month + 1, 0)).getUTCDate();
     }
 
     get上月天数(): number {
         const formatted = this.getFormatted();
         // 这个月的第 0 天 = 上月的最后一天
-        return new Date(formatted.year, formatted.month, 0).getDate();
+        return new Date(Date.UTC(formatted.year, formatted.month, 0)).getUTCDate();
     }
 
 

@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<Props>(), {
   blockSize: '100%'
 })
 
-// 处理传进来的宽高，数字自动加dvw，字符串直接用
+// 处理传进来的宽高，数字自动加dvx，字符串直接用
 const blockStyle = computed(() => ({
   'block-size': typeof props.blockSize === 'number' ? `${props.blockSize}dvb` : props.blockSize,
   'inline-size': typeof props.inlineSize === 'number' ? `${props.inlineSize}dvi` : props.inlineSize
@@ -31,5 +31,6 @@ const blockStyle = computed(() => ({
   justify-content: center;
   align-items: center;
   border: var(--theme-color) 1px solid;
+  cursor: pointer;
 }
 </style>
