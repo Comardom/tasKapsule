@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import xyz.taskapsule.backend.entity.Capsule
 import xyz.taskapsule.backend.entity.CapsuleRepository
+import xyz.taskapsule.backend.entity.CapsuleStatus
 import java.time.LocalDate
+import java.time.LocalTime
 
 //它标记这个类为一个控制器，并且告诉 Spring：
 //这个类中所有方法的返回值（如 List、Object）都会被自动转换成 JSON 格式，
@@ -56,18 +58,18 @@ class CapsuleController(private val repository: CapsuleRepository) {
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody updated: Capsule): ResponseEntity<Capsule> {
+    fun update(@PathVariable id: Long, @RequestBody body: Map<String, Any?>): ResponseEntity<Capsule> {
         val existing = repository.findById(id)
         return if (existing.isPresent) {
             val capsule = existing.get()
-            capsule.title = updated.title
-            capsule.content = updated.content
-            capsule.audioPath = updated.audioPath
-            capsule.attachmentPaths = updated.attachmentPaths
-            capsule.targetDate = updated.targetDate
-            capsule.startTime = updated.startTime
-            capsule.durationMinutes = updated.durationMinutes
-            capsule.status = updated.status
+            body["title"]?.let { capsule.title = it.toString() }
+            body["content"]?.let { capsule.content = it.toString() }
+            body["audioPath"]?.let { capsule.audioPath = it.toString() }
+            body["attachmentPaths"]?.let { capsule.attachmentPaths = it.toString() }
+            body["targetDate"]?.let { capsule.targetDate = LocalDate.parse(it.toString()) }
+            body["startTime"]?.let { capsule.startTime = LocalTime.parse(it.toString()) }
+            body["durationMinutes"]?.let { capsule.durationMinutes = it.toString().toInt() }
+            body["status"]?.let { capsule.status = CapsuleStatus.valueOf(it.toString()) }
             ResponseEntity.ok(repository.save(capsule))
         } else {
             ResponseEntity.notFound().build()

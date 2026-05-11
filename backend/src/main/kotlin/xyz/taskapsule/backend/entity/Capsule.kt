@@ -42,6 +42,6 @@ class Capsule(
     @Enumerated(EnumType.STRING)
     var status: CapsuleStatus = CapsuleStatus.PENDING,
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, insertable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
 )

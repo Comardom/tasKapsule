@@ -112,7 +112,7 @@ app.whenReady().then(() => {
             if (process.platform !== 'win32') {
                 try {
                     const stats = fs.statSync(javaPath);
-                    const isExecutable = !!(stats.mode & 100); // 检查是否有执行权限
+                    const isExecutable = !!(stats.mode & 0o100); // 检查是否有执行权限
 
                     if (!isExecutable) {
                         fs.chmodSync(javaPath, 0o755);
@@ -134,6 +134,9 @@ app.whenReady().then(() => {
     }
 
 
+    // 显示主界面
+    createWindow();
+
     // 启动子进程：启动 Spring Boot 后端
     // stdio: 'pipe' (默认) 会创建管道。
     backendProcess = spawn(javaPath, ['-jar', jarPath], {
@@ -148,17 +151,12 @@ app.whenReady().then(() => {
     // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data: Buffer) => {
-            const line = data.toString();
-            console.log(`Backend: ${line}`);
-
-            // 匹配 [STAGE] 标签
-            // 匹配格式: [STAGE] KEY: 内容
-            const match = line.match(/\[STAGE\]\s*(\w+):\s*(.*)/);
-            if (match && mainWindow) {
-                const stageText = match[2].trim();
-                // 通过 IPC 发送给渲染进程
-                mainWindow.webContents.send('jvm-status-update', stageText);
-            }
+            data.toString().split('\n').forEach(line => {
+                const match = line.match(/\[STAGE\]\s*(\w+):\s*(.*)/);
+                if (match && mainWindow) {
+                    mainWindow.webContents.send('jvm-status-update', match[2].trim());
+                }
+            });
         });
     }
 
@@ -183,9 +181,6 @@ app.whenReady().then(() => {
         fs.writeFileSync(filePath, content, 'utf-8');
         return true;
     });
-
-    // 最后：显示主界面
-    createWindow();
 });
 
 

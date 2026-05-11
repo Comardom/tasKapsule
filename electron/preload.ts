@@ -6,11 +6,12 @@ contextBridge.exposeInMainWorld('api', {
 })
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onJvmStatus: (callback: (text: string) => void) => {
-    // 监听主进程发来的消息，也就是main.ts中正则表达式匹配的地方
-    ipcRenderer.on('jvm-status-update', (_event, value: string) => callback(value));
-  },
-  removeJvmListeners: () => {
-    ipcRenderer.removeAllListeners('jvm-status-update');
-  }
+    onJvmStatus: (callback: (text: string) => void) => {
+        const handler = (_event: any, value: string) => callback(value);
+        ipcRenderer.on('jvm-status-update', handler);
+        return () => ipcRenderer.removeListener('jvm-status-update', handler);
+    },
+    removeJvmListeners: () => {
+        ipcRenderer.removeAllListeners('jvm-status-update');
+    }
 });

@@ -38,8 +38,8 @@ function refreshCalendar(){
     });
   }
 }
-//每分钟刷新一下时间
-const timer = setInterval(refreshCalendar, 60_000);
+//为了每分钟刷新
+let timer: ReturnType<typeof setInterval>;
 
 const 总行数 = computed(() => {
   const 前置天数 = 月初曜日.value; // 需要显示的上月天数
@@ -87,6 +87,8 @@ onMounted(() => {
       });
     }
   }
+  //每分钟刷新一下时间
+  timer = setInterval(refreshCalendar, 60_000);
 });
 //计时器需要卸载
 onUnmounted(() => {

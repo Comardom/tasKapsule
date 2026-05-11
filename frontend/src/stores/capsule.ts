@@ -40,6 +40,7 @@ export const useCapsuleStore = defineStore('capsule', {
       //开始工作：设置加载状态，清空之前的错误
       this.isLoading = true;
       this.error = null;
+      this.capsules = [];
       try {
         //通讯：调用之前封装好的 API 接口
         const res = await capsuleApi.getByDate(this.selectedDate);

@@ -21,11 +21,7 @@ export function loadingPageController() {
         let retries = 0;
         const MAX_RETRIES = 120;
         while (!ready && retries < MAX_RETRIES) {
-            try {
-                ready = await checkBackendHealth();
-            } catch (e) {
-                ready = false;
-            }
+            ready = await checkBackendHealth();
             if (!ready) {
                 retries++;
                 await new Promise(resolve => setTimeout(resolve, 1000));

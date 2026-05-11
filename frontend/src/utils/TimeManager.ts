@@ -6,7 +6,7 @@ export class TimeManager {
 
     constructor(timeZone?: string) {
         this.date = new Date();
-        this.timeZone = timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+        this.timeZone = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
 
     // 获取格式化后的各个部分
@@ -40,8 +40,8 @@ export class TimeManager {
 
         return {
             year: resultToInt.year ?? 1970 ,
-            month: (resultToInt.month ?? 0) - 1, // 转回0-11
-            day: resultToInt.day ?? 0,
+            month: (resultToInt.month ?? 1) - 1, // 转回0-11
+            day: resultToInt.day ?? 1,
             hour: resultToInt.hour ?? 0,
             minute: resultToInt.minute ?? 0,
             second: resultToInt.second ?? 0,

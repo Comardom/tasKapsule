@@ -17,7 +17,20 @@
 
 
 
+## [2026-05-12] - 0.0.25
+* 修复了TimeManager.ts的后备值逻辑错误
+* 修复了electron/main.ts的权限进制错误
+* 更改了electron/main.ts的正则表达式(单行->多行)
+* 将electron/main.ts中creatWindow()提到了前面方便扫描STAGE消息
+* CapsuleController.kt中update改为只覆盖前端明确传了的字段
+* Capsule.kt中对createAt字段加入了不可写入，防止假冒
+* 修复了Calendar.vue中timer泄漏的问题
+* loadingPageController.ts中删掉了不可到达的catch块
+* 修复了capsule.ts中“如果setDate失败,就会显示旧数据”的问题
+* 修复了electron/preload.ts的监听器堆积问题
+* 补充了DatabaseConfig.kt的数据库目录缺失报错
 
+---
 ## [2026-05-11] - 0.0.24
 * CSS全局变量删掉了来自旧项目的--camera-*
 * 删掉了frontend/src/main.ts中的IIFE，因为异步内容已经被移除，而挂载是同步的
