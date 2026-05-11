@@ -18,7 +18,12 @@
 
 
 
+## [2026-05-11] - 0.0.24
+* CSS全局变量删掉了来自旧项目的--camera-*
+* 删掉了frontend/src/main.ts中的IIFE，因为异步内容已经被移除，而挂载是同步的
+* DatabaseConfig.kt中删掉了创建目录的部分，因为BackendApplication.kt已经建立了
 
+---
 ## [2026-05-11] - 0.0.23
 * Capsule.kt加入了表级索引
 * CapsuleController.kt加入了update
@@ -263,7 +268,7 @@
 ---
 
 ## JDK
-- 非 Windows：安装 **sdkman**
+- 非 Windows：安装 **SDKMAN**
 - Windows：配置系统环境变量 `JAVA_HOME` 指向需要的版本，并更新 `PATH`
 - 下载JDK请去Adoptium网站，使用Java21
 ### 注意！！！一定要看/jre/README.md！！！

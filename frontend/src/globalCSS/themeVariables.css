@@ -13,9 +13,6 @@
   --theme-border-button: #cccccc;
   --theme-color-button: #222222;
 
-  --camera-border: rgba(0, 0, 0, 0.85);
-  --camera-corner: rgba(0, 0, 0, 0.7);
-
   --selection-bg: #cccccc;
   --selection-text: #000000;
 
@@ -57,8 +54,6 @@
   --theme-border-button: #666666;
   --theme-color-button: #e0e0e0;
 
-  --camera-border: rgba(255, 255, 255, 0.85);
-  --camera-corner: rgba(255, 255, 255, 0.7);
 
   --selection-bg: #555555;
   --selection-text: #ffffff;

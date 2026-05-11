@@ -39,18 +39,42 @@
 
 ## P3 — 可清理的杂物
 
-| # | 文件 | 问题 | 操作 |
+| # | 文件 | 问题 | 状态 |
 |---|---|---|---|
-| 22 | `themeVariables.css` | `--camera-border` / `--camera-corner` 从未使用 | 删 |
-| 23 | `fileHandleFunctions.ts` | 全文件未导出未调用 | 删 |
-| 24 | `TestPage.vue` + `TestPage1.vue` | 几乎一样 | 合并或删一个 |
-| 25 | `CapsuleShelf.vue` / `EgoMe.vue` | 空壳 | 实现或删 |
-| 26 | `index.html` | `lang=""` 空属性、`<title>Vite App</title>` | ✅ 已修 |
-| 27 | `Calendar.vue` | `.clock` 和 `.calendar-tail` 空 div | 删 |
-| 28 | `main.ts` | 无用的 IIFE、注释掉的调试代码 | 简化 |
-| 29 | `App.vue` | 测试导航栏在生产代码中 | dev gating |
-| 30 | `DatabaseConfig.kt` | `mkdirs()` 成功分支永远不可达 | 简化 |
+| 22 | `themeVariables.css` | `--camera-border` / `--camera-corner` 从未使用 | ✅ 已删 |
+| 23 | `fileHandleFunctions.ts` | 全文件未导出未调用 | ⏸️ 保留 |
+| 24 | `TestPage.vue` + `TestPage1.vue` | 几乎一样 | ⏸️ 保留 |
+| 25 | `CapsuleShelf.vue` / `EgoMe.vue` | 空壳 | ⏸️ 保留 |
+| 26 | `index.html` | `lang=""` / `title` | ✅ 已修 |
+| 27 | `Calendar.vue` | 空 div | ⏸️ 保留 |
+| 28 | `main.ts` | IIFE + 调试注释 | ✅ 已修 |
+| 29 | `App.vue` | 测试导航栏 | ⏸️ 保留 |
+| 30 | `DatabaseConfig.kt` | 死分支 | ✅ 已修 |
 
-## 建议修复顺序
+---
 
-P0 (4) → P1 #5,6,7 → P2 选择性 → P3 一次性清理
+# Known Issues (2026-05-12 第二轮扫描)
+
+## P1 — 功能不正确
+
+| # | 文件 | 行 | 问题 |
+|---|---|---|---|
+| 31 | `electron/main.ts` | 115 | 权限位掩码 `100`（十进制）应为 `0o100`（八进制），每次启动都错误执行 `chmod`，AppImage 中触发不必要的 EROFS 警告 |
+| 32 | `electron/main.ts` | 156 | stdout 正则一次只匹配一行，多行 `[STAGE]` 挤在同一 buffer 时只取第一条，其余进度消息丢失 |
+| 33 | `electron/main.ts` | 139 vs 188 | `spawn()` 在 `createWindow()` 之前，早期 `[STAGE]` 消息因 `mainWindow === null` 被丢弃 |
+| 34 | `Calendar.vue` | 42 | `setInterval` 在 `<script setup>` 顶层创建，KeepAlive / 快速路由切换时定时器泄漏 |
+| 35 | `TimeManager.ts` | 9 | 构造函数用 `\|\|` 而非 `??`，空字符串时区被忽略 |
+| 36 | `TimeManager.ts` | 110–113 | `setTimeZone()` 不刷新 `this.date`，返回旧时间戳在新时区下的值 |
+| 37 | `CapsuleController.kt` | 58–75 | PUT 逐字段复制 + 实体有默认值，部分更新会重置未传字段为默认值 |
+| 38 | `CapsuleController.kt` | 42–44 | `createdAt` 缺 `insertable = false`，客户端可伪造创建时间 |
+| 39 | `DatabaseConfig.kt` | 24–28 | 目录检查无 else 分支，不存在时静默跳过，Electron 收不到 `[STAGE]` |
+
+## P2 — 防御性 / 边缘情况
+
+| # | 文件 | 行 | 问题 |
+|---|---|---|---|
+| 40 | `TimeManager.ts` | 43 | `month` 后备值 `(0) - 1 = -1`，应改为 `(?? 1) - 1` = 一月 |
+| 41 | `TimeManager.ts` | 44 | `day` 后备值 `0` = 上月末日，应改为 `?? 1` |
+| 42 | `loadingPageController.ts` | 24–28 | `catch (e)` 分支不可达 — `checkBackendHealth()` 已内部捕获，永不抛出 |
+| 43 | `capsule.ts` | 62–68 | `setDate` 先改日期再请求，失败时 `capsules` 保留上个日期的数据 |
+| 44 | `electron/preload.ts` | 9–11 | `onJvmStatus` 无单条取消能力，多次调用堆积监听器 |

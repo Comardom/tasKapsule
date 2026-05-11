@@ -21,13 +21,8 @@ class DatabaseConfig {
         val dbDir = File(dbDirPath)
 
         // 确保目录存在
-        if (!dbDir.exists()) {
-            if (dbDir.mkdirs()) {
-                logger.info("[STAGE] DB_SUCCESS: 数据库目录创建成功")
-            } else {
-                logger.error("[STAGE] DB_ERROR: 目录创建失败")
-            }
-        } else {
+        if (dbDir.exists())
+        {
             logger.info("[STAGE] DB_READY: 数据库目录已就绪")
         }
     }

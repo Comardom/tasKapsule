@@ -136,9 +136,13 @@ Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` c
 
 `BackendApplicationTests.kt` injects `CapsuleRepository` via `@Autowired` and asserts it's not null after context loads.
 
+### Backend: DatabaseConfig slimmed down ✅ fixed
+
+`DatabaseConfig.kt` no longer attempts `mkdirs()` — the directory is pre-created by `BackendApplication.main()` before Spring starts. Only `[STAGE]` progress logging remains.
+
 ## Issue tracker
 
-`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Check it before starting significant work to avoid re-investigating known problems.
+`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Round 1 (2026-05-10) is complete. Round 2 (2026-05-12) added 14 new issues (#31–44) — check the file before starting significant work.
 
 ## Project layout
 
