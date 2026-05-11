@@ -26,16 +26,16 @@
 
 | # | 文件 | 行 | 问题 | 状态 |
 |---|---|---|---|---|
-| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST | 待改 |
+| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST | ✅ 已修 |
 | 13 | `TimeManager.ts` | 42–47 | `\|\|` 把 0 当 falsy，应用 `??` | ✅ 已修 |
 | 14 | `apiService.ts` | 11–13 | 所有 API 返回值是 `any[]`/`any`，无类型安全 | ✅ 已修 |
 | 15 | `backendHealthCheck.ts` | 5 | `axios.get` 无 timeout | ✅ 已修 |
 | 16 | `Calendar.vue` | 21,23 | `当天曜日` 和 `月末曜日` 两个 ref 从未被读取 | ✅ 保留（加注） |
 | 17 | `index.html` + `theme.ts` | 8 / 18 | `.dark` class 在 CSS 中没有使用 → 已删 | ✅ 已修 |
 | 18 | `router/index.ts` | — | 无 404 兜底路由；7 条中 5 条是 test/stub/deprecated | ✅ 已修 |
-| 19 | `CapsuleController.kt` | — | 无 Update/PUT，CRUD 不完整 | 待改 |
-| 20 | `Capsule.kt` | 27 | `targetDate` 无 `@Index`，每次全表扫描 | 待改 |
-| 21 | `BackendApplicationTests.kt` | — | `contextLoads()` 无断言 | 待改 |
+| 19 | `CapsuleController.kt` | — | 无 Update/PUT，CRUD 不完整 | ✅ 已修 |
+| 20 | `Capsule.kt` | 27 | `targetDate` 无 `@Index`，每次全表扫描 | ✅ 已修 |
+| 21 | `BackendApplicationTests.kt` | — | `contextLoads()` 无断言 | ✅ 已修 |
 
 ## P3 — 可清理的杂物
 

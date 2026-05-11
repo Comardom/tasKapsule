@@ -120,6 +120,22 @@ Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` c
 
 `router/index.ts` includes `{ path: '/:pathMatch(.*)*', redirect: '/' }` as the last route. Any unrecognized hash path redirects to the home page.
 
+### Backend: CapsuleRepository null-safe sorting ✅ fixed
+
+`findByTargetDateOrderByStartTimeAsc` uses a `@Query` with `CASE WHEN c.startTime IS NULL THEN 1 ELSE 0 END` to push null `startTime` values to the end of the list. SQLite defaults to `NULLS FIRST`, which would put untimed capsules above timed ones.
+
+### Backend: Capsule CRUD now includes PUT endpoint ✅ fixed
+
+`CapsuleController.kt` has a `@PutMapping("/{id}")` that uses `findById` + field-by-field assignment on the managed entity, avoiding `.copy()` (Capsule is not a data class). Hibernate generates an `UPDATE` from the dirty-checked fields.
+
+### Backend: `targetDate` indexed ✅ fixed
+
+`Capsule.kt` `@Table` annotation includes `indexes = [Index(name = "idx_capsules_target_date", columnList = "targetDate")]`.
+
+### Backend: basic integration test ✅ fixed
+
+`BackendApplicationTests.kt` injects `CapsuleRepository` via `@Autowired` and asserts it's not null after context loads.
+
 ## Issue tracker
 
 `design/issues.md` contains the full known-issues list organized by P0–P3 priority. Check it before starting significant work to avoid re-investigating known problems.

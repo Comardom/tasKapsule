@@ -2,15 +2,7 @@ package xyz.taskapsule.backend.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import xyz.taskapsule.backend.entity.Capsule
 import xyz.taskapsule.backend.entity.CapsuleRepository
 import java.time.LocalDate
@@ -60,6 +52,25 @@ class CapsuleController(private val repository: CapsuleRepository) {
             ResponseEntity.noContent().build() // 返回 204 No Content，表示成功且无返回内容
         } else {
             ResponseEntity.notFound().build()   // 返回 404 Not Found，表示 ID 不存在
+        }
+    }
+
+    @PutMapping("/{id}")
+    fun update(@PathVariable id: Long, @RequestBody updated: Capsule): ResponseEntity<Capsule> {
+        val existing = repository.findById(id)
+        return if (existing.isPresent) {
+            val capsule = existing.get()
+            capsule.title = updated.title
+            capsule.content = updated.content
+            capsule.audioPath = updated.audioPath
+            capsule.attachmentPaths = updated.attachmentPaths
+            capsule.targetDate = updated.targetDate
+            capsule.startTime = updated.startTime
+            capsule.durationMinutes = updated.durationMinutes
+            capsule.status = updated.status
+            ResponseEntity.ok(repository.save(capsule))
+        } else {
+            ResponseEntity.notFound().build()
         }
     }
 }

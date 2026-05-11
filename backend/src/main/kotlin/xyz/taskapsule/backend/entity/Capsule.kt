@@ -12,11 +12,13 @@ enum class CapsuleStatus {
 
 
 @Entity
-@Table(name = "capsules")
+@Table(name = "capsules", indexes = [
+    Index(name = "idx_capsules_target_date", columnList = "targetDate")
+])
 class Capsule(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    var id: Long? = null,
 
     @Column(nullable = false)
     var title: String = "",
@@ -41,5 +43,5 @@ class Capsule(
     var status: CapsuleStatus = CapsuleStatus.PENDING,
 
     @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    var createdAt: LocalDateTime = LocalDateTime.now()
 )

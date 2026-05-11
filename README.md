@@ -19,7 +19,12 @@
 
 
 
+## [2026-05-11] - 0.0.23
+* Capsule.kt加入了表级索引
+* CapsuleController.kt加入了update
+* BackendApplicationTests.kt加了一个断言验证Spring上下文真的加载了
 
+---
 ## [2026-05-11] - 0.0.22
 * 修改了TimeManager.ts中||为??
 * apiServices.ts的any换成了capsule.ts相关定义
