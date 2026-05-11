@@ -20,7 +20,18 @@
 
 
 
+## [2026-05-11] - 0.0.22
+* 修改了TimeManager.ts中||为??
+* apiServices.ts的any换成了capsule.ts相关定义
+* backendHealthCheck.ts加入了超时
+* 修改了index.html
+  * 补全了标题和logo
+  * 删掉无用脚本
+* theme.ts删掉无用classList.toggle('dark'）
+* router加入了其它页面重定向到主页的功能
+* 修复了CapsuleRepository.kt没设startTime的胶囊排在最上面的问题
 
+---
 ## [2026-05-11] - 0.0.21
 * loadingPageController.ts中加入失败重试次数上限
 * 修复了日历界面注入CSS变量不生效时的塌陷问题

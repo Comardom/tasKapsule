@@ -24,18 +24,18 @@
 
 ## P2 — 代码质量 / 体验问题
 
-| # | 文件 | 行 | 问题 |
-|---|---|---|---|
-| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST |
-| 13 | `TimeManager.ts` | 42–47 | `\|\|` 把 0 当 falsy，应用 `??` |
-| 14 | `apiService.ts` | 11–13 | 所有 API 返回值是 `any[]`/`any`，无类型安全 |
-| 15 | `backendHealthCheck.ts` | 5 | `axios.get` 无 timeout |
-| 16 | `Calendar.vue` | 21,23 | `当天曜日` 和 `月末曜日` 两个 ref 从未被读取 |
-| 17 | `index.html` | 8 | `classList.add('dark')` 写入的 `.dark` class 在 CSS 中没有使用 |
-| 18 | `router/index.ts` | — | 无 404 兜底路由；7 条中 5 条是 test/stub/deprecated |
-| 19 | `CapsuleController.kt` | — | 无 Update/PUT，CRUD 不完整 |
-| 20 | `Capsule.kt` | 27 | `targetDate` 无 `@Index`，每次全表扫描 |
-| 21 | `BackendApplicationTests.kt` | — | `contextLoads()` 无断言 |
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST | 待改 |
+| 13 | `TimeManager.ts` | 42–47 | `\|\|` 把 0 当 falsy，应用 `??` | ✅ 已修 |
+| 14 | `apiService.ts` | 11–13 | 所有 API 返回值是 `any[]`/`any`，无类型安全 | ✅ 已修 |
+| 15 | `backendHealthCheck.ts` | 5 | `axios.get` 无 timeout | ✅ 已修 |
+| 16 | `Calendar.vue` | 21,23 | `当天曜日` 和 `月末曜日` 两个 ref 从未被读取 | ✅ 保留（加注） |
+| 17 | `index.html` + `theme.ts` | 8 / 18 | `.dark` class 在 CSS 中没有使用 → 已删 | ✅ 已修 |
+| 18 | `router/index.ts` | — | 无 404 兜底路由；7 条中 5 条是 test/stub/deprecated | ✅ 已修 |
+| 19 | `CapsuleController.kt` | — | 无 Update/PUT，CRUD 不完整 | 待改 |
+| 20 | `Capsule.kt` | 27 | `targetDate` 无 `@Index`，每次全表扫描 | 待改 |
+| 21 | `BackendApplicationTests.kt` | — | `contextLoads()` 无断言 | 待改 |
 
 ## P3 — 可清理的杂物
 
@@ -45,7 +45,7 @@
 | 23 | `fileHandleFunctions.ts` | 全文件未导出未调用 | 删 |
 | 24 | `TestPage.vue` + `TestPage1.vue` | 几乎一样 | 合并或删一个 |
 | 25 | `CapsuleShelf.vue` / `EgoMe.vue` | 空壳 | 实现或删 |
-| 26 | `index.html` | `lang=""` 空属性、`<title>Vite App</title>` | 补 |
+| 26 | `index.html` | `lang=""` 空属性、`<title>Vite App</title>` | ✅ 已修 |
 | 27 | `Calendar.vue` | `.clock` 和 `.calendar-tail` 空 div | 删 |
 | 28 | `main.ts` | 无用的 IIFE、注释掉的调试代码 | 简化 |
 | 29 | `App.vue` | 测试导航栏在生产代码中 | dev gating |

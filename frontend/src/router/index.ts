@@ -11,7 +11,7 @@ const router = createRouter({
   //带 # 的哈希模式，适配electron
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
-      {
+    {
       path: '/',           // 首页，URL 是 https://qwerty.uiop/#/
       name: 'centro',
       component: Centro,
@@ -40,6 +40,10 @@ const router = createRouter({
       path: '/clock-vibe',
       name: 'clock-vibe',
       component: ClockVibe,
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
     },
   ],
 })

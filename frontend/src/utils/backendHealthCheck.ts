@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function checkBackendHealth() {
   try {
-    const response = await axios.get('http://localhost:9999/health');
+    const response = await axios.get('http://localhost:9999/health', { timeout: 3000 });
     console.log('后端连接成功:', response.data);
     return true;
   } catch (error) {

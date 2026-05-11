@@ -108,6 +108,18 @@ Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` c
 
 `CapsuleController.kt` now logs caught exceptions via `logger.error(...)` before returning the empty list. The log output appears in Electron's stderr capture, making date-parse failures and DB errors visible during debugging.
 
+### TimeManager: `??` not `||` for fallback values ✅ fixed
+
+`TimeManager.ts` line 42–47 uses `??` (nullish coalescing) instead of `||`. The `||` operator treats `0` as falsy, which could cause month/day/hour/minute/second values of `0` to incorrectly trigger fallbacks. `??` only triggers on `null`/`undefined`.
+
+### apiService uses Capsule types ✅ fixed
+
+`apiService.ts` imports `Capsule` interface from `stores/capsule.ts`. `getByDate` returns `Capsule[]`, `create` accepts `Omit<Capsule, 'id' | 'createdAt'>`. No `any` types remain.
+
+### Router has 404 catch-all ✅ fixed
+
+`router/index.ts` includes `{ path: '/:pathMatch(.*)*', redirect: '/' }` as the last route. Any unrecognized hash path redirects to the home page.
+
 ## Issue tracker
 
 `design/issues.md` contains the full known-issues list organized by P0–P3 priority. Check it before starting significant work to avoid re-investigating known problems.

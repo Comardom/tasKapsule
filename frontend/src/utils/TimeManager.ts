@@ -39,12 +39,12 @@ export class TimeManager {
         }
 
         return {
-            year: resultToInt.year || 1970 ,
-            month: (resultToInt.month || 0) - 1, // 转回0-11
-            day: resultToInt.day || 0,
-            hour: resultToInt.hour || 0,
-            minute: resultToInt.minute || 0,
-            second: resultToInt.second || 0,
+            year: resultToInt.year ?? 1970 ,
+            month: (resultToInt.month ?? 0) - 1, // 转回0-11
+            day: resultToInt.day ?? 0,
+            hour: resultToInt.hour ?? 0,
+            minute: resultToInt.minute ?? 0,
+            second: resultToInt.second ?? 0,
             timeZone: this.timeZone
         };
     }

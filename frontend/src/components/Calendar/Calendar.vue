@@ -18,6 +18,7 @@ const 今天几号 = ref<number>(timeManager.get今天几号());
 const 当月天数 = ref<number>(timeManager.get当月天数());
 const 上月天数 = ref<number>(timeManager.get上月天数());
 
+//当天曜日、月末曜日未使用，但是暂时保留
 const 当天曜日 = ref<number>(timeManager.get当天曜日());
 const 月初曜日 = ref<number>(timeManager.get月初曜日());
 const 月末曜日 = ref<number>(timeManager.get月末曜日());

@@ -14,9 +14,6 @@ export const useThemeStore
     // 同步到 HTML 属性：<HTML data-theme="dark">
     root.setAttribute('data-theme', theme.value);
 
-    // 同时同步一个 class，兼容某些旧库的 .dark 选择器
-    root.classList.toggle('dark', theme.value === 'dark');
-
     // 持久化存储
     localStorage.setItem('app-theme', theme.value);
   });
