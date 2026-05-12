@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Calendar from "@/components/Calendar/Calendar.vue";
-import CapsuleShelf from "@/components/CapsuleShelf.vue";
+import CapsuleShelf from "@/components/CapsuleShelf/CapsuleShelf.vue";
 </script>
 
 <template>
@@ -15,7 +15,7 @@ import CapsuleShelf from "@/components/CapsuleShelf.vue";
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   block-size: 100svb;
   inline-size: 100svi;
 }

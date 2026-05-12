@@ -15,9 +15,9 @@ onMounted(() => {
   <div class="middle">
     <slot />
     <input
-      type="date"
-      :value="capsuleStore.selectedDate"
-      @input="e => capsuleStore.setDate((e.target as HTMLInputElement).value)"
+        type="date"
+        :value="capsuleStore.selectedDate"
+        @input="e => capsuleStore.setDate((e.target as HTMLInputElement).value)"
     />
 
     <div v-if="capsuleStore.isLoading">正在加载中...</div>
@@ -27,14 +27,9 @@ onMounted(() => {
     </div>
 
     <ul v-else>
-      <li v-for="item in capsuleStore.capsules" :key="item.id">
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.content }}</p>
-        <small>状态：{{ item.status }}</small>
-      </li>
+      <li v-for="item in capsuleStore.capsules" :key="item.id">...</li>
     </ul>
-
-    <p v-if="!capsuleStore.isLoading && capsuleStore.capsules.length === 0">
+    <p v-if="capsuleStore.capsules.length === 0">
       这一天没有时间胶囊哦。
     </p>
   </div>

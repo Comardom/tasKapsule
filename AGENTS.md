@@ -142,7 +142,7 @@ Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` c
 
 ## Issue tracker
 
-`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Round 1 (2026-05-10) complete. Round 2 (2026-05-12) complete. Round 3 (2026-05-12) complete — 7 of 7 fixed.
+`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Rounds 1–3 complete. Round 4 (2026-05-13) complete — 3 fixed, 5 intentionally skipped.
 
 ## Project layout
 

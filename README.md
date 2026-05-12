@@ -15,7 +15,18 @@
 
 
 
+## [2026-05-12] - 0.0.27
+* 优化了TestPinia.vue的显示逻辑
+* 优化了CapsuleController.kt 
+  * 保存胶囊时禁止伪造时间
+  * 添加附加文件时多文件路径的处理为合法JSON
+* 在electron/main.ts的两种后端启动失败处加了app.quit();
+* 把Centro.vue的方向改成了flex-start，让日历靠左
+* 修复了Calendar.vue中当天格子颜色错误切换的问题
+* 增大了日历内部字体，给了左右边框
+* CapsuleShelf.vue与新建的Capsule.vue合并进文件夹
 
+---
 ## [2026-05-12] - 0.0.26
 * 删除了favicon.ico
 * electron/main.ts加入了启动java子进程后的error监听

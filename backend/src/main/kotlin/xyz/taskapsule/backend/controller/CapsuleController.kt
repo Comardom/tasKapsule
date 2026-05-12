@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import tools.jackson.databind.ObjectMapper
 import xyz.taskapsule.backend.entity.Capsule
 import xyz.taskapsule.backend.entity.CapsuleRepository
 import xyz.taskapsule.backend.entity.CapsuleStatus
@@ -20,7 +21,10 @@ import java.time.LocalTime
 @RequestMapping("/api/v1/capsules")
 @CrossOrigin(origins = ["http://localhost:9998", "app://localhost"])
 
-class CapsuleController(private val repository: CapsuleRepository) {
+class CapsuleController(
+    private val repository: CapsuleRepository,
+    private val objectMapper: ObjectMapper  // 用于 PUT 时把 List/Map 重新序列化为合法 JSON 字符串
+) {
 
     private val logger = LoggerFactory.getLogger(CapsuleController::class.java)
 
@@ -43,7 +47,14 @@ class CapsuleController(private val repository: CapsuleRepository) {
     // 访问路径示例: POST /api/v1/capsules
     @PostMapping
     fun create(@RequestBody capsule: Capsule): Capsule {
+        // 禁止客户端注入 id：清空后由数据库自动生成
         capsule.id = null
+        // 禁止客户端伪造创建时间：实体字段有 insertable = false，
+        // Hibernate 不会把 createdAt 写入 INSERT SQL（数据库自动填入当前时间），
+        // 但 save() 返回的是内存中的对象不会自动回读 DB，
+        // 客户端如果在请求体里传了 "createdAt" 就会被原样返回。
+        // 此处强制覆盖为服务端当前时间，确保 API 返回值与数据库一致。
+        capsule.createdAt = java.time.LocalDateTime.now()
         return repository.save(capsule)
     }
 
@@ -78,7 +89,16 @@ class CapsuleController(private val repository: CapsuleRepository) {
             // 可为空字段：用 containsKey 区分"没传"和"传了 null"
             if (body.containsKey("content")) capsule.content = body["content"]?.toString()
             if (body.containsKey("audioPath")) capsule.audioPath = body["audioPath"]?.toString()
-            if (body.containsKey("attachmentPaths")) capsule.attachmentPaths = body["attachmentPaths"]?.toString()
+            // attachmentPaths 用来存储多个文件路径，前端传 JSON 数组如 ["/path/a.png","/path/b.pdf"]
+            // @RequestBody 用 Map<String, Any?> 接收时，Jackson 会把 JSON 数组反序列化为 Kotlin List<*>
+            // List.toString() 输出 [a, b]（没有引号，不是合法 JSON），存入数据库后前端无法解析。
+            // 因此用 ObjectMapper.writeValueAsString() 重新序列化，保证写入的是合法 JSON 字符串。
+            // 如果前端传的是普通字符串（已序列化好的 JSON 或单路径），writeValueAsString 会原样包裹引号返回，
+            // 与 toString() 行为一致，不会损坏已有数据。
+            if (body.containsKey("attachmentPaths")) {
+                val v = body["attachmentPaths"]
+                capsule.attachmentPaths = if (v != null) objectMapper.writeValueAsString(v) else null
+            }
             if (body.containsKey("startTime")) {
                 val v = body["startTime"]
                 capsule.startTime = if (v != null) LocalTime.parse(v.toString()) else null

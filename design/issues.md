@@ -94,3 +94,25 @@
 | 50 | `CapsuleController.kt` | 44 | POST `capsule.id = null` 防客户端注入 id | ✅ 已修 |
 | 51 | `CapsuleController.kt` | 66–70 | PUT nullable 字段改用 `containsKey`，可清空为 null | ✅ 已修 |
 | 52 | `CapsuleController.kt` | 69–72 | PUT 加 try/catch，提前 return 避类型推断，返回 400 | ✅ 已修 |
+
+---
+
+# Known Issues (2026-05-13 第四轮扫描)
+
+## P1 — 功能不正确
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 53 | `TestPinia.vue` | 37-39 | 错误消息和空状态同时显示 | ✅ 已修 |
+| 54 | `Calendar.vue` | 34,60-62 | 换时区月中高度不重算 | ⏸️ 不是 bug |
+| 55 | `CapsuleController.kt` | 44-48 | POST 返回客户端注入的 `createdAt` | ✅ 已修 |
+| 56 | `electron/main.ts` | 109,132 | macOS 错误框关闭后进程残留 | ⏸️ 跳过 |
+
+## P2 — 防御性 / 边缘情况
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 57 | `CapsuleController.kt` | 79,81 | PUT `toString()` 损坏结构化 JSON → `ObjectMapper.writeValueAsString()` | ✅ 已修 |
+| 58 | `BackendApplication.kt` | 16 | `mkdirs()` 返回值忽略 | ⏸️ 跳过 |
+| 59 | `electron/killPort.ts` | 13-15 | `netstat`/`lsof` 匹配主动出站连接 | ⏸️ 跳过 |
+| 60 | `electron/killPort.ts` | 19 | `execSync` 无超时 | ⏸️ 跳过 |

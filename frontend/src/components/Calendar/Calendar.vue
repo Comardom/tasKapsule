@@ -179,7 +179,7 @@ onUnmounted(() => {
   /*这个是高度*/
   block-size: var(--full-block-size);
   /*这个是宽度*/
-  inline-size: var(--full-inline-size);
+  inline-size: calc(var(--full-inline-size) + 3dvi);
   background-color: var(--calendar-frame-bg);
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
 }
@@ -194,6 +194,7 @@ onUnmounted(() => {
   inline-size: var(--full-inline-size);
 }
 .calendar-body{
+  font-size: 1.125rem;
   display: grid;
   place-content: center;
   place-items: center;
@@ -222,6 +223,8 @@ onUnmounted(() => {
       var(--calendar-today-bg-mid),
       var(--calendar-today-bg-end)
   );
+}
+.today span{
   color: var(--calendar-today-text);
 }
 </style>
