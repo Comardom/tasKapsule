@@ -1,6 +1,7 @@
 package xyz.taskapsule.backend.controller
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import xyz.taskapsule.backend.entity.Capsule
@@ -42,6 +43,7 @@ class CapsuleController(private val repository: CapsuleRepository) {
     // 访问路径示例: POST /api/v1/capsules
     @PostMapping
     fun create(@RequestBody capsule: Capsule): Capsule {
+        capsule.id = null
         return repository.save(capsule)
     }
 
@@ -57,22 +59,35 @@ class CapsuleController(private val repository: CapsuleRepository) {
         }
     }
 
+    // 更新胶囊
+    // 访问路径示例: PUT /api/v1/capsules/1
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody body: Map<String, Any?>): ResponseEntity<Capsule> {
+    fun update(@PathVariable id: Long, @RequestBody body: Map<String, Any?>): ResponseEntity<*> {
         val existing = repository.findById(id)
-        return if (existing.isPresent) {
-            val capsule = existing.get()
+        // 胶囊不存在 → 直接返回 404
+        if (existing.isEmpty) return ResponseEntity<Unit>(HttpStatus.NOT_FOUND)
+
+        val capsule = existing.get()
+        return try {
+            // 非空字段：?.let 即可（不能设为 null，所以不用 containsKey）
             body["title"]?.let { capsule.title = it.toString() }
-            body["content"]?.let { capsule.content = it.toString() }
-            body["audioPath"]?.let { capsule.audioPath = it.toString() }
-            body["attachmentPaths"]?.let { capsule.attachmentPaths = it.toString() }
             body["targetDate"]?.let { capsule.targetDate = LocalDate.parse(it.toString()) }
-            body["startTime"]?.let { capsule.startTime = LocalTime.parse(it.toString()) }
             body["durationMinutes"]?.let { capsule.durationMinutes = it.toString().toInt() }
             body["status"]?.let { capsule.status = CapsuleStatus.valueOf(it.toString()) }
+
+            // 可为空字段：用 containsKey 区分"没传"和"传了 null"
+            if (body.containsKey("content")) capsule.content = body["content"]?.toString()
+            if (body.containsKey("audioPath")) capsule.audioPath = body["audioPath"]?.toString()
+            if (body.containsKey("attachmentPaths")) capsule.attachmentPaths = body["attachmentPaths"]?.toString()
+            if (body.containsKey("startTime")) {
+                val v = body["startTime"]
+                capsule.startTime = if (v != null) LocalTime.parse(v.toString()) else null
+            }
+
             ResponseEntity.ok(repository.save(capsule))
-        } else {
-            ResponseEntity.notFound().build()
+        } catch (e: Exception) {
+            // 日期格式错误、数字格式错误、枚举名拼写错误等统一返回 400
+            ResponseEntity.badRequest().body(mapOf("error" to "请求参数格式错误: ${e.message}"))
         }
     }
 }

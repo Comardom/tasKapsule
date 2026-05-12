@@ -11,7 +11,7 @@ export function killPort(port: number) {
     //   : `lsof -i :${port} -t`;
     const isWin = process.platform === 'win32';
     const cmd = isWin
-      ? `netstat -ano | findstr :${port}`
+      ? `netstat -ano | findstr /R :${port}[^0-9]`
       : `lsof -i :${port} -t`;
 
     //运行cmd这段shell命令，把结果变成字符串然后去掉头尾的空格

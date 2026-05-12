@@ -134,7 +134,7 @@ onUnmounted(() => {
       </Cell>
       <Cell
           v-for="day上月 in 月初曜日"
-          :key="day上月"
+          :key="'prev-' + day上月"
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize=cellInlineSize
           class="lastMonthTail"
@@ -143,7 +143,7 @@ onUnmounted(() => {
       </Cell>
       <Cell
           v-for="day此月 in 当月天数"
-          :key="day此月"
+          :key="'curr-' + day此月"
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize=cellInlineSize
           class="thisMonth"
@@ -153,7 +153,7 @@ onUnmounted(() => {
       </Cell>
       <Cell
           v-for="day下月 in ((7 - (月初曜日 + 当月天数) % 7) % 7)"
-          :key="day下月"
+          :key="'next-' + day下月"
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize="cellInlineSize"
           class="nextMonthHead"

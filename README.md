@@ -16,7 +16,18 @@
 
 
 
+## [2026-05-12] - 0.0.26
+* 删除了favicon.ico
+* electron/main.ts加入了启动java子进程后的error监听
+* electron/killPort.ts修复了Windows下会杀掉无关进程的问题
+* stores/capsule.ts把ISO时间换成了本地时区的时间
+* 修改Calendar.vue中v-for的key为字符串+数字，防止Vue DOM操作出错
+* capsuleController.kt进行修改
+  * 创建胶囊函数中为了保证id自增，先将id写为null
+  * 为了保证可以制作无字的胶囊，区分了content的未传数据和null
+  * update函数进行了大的修改，具体请看函数内部注释
 
+---
 ## [2026-05-12] - 0.0.25
 * 修复了TimeManager.ts的后备值逻辑错误
 * 修复了electron/main.ts的权限进制错误

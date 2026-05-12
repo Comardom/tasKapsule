@@ -2,7 +2,7 @@
   "name": "taskapsule",
   "description": "Task management app with Electron + Vue + Spring Boot",
   "author": "Comardom",
-  "version": "0.0.21",
+  "version": "0.0.26",
   "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",

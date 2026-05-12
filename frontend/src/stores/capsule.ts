@@ -19,9 +19,12 @@ export interface Capsule {
 export const useCapsuleStore = defineStore('capsule', {
   //State: 存储数据的地方（相当于 Vue 组件的 data）
   state: () => ({
-    // 当前日历选中的日期，默认为今天（取 ISO 字符串的前 10 位）
+    // 当前日历选中的日期，默认为今天
+    // 此处的sv-SE是本地时区，返回一个yyyy-MM-dd
+    //原本这里用的是ISO 字符串的前 10 位
     //ISO时间是2026-04-23T15:12:16Z的格式，在T处分割，生成一个数组，第一个就是日期
-    selectedDate: new Date().toISOString().split('T')[0],
+    //selectedDate: new Date().toISOString().split('T')[0],
+    selectedDate: new Date().toLocaleDateString('sv-SE'),
     // 存放从后端获取到的胶囊数组
     capsules: [] as Capsule[],
     // 全局加载状态。True 时，界面可以显示转圈圈动画

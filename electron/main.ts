@@ -143,6 +143,10 @@ app.whenReady().then(() => {
         cwd: resPath, // 将工作目录设为 resources 目录，方便后端读写相对路径的文件
         stdio: 'pipe'// 修改为 pipe 才能捕获 stdout/stderr 日志
     });
+    backendProcess.on('error', (err) => {
+        console.error('启动后端进程失败:', err);
+        dialog.showErrorBox('后端启动失败', `无法启动 Java 后端:\n${err.message}`);
+    });
 
     // 下面这俩是匹配后端的输出流的，
     // 得到信息传给preload.ts，

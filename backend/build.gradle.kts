@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "xyz.taskapsule"
-version = "0.0.21"
+version = "0.0.26"
 description = "backend"
 
 java {

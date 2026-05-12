@@ -85,12 +85,12 @@
 
 ## P1 — 功能不正确
 
-| # | 文件 | 行 | 问题 |
-|---|---|---|---|
-| 45 | `electron/main.ts` | 142 | `spawn()` 之后缺少 `backendProcess.on('error', ...)` 监听器，异步启动错误未捕获崩溃 Electron |
-| 46 | `electron/killPort.ts` | 14 | Windows `findstr :9999` 子串命中 `:99990`，误杀无关进程 |
-| 47 | `capsule.ts` | 24 | `toISOString()` 用 UTC，UTC+8 凌晨打开的 `selectedDate` 是昨天 |
-| 48 | `Calendar.vue` | 137/146/156 | 三组 `v-for` key 都从 1 开始，跨月刷新 Vue diff 错配 |
-| 50 | `CapsuleController.kt` | 44 | POST 接受裸实体，客户端可传 `id` 导致 upsert |
-| 51 | `CapsuleController.kt` | 66–70 | PUT `?.let` 把 JSON `null` 也跳过，无法清空 nullable 字段 |
-| 52 | `CapsuleController.kt` | 69–72 | PUT 无 try/catch，错误输入直接 500 |
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 45 | `electron/main.ts` | 142 | `spawn()` 之后缺少 `backendProcess.on('error', ...)` 监听器 | ✅ 已修 |
+| 46 | `electron/killPort.ts` | 14 | Windows `findstr :9999` 子串命中 `:99990` | ✅ 已修 |
+| 47 | `capsule.ts` | 24 | `toISOString()` 用 UTC → 改为 `toLocaleDateString('sv-SE')` | ✅ 已修 |
+| 48 | `Calendar.vue` | 137/146/156 | 三组 `v-for` key 加 `prev-`/`curr-`/`next-` 前缀 | ✅ 已修 |
+| 50 | `CapsuleController.kt` | 44 | POST `capsule.id = null` 防客户端注入 id | ✅ 已修 |
+| 51 | `CapsuleController.kt` | 66–70 | PUT nullable 字段改用 `containsKey`，可清空为 null | ✅ 已修 |
+| 52 | `CapsuleController.kt` | 69–72 | PUT 加 try/catch，提前 return 避类型推断，返回 400 | ✅ 已修 |
