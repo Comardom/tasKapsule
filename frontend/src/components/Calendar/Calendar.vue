@@ -73,6 +73,7 @@ const setCalendarHeight = () => {
 //这里是在计算日历横向除以七的宽度，好分配给每一周，这个仅仅是数字！！！这个7是随便预设的，就当是不存在
 const cellInlineSize = ref<number>(7);
 onMounted(() => {
+  //计算宽度！
   const calendarEl = document.querySelector('.calendar') as HTMLElement
   if (calendarEl) {
     //这里是获取总宽度，然后除以七
@@ -87,15 +88,24 @@ onMounted(() => {
       });
     }
   }
+  //宽度计算完了
+
   //每分钟刷新一下时间
   timer = setInterval(refreshCalendar, 60_000);
 });
-//计时器需要卸载
+
 onUnmounted(() => {
+  //计时器需要卸载
   clearInterval(timer);
 })
 
-
+const isSelectOtherMonth = ref<boolean>(false);
+const selectedDay = ref<number>(今天几号.value);
+const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
+  isSelectOtherMonth.value = isOtherMonth;
+  selectedDay.value = whatDay;
+  // TODO: capsuleStore.setDate()，把 selectedDay 同步到全局 store，驱动 CapsuleShelf 刷新
+}
 </script>
 
 <template>
@@ -129,6 +139,7 @@ onUnmounted(() => {
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize=cellInlineSize
           class="曜日"
+          :interactive=false
       >
         <span>{{ 曜日 }}</span>
       </Cell>
@@ -138,6 +149,10 @@ onUnmounted(() => {
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize=cellInlineSize
           class="lastMonthTail"
+          :class="{
+            'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth,
+          }"
+          @click="cellClicked(上月天数 - 月初曜日 + day上月,true)"
       >
         <span>{{ 上月天数 - 月初曜日 + day上月 }}</span>
       </Cell>
@@ -147,7 +162,11 @@ onUnmounted(() => {
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize=cellInlineSize
           class="thisMonth"
-          :class="{today: day此月 === 今天几号}"
+          :class="{
+            'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
+            'cell-gray': day此月 === 今天几号 && selectedDay != 今天几号,
+          }"
+          @click="cellClicked(day此月,false)"
       >
         <span>{{ day此月 }}</span>
       </Cell>
@@ -157,6 +176,10 @@ onUnmounted(() => {
           :blockSize="cellInlineSize + 'dvi'"
           :inlineSize="cellInlineSize"
           class="nextMonthHead"
+          :class="{
+            'cell-blue':day下月 === selectedDay && isSelectOtherMonth,
+          }"
+          @click="cellClicked(day下月,true)"
       >
         <span>{{ day下月 }}</span>
       </Cell>
@@ -197,7 +220,7 @@ onUnmounted(() => {
   font-size: 1.125rem;
   display: grid;
   place-content: center;
-  place-items: center;
+  /*place-items: center;*/
   grid-template-columns: repeat(7, 1fr);
   background-color: var(--calendar-cell-bg);
   /*这个是高度，由TS控制*/
@@ -216,7 +239,7 @@ onUnmounted(() => {
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }
-.today{
+.cell-blue{
   background: linear-gradient(
       to bottom,
       var(--calendar-today-bg-start),
@@ -224,7 +247,15 @@ onUnmounted(() => {
       var(--calendar-today-bg-end)
   );
 }
-.today span{
+.cell-blue span{
+  color: var(--calendar-today-text);
+}
+.cell-gray {
+  background-color: var(--calendar-today-unselected-bg);
+  box-shadow: inset 0 0 0.4rem 0.2rem var(--calendar-today-unselected-shadow);
+  color: var(--calendar-today-text);
+}
+.cell-gray span {
   color: var(--calendar-today-text);
 }
 </style>

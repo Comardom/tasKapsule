@@ -6,6 +6,7 @@ import CapsuleShelf from "@/components/CapsuleShelf/CapsuleShelf.vue";
 <template>
   <div class="container">
     <Calendar></Calendar>
+    <Calendar></Calendar>
     <CapsuleShelf></CapsuleShelf>
   </div>
 </template>
@@ -13,9 +14,9 @@ import CapsuleShelf from "@/components/CapsuleShelf/CapsuleShelf.vue";
 <style scoped>
 .container {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  /*flex-direction: column;*/
+  justify-content: space-between; ;
+  align-items: center;
   block-size: 100svb;
   inline-size: 100svi;
 }

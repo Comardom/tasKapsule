@@ -7,8 +7,9 @@ electron_1.contextBridge.exposeInMainWorld('api', {
 });
 electron_1.contextBridge.exposeInMainWorld('electronAPI', {
     onJvmStatus: (callback) => {
-        // 监听主进程发来的消息，也就是main.ts中正则表达式匹配的地方
-        electron_1.ipcRenderer.on('jvm-status-update', (_event, value) => callback(value));
+        const handler = (_event, value) => callback(value);
+        electron_1.ipcRenderer.on('jvm-status-update', handler);
+        return () => electron_1.ipcRenderer.removeListener('jvm-status-update', handler);
     },
     removeJvmListeners: () => {
         electron_1.ipcRenderer.removeAllListeners('jvm-status-update');

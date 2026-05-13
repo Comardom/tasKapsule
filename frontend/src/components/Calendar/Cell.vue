@@ -4,17 +4,20 @@ import {computed} from "vue";
 interface Props {
   inlineSize?: string | number
   blockSize?: string | number
+  interactive?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   inlineSize: '100%',
-  blockSize: '100%'
+  blockSize: '100%',
+  interactive: true
 })
 
-// 处理传进来的宽高，数字自动加dvx，字符串直接用
+// 处理传进来的宽高，数字自动加dvx，字符串直接用；光标控制
 const blockStyle = computed(() => ({
   'block-size': typeof props.blockSize === 'number' ? `${props.blockSize}dvb` : props.blockSize,
-  'inline-size': typeof props.inlineSize === 'number' ? `${props.inlineSize}dvi` : props.inlineSize
+  'inline-size': typeof props.inlineSize === 'number' ? `${props.inlineSize}dvi` : props.inlineSize,
+  'cursor': props.interactive ? 'pointer' : 'default'
 }))
 </script>
 
@@ -31,6 +34,5 @@ const blockStyle = computed(() => ({
   justify-content: center;
   align-items: center;
   border: var(--calendar-grid-line) 1px solid;
-  cursor: pointer;
 }
 </style>

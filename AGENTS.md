@@ -167,7 +167,8 @@ tasKapsule/
 ├── jre/                # Bundled JRE per platform (win_x64, mac_arm, linux_x64)
 └── design/             # Design specs
     ├── color.md        # Calendar color reference (fabric-texture palette)
-    └── issues.md       # Known issues tracker (P0–P3 priority)
+    ├── issues.md       # Known issues tracker (P0–P3 priority)
+    └── mvp-plan.md     # MVP Phase 1: skeleton (Centro layout, calendar click, CapsuleShelf)
 ```
 
 ## Key conventions
@@ -271,7 +272,8 @@ Variables `--camera-border` and `--camera-corner` in `themeVariables.css` are un
 
 ## Known stub / deprecated components
 
-- `CapsuleShelf.vue` — empty stub, meant for capsule display list.
+- `CapsuleShelf/Capsule.vue` — single capsule card component (new).
+- `CapsuleShelf/CapsuleShelf.vue` — capsule list view (in progress).
 - `EgoMe.vue` — empty stub, meant for personal profile page.
 - `ClockVibe.vue` — deprecated, will be removed.
 - `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.

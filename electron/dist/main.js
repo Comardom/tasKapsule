@@ -84,6 +84,11 @@ function createWindow() {
 electron_1.app.whenReady().then(() => {
     // 获取当前环境：app.isPackaged 为 true 表示是打包后的生产环境，false 为开发环境
     const isProd = electron_1.app.isPackaged;
+    if (!isProd) {
+        // 开发模式：Electron 只负责开窗口，后端由 ./gradlew bootRun 独立管理
+        createWindow();
+        return; // ← 关键：不执行后面的 javaPath/jarPath 检查和 spawn
+    }
     // 资源根目录：生产环境下是 process.resourcesPath，开发环境下是项目根目录
     const resPath = isProd ? process.resourcesPath : path.join(__dirname, '../../');
     // 处理端口冲突（很重要！！！）
@@ -120,34 +125,46 @@ electron_1.app.whenReady().then(() => {
             electron_1.dialog.showErrorBox('JVM 启动失败', `预期 Java 路径: ${javaPath}\n\n` +
                 `resources 目录下有: ${dirContent.join(', ')}\n` +
                 `jre 目录下有: ${subContent}`);
+            electron_1.app.quit();
+            return;
         }
         else {
             // Linux 权限处理：Node.js spawn 启动二进制文件需要 755 (可执行) 权限
             if (process.platform !== 'win32') {
                 try {
                     const stats = fs.statSync(javaPath);
-                    const isExecutable = !!(stats.mode & 100); // 检查是否有执行权限
+                    const isExecutable = !!(stats.mode & 0o100); // 检查是否有执行权限
                     if (!isExecutable) {
                         fs.chmodSync(javaPath, 0o755);
                     }
                 }
                 catch (err) {
-                    if (err.code !== 'EROFS') {
+                    if (err.code === 'EROFS') {
+                        console.warn('文件系统只读，无法修改 Java 权限（AppImage 中属正常）');
+                    }
+                    else {
                         console.error('权限检查/修改失败:', err);
                     }
-                    console.error('RROFS', err);
                 }
             }
         }
         if (!fs.existsSync(jarPath)) {
             electron_1.dialog.showErrorBox('后端丢失', `找不到后端文件: ${jarPath}`);
+            electron_1.app.quit();
+            return;
         }
     }
+    // 显示主界面
+    createWindow();
     // 启动子进程：启动 Spring Boot 后端
     // stdio: 'pipe' (默认) 会创建管道。
     backendProcess = (0, child_process_1.spawn)(javaPath, ['-jar', jarPath], {
         cwd: resPath, // 将工作目录设为 resources 目录，方便后端读写相对路径的文件
         stdio: 'pipe' // 修改为 pipe 才能捕获 stdout/stderr 日志
+    });
+    backendProcess.on('error', (err) => {
+        console.error('启动后端进程失败:', err);
+        electron_1.dialog.showErrorBox('后端启动失败', `无法启动 Java 后端:\n${err.message}`);
     });
     // 下面这俩是匹配后端的输出流的，
     // 得到信息传给preload.ts，
@@ -156,16 +173,12 @@ electron_1.app.whenReady().then(() => {
     // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data) => {
-            const line = data.toString();
-            console.log(`Backend: ${line}`);
-            // 匹配 [STAGE] 标签
-            // 匹配格式: [STAGE] KEY: 内容
-            const match = line.match(/\[STAGE\]\s*(\w+):\s*(.*)/);
-            if (match && mainWindow) {
-                const stageText = match[2].trim();
-                // 通过 IPC 发送给渲染进程
-                mainWindow.webContents.send('jvm-status-update', stageText);
-            }
+            data.toString().split('\n').forEach(line => {
+                const match = line.match(/\[STAGE\]\s*(\w+):\s*(.*)/);
+                if (match && mainWindow) {
+                    mainWindow.webContents.send('jvm-status-update', match[2].trim());
+                }
+            });
         });
     }
     if (backendProcess.stderr) {
@@ -189,8 +202,6 @@ electron_1.app.whenReady().then(() => {
         fs.writeFileSync(filePath, content, 'utf-8');
         return true;
     });
-    // 最后：显示主界面
-    createWindow();
 });
 // 生命周期钩子：应用即将关闭
 electron_1.app.on('will-quit', () => {

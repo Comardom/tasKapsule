@@ -40,6 +40,9 @@
 
   /* ── 格线 ── */
   --calendar-grid-line: #DADBDF;
+
+  --calendar-today-unselected-bg: #B8B8B8;
+  --calendar-today-unselected-shadow: #A0A0A0;
 }
 
 [data-theme='dark'] {
@@ -82,4 +85,7 @@
 
   /* ── 格线 ── */
   --calendar-grid-line: #3A3A40;
+
+  --calendar-today-unselected-bg: #222228;
+  --calendar-today-unselected-shadow: #0D0D12;
 }
