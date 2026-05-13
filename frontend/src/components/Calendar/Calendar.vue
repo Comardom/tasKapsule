@@ -101,6 +101,7 @@ onUnmounted(() => {
 
 const isSelectOtherMonth = ref<boolean>(false);
 const selectedDay = ref<number>(今天几号.value);
+const useAnimate = ref<boolean>(true);
 const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   isSelectOtherMonth.value = isOtherMonth;
   selectedDay.value = whatDay;
@@ -109,7 +110,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 </script>
 
 <template>
-  <div class="calendar">
+  <div class="calendar" :class="{ 'no-animate': !useAnimate }">
     <div class="calendar-header">
       <div class="clock">
 
@@ -130,6 +131,9 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
+      <button @click="useAnimate = !useAnimate" class="animate-toggle">
+        {{ useAnimate ? '🎞️' : 'no🎞️' }}
+      </button>
     </div>
 
     <div class="calendar-body">
@@ -193,6 +197,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 
 <style scoped>
 .calendar{
+  --cell-transition-duration: 0.25s;
   --full-block-size : 85dvb;
   --full-inline-size : 35dvi;
   display: flex;
@@ -206,9 +211,12 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   background-color: var(--calendar-frame-bg);
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
 }
+.calendar.no-animate {
+  --cell-transition-duration: 0s;
+}
 .calendar-header{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   /*这个是高度*/
@@ -239,15 +247,11 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }
-.cell-blue{
-  background: linear-gradient(
-      to bottom,
-      var(--calendar-today-bg-start),
-      var(--calendar-today-bg-mid),
-      var(--calendar-today-bg-end)
-  );
+/* 蓝色渐变通过 Cell 组件的 ::after 伪元素 + opacity 过渡实现，见 Cell.vue */
+.cell-blue::after {
+  opacity: 1;
 }
-.cell-blue span{
+.cell-blue span {
   color: var(--calendar-today-text);
 }
 .cell-gray {
@@ -257,5 +261,10 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 }
 .cell-gray span {
   color: var(--calendar-today-text);
+}
+.animate-toggle {
+  margin-block-start: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
 }
 </style>

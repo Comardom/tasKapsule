@@ -220,7 +220,7 @@ watch(() => capsuleStore.selectedDate, () => {
 ## 执行顺序
 
 1. `themeVariables.css` — 加灰色凹陷变量 ✅
-2. `Calendar.vue` — 点击 + 三态逻辑 + CSS ✅
+2. `Calendar.vue` — 点击 + 三态逻辑 + 动画开关 + 伪元素渐变过渡 ✅
 3. `Centro.vue` — 改 flex 方向 ✅
 4. `Capsule.vue` — 单个胶囊卡片组件 ✅
 5. `CapsuleShelf.vue` — 完整骨架（引入 store + watch + 四状态渲染） ⬅️ 当前

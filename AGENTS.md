@@ -62,6 +62,10 @@ If you change the `[STAGE]` log format in the Kotlin controllers, the loading sc
 
 `TimeManager.ts` uses `Date.UTC()` + `getUTC*()` for all calendar math (day-of-week, days-in-month, etc.). This avoids timezone offset errors when `this.timeZone` differs from the system local timezone. When adding new date calculation methods, follow the same pattern — never use bare `new Date(year, month, day)` without `Date.UTC`.
 
+### Calendar cell color animation toggle
+
+Calendar cells have smooth 0.25s transitions on `background-color`, `box-shadow`, and `opacity` (via `::after` pseudo-element overlay in `Cell.vue`). A toggle button in `.calendar-header` switches `--cell-transition-duration` between `0.25s` and `0s` via CSS class `.no-animate` on `.calendar`. The duration is read by `Cell.vue` via `var(--cell-transition-duration, 0.25s)`.
+
 ### Theme: index.html and store use the same localStorage key
 
 Both `index.html` (inline anti-FOUC script) and `stores/theme.ts` read/write key `'app-theme'`. Keep them in sync.
