@@ -12,7 +12,15 @@
 
 
 
+## [2026-05-14] - 0.0.30
+* 优化UI
+* 优化Calendar.vue的script内容顺序
+### 重大告知
+* 项目的后端将从Spring Boot Kotlin切换成Go
+* kotlin项目开发无限期停滞，转移到[tasKapsule-kotlin](https://github.com/Comardom/tasKapsule-kotlin.git)
+* 此仓库不设置主、次分支，master将会逐步转向go，清除kotlin内容
 
+---
 ## [2026-05-13] - 0.0.29
 * 日历增加切换格子的动效
 * 动效可以自主关闭或打开

@@ -1,53 +1,41 @@
 <script setup lang="ts">
-import type { Capsule } from '@/stores/capsule.ts';
 
-defineProps<{
-  capsule: Capsule;
-}>();
 </script>
 
 <template>
-  <div class="capsule-card">
-    <h3 class="capsule-title">{{ capsule.title }}</h3>
-    <div class="capsule-meta">
-      <span v-if="capsule.startTime" class="capsule-time">{{ capsule.startTime }}</span>
-      <span class="capsule-status" :class="{ completed: capsule.status === 'COMPLETED' }">
-        {{ capsule.status === 'COMPLETED' ? '已完成' : '待完成' }}
-      </span>
-    </div>
+  <div
+      :class="{
+        'capsule': true,
+        'small': 1,
+        'big': 0,
+        'common':true,
+      }"
+  >
+    <slot />
   </div>
 </template>
 
 <style scoped>
-.capsule-card {
-  padding: 0.75rem 1rem;
-  margin-block-end: 0.5rem;
-  background-color: var(--calendar-cell-bg);
-  border: 1px solid var(--calendar-grid-line);
-  border-radius: 4px;
-  transition: box-shadow 0.2s ease;
-}
-.capsule-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-.capsule-title {
-  margin: 0 0 0.375rem 0;
-  font-size: 1rem;
-  color: var(--calendar-cell-text);
-}
-.capsule-meta {
+.capsule{
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  font-size: 0.875rem;
 }
-.capsule-time {
-  color: var(--calendar-cell-text-small);
+.small{
+  block-size: 8dvb;
+  inline-size: 12dvi;
+  border-radius: 4dvb;/* 高度的一半，形成跑道形状 */
 }
-.capsule-status {
-  color: var(--calendar-today-bg-mid);
+.big{
+  block-size: 12dvb;
+  inline-size: 16dvi;
+  border-radius: 6dvb;/* 高度的一半，形成跑道形状 */
 }
-.capsule-status.completed {
-  color: var(--calendar-cell-text-small);
+.common{
+  background-color: #628CED;
+}
+.common :slotted(span){
+  color:#fff;
 }
 </style>

@@ -39,6 +39,12 @@ const blockStyle = computed(() => ({
               box-shadow var(--cell-transition-duration, 0.25s) ease;
   overflow: hidden;
 }
+.flex-block slot{
+  user-select: none;
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* IE/Edge */
+}
 /* 蓝色渐变层，始终存在但默认透明，通过 opacity 过渡实现切换动画 */
 .flex-block::after {
   content: '';

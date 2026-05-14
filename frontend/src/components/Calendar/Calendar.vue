@@ -1,23 +1,40 @@
 <script setup lang="ts">
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
-import {Zh曜日,Jp曜日,En曜日} from "@/components/Calendar/nameOfDaysOfWeek.ts";
+import {Zh曜日,Jp曜日,En曜日} from "@/data/nameOfDaysOfWeek.ts";
 import Cell from "@/components/Calendar/Cell.vue";
-
-
 import { timeZoneOptions } from '@/data/timezones.ts'
-
 import {TimeManager} from '@/utils/TimeManager.ts'
 import useLocaleStore from "@/stores/locale.ts";
+
+//固定内容
+const 曜日缩写 = computed(() => {
+  switch (localeStore.locale)
+  {
+    case 'ja':  return Jp曜日;
+    case 'zh':  return Zh曜日;
+    default:    return En曜日;
+  }
+});
+const 总行数 = computed(() => {
+  const 前置天数 = 月初曜日.value; // 需要显示的上月天数
+  const 后置天数 = (7 - (前置天数 + 当月天数.value) % 7) % 7; // 需要显示的下月天数
+  return (前置天数 + 当月天数.value + 后置天数) / 7 + 1;
+});
+
+//pinia
 const localeStore = useLocaleStore();
+//如果时区变了就改变timerManager的时区
+watch(()=>localeStore.timeZone,(newTz)=>{
+  timeManager.setTimeZone(newTz);
+  refreshCalendar();
+});
 
-
+//timeManager
 const timeManager = new TimeManager(localeStore.timeZone);
 
 const 今天几号 = ref<number>(timeManager.get今天几号());
-
 const 当月天数 = ref<number>(timeManager.get当月天数());
 const 上月天数 = ref<number>(timeManager.get上月天数());
-
 //当天曜日、月末曜日未使用，但是暂时保留
 const 当天曜日 = ref<number>(timeManager.get当天曜日());
 const 月初曜日 = ref<number>(timeManager.get月初曜日());
@@ -38,29 +55,8 @@ function refreshCalendar(){
     });
   }
 }
-//为了每分钟刷新
-let timer: ReturnType<typeof setInterval>;
-
-const 总行数 = computed(() => {
-  const 前置天数 = 月初曜日.value; // 需要显示的上月天数
-  const 后置天数 = (7 - (前置天数 + 当月天数.value) % 7) % 7; // 需要显示的下月天数
-  return (前置天数 + 当月天数.value + 后置天数) / 7 + 1;
-});
 
 
-const 曜日缩写 = computed(() => {
-  switch (localeStore.locale)
-  {
-    case 'ja':  return Jp曜日;
-    case 'zh':  return Zh曜日;
-    default:    return En曜日;
-  }
-})
-//如果时区变了就改变timerManager的时区
-watch(()=>localeStore.timeZone,(newTz)=>{
-  timeManager.setTimeZone(newTz);
-  refreshCalendar();
-});
 
 const setCalendarHeight = () => {
   const calendarBodyEl = document.querySelector('.calendar-body') as HTMLElement;
@@ -72,6 +68,8 @@ const setCalendarHeight = () => {
 
 //这里是在计算日历横向除以七的宽度，好分配给每一周，这个仅仅是数字！！！这个7是随便预设的，就当是不存在
 const cellInlineSize = ref<number>(7);
+//为了每分钟刷新
+let timer: ReturnType<typeof setInterval>;
 onMounted(() => {
   //计算宽度！
   const calendarEl = document.querySelector('.calendar') as HTMLElement
@@ -81,7 +79,6 @@ onMounted(() => {
     const fullInlineSize = parseFloat(styles.getPropertyValue('--full-inline-size').trim());
     if (!isNaN(fullInlineSize)) {
       cellInlineSize.value = fullInlineSize / 7;
-
       // 等待 DOM 更新后再设置高度
       nextTick(() => {
         setCalendarHeight();
@@ -99,6 +96,7 @@ onUnmounted(() => {
   clearInterval(timer);
 })
 
+//格子点击事件的处理
 const isSelectOtherMonth = ref<boolean>(false);
 const selectedDay = ref<number>(今天几号.value);
 const useAnimate = ref<boolean>(true);
@@ -113,7 +111,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   <div class="calendar" :class="{ 'no-animate': !useAnimate }">
     <div class="calendar-header">
       <div class="clock">
-
+        <button><span>这是clock区域</span></button>
       </div>
       <select
           v-model="localeStore.timeZone"
@@ -131,8 +129,8 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
-      <button @click="useAnimate = !useAnimate" class="animate-toggle">
-        {{ useAnimate ? '🎞️' : 'no🎞️' }}
+      <button @click="useAnimate = !useAnimate">
+        {{ useAnimate ? '目前有动画：点击改为无动画' : '目前无动画：点击改为有动画' }}
       </button>
     </div>
 
@@ -261,10 +259,5 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 }
 .cell-gray span {
   color: var(--calendar-today-text);
-}
-.animate-toggle {
-  margin-block-start: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
 }
 </style>

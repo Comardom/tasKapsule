@@ -6,7 +6,6 @@ import CapsuleShelf from "@/components/CapsuleShelf/CapsuleShelf.vue";
 <template>
   <div class="container">
     <Calendar></Calendar>
-    <Calendar></Calendar>
     <CapsuleShelf></CapsuleShelf>
   </div>
 </template>
