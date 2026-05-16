@@ -1,5 +1,4 @@
 // src/utils/apiService.ts
-// TODO 重写
 import axios from 'axios';
 import type { Capsule } from '@/stores/capsule.ts';
 
@@ -10,13 +9,16 @@ const api = axios.create({
 
 export const capsuleApi = {
   // 获取某天的胶囊
-  getByDate(date: string) {
+  getAll() {
     // 明确告诉请求返回的是一个数组
-    return api.get<Capsule[]>('/capsules', { params: { date } });
+    return api.get<Capsule[]>('/capsules');
   },
-  // 创建胶囊,omit把后端自动生成的字段排除掉，前端传参时 IDE 会提示只填 title、content 等
+  // 创建胶囊
   create(data: Omit<Capsule, 'id' | 'createdAt'>) {
     return api.post('/capsules', data);
+  },
+  update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>) {
+    return api.put(`/capsules/${id}`, data);
   },
   // 删除胶囊
   delete(id: number) {

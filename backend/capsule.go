@@ -144,15 +144,15 @@ type Capsule struct {
 // 一般的模式是：(正常结果, 错误信息)。如果没出错，错误信息就是 nil。
 // 每个 handler 里都通过 if err != nil 来检查是否出错。
 func scanCapsule(s scanner) (Capsule, error) {
-	var c Capsule  // 先声明一个空的 Capsule 结构体
+	var item Capsule  // 先声明一个空的 Capsule 结构体
 	err := s.Scan( // 然后调用 Scan，把 SQL 查到的值填进去
-		&c.ID, &c.CreatedAt, &c.ContentText, &c.AudioPath, // & 是取地址符——Scan 需要知道往哪里写
-		&c.AttachmentPaths, &c.Classification, &c.IsWithSchedule, // 传 &c.字段 意思是"把值写到这个字段里"
-		&c.ScheduleIcon, &c.ScheduleContentText, &c.ScheduleStartAt,
-		&c.ScheduleEndAt, &c.ScheduleStatus, &c.ScheduleDeadline,
-		&c.AlarmClocks,
+		&item.ID, &item.CreatedAt, &item.ContentText, &item.AudioPath, // & 是取地址符——Scan 需要知道往哪里写
+		&item.AttachmentPaths, &item.Classification, &item.IsWithSchedule, // 传 &item.字段 意思是"把值写到这个字段里"
+		&item.ScheduleIcon, &item.ScheduleContentText, &item.ScheduleStartAt,
+		&item.ScheduleEndAt, &item.ScheduleStatus, &item.ScheduleDeadline,
+		&item.AlarmClocks,
 	)
-	return c, err
+	return item, err
 }
 
 // writeJSON 是一个通用的 JSON 响应发送器。
@@ -214,8 +214,8 @@ func handleGetCapsules(w http.ResponseWriter, r *http.Request) {
 	//
 	// SELECT 后面的列名顺序必须和 scanCapsule 里的顺序完全一致！
 	// 因为 scanCapsule 不知道每个列叫什么名字，它按照位置的顺序逐一读：
-	// 第 1 个列 → 第 1 个 &c.ID
-	// 第 2 个列 → 第 2 个 &c.CreatedAt
+	// 第 1 个列 → 第 1 个 &item.ID
+	// 第 2 个列 → 第 2 个 &item.CreatedAt
 	// ...依此类推
 	//
 	// ORDER BY created_at DESC：按创建时间倒序排列，后创建的排前面。
@@ -258,14 +258,14 @@ func handleGetCapsules(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		// 调用 scanCapsule 帮助函数，把当前行 SQL 结果填进 Capsule 结构体。
-		c, err := scanCapsule(rows)
+		item, err := scanCapsule(rows)
 		if err != nil {
 			// 如果某一行读失败了，返回 500。
 			writeJSON(w, 500, map[string]string{"error": err.Error()})
 			return
 		}
-		// append 把 c 追加到切片末尾。
-		capsules = append(capsules, c)
+		// append 把 item 追加到切片末尾。
+		capsules = append(capsules, item)
 	}
 
 	// 把整个切片序列化成 JSON，写入响应体。
@@ -290,11 +290,11 @@ func handleCreateCapsule(w http.ResponseWriter, r *http.Request) {
 	// ── 1. 解析请求体的 JSON ──
 	// json.NewDecoder(r.Body) 创建一个 JSON 解码器。
 	// r.Body 是请求体的数据流——从网络上一个字节一个字节读进来。
-	// .Decode(&c) 把 JSON 解码到 Capsule 结构体变量 c 中。
-	// 注意！传的是 &c（c 的地址），因为 Decode 需要修改 c 的值来填字段。
-	// 如果不传地址，Decode 只是修改了一个 c 的副本，原始 c 还是空的。
-	var c Capsule
-	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+	// .Decode(&item) 把 JSON 解码到 Capsule 结构体变量 item 中。
+	// 注意！传的是 &item（item 的地址），因为 Decode 需要修改 item 的值来填字段。
+	// 如果不传地址，Decode 只是修改了一个 item 的副本，原始 item 还是空的。
+	var item Capsule
+	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		// 400 Bad Request：客户端请求格式不对。
 		// 比如传了不合法的 JSON（少花括号、字符串没加引号...）。
 		writeJSON(w, 400, map[string]string{"error": "JSON 解析失败: " + err.Error()})
@@ -306,7 +306,7 @@ func handleCreateCapsule(w http.ResponseWriter, r *http.Request) {
 	// INSERT 语句里，列名列了 12 个字段（跳过了 id 和 created_at——交给数据库自己生成）。
 	//
 	// VALUES (?, ?, ?, ...) 中的 ? 是 SQLite 的参数占位符。
-	// 第一个 ? 被 c.ContentText 替换，第二个 ? 被 c.AudioPath 替换...依此类推。
+	// 第一个 ? 被 item.ContentText 替换，第二个 ? 被 item.AudioPath 替换...依此类推。
 	// 不直接把值拼进 SQL 字符串是出于安全考虑——防止"SQL 注入"攻击。
 	// 用 ? 占位后，数据库驱动会自动处理转义，恶意用户无法通过输入特殊字符篡改 SQL。
 	//
@@ -322,11 +322,11 @@ func handleCreateCapsule(w http.ResponseWriter, r *http.Request) {
 			alarm_clocks
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`,
-		c.ContentText, c.AudioPath, c.AttachmentPaths,
-		c.Classification, c.IsWithSchedule,
-		c.ScheduleIcon, c.ScheduleContentText, c.ScheduleStartAt,
-		c.ScheduleEndAt, c.ScheduleStatus, c.ScheduleDeadline,
-		c.AlarmClocks,
+		item.ContentText, item.AudioPath, item.AttachmentPaths,
+		item.Classification, item.IsWithSchedule,
+		item.ScheduleIcon, item.ScheduleContentText, item.ScheduleStartAt,
+		item.ScheduleEndAt, item.ScheduleStatus, item.ScheduleDeadline,
+		item.AlarmClocks,
 	)
 	if err != nil {
 		writeJSON(w, 500, map[string]string{"error": err.Error()})
@@ -393,8 +393,8 @@ func handleUpdateCapsule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ── 3. 解析请求体（和 create 一样） ──
-	var c Capsule
-	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+	var item Capsule
+	if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 		writeJSON(w, 400, map[string]string{"error": "JSON 解析失败: " + err.Error()})
 		return
 	}
@@ -411,11 +411,11 @@ func handleUpdateCapsule(w http.ResponseWriter, r *http.Request) {
 			alarm_clocks=?
 		WHERE id=?
 	`,
-		c.ContentText, c.AudioPath, c.AttachmentPaths,
-		c.Classification, c.IsWithSchedule,
-		c.ScheduleIcon, c.ScheduleContentText, c.ScheduleStartAt,
-		c.ScheduleEndAt, c.ScheduleStatus, c.ScheduleDeadline,
-		c.AlarmClocks,
+		item.ContentText, item.AudioPath, item.AttachmentPaths,
+		item.Classification, item.IsWithSchedule,
+		item.ScheduleIcon, item.ScheduleContentText, item.ScheduleStartAt,
+		item.ScheduleEndAt, item.ScheduleStatus, item.ScheduleDeadline,
+		item.AlarmClocks,
 		id, // ← 这个 ? 对应 WHERE id=?
 	)
 	if err != nil {

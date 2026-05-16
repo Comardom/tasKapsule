@@ -20,19 +20,19 @@
 
 ## Go 核心概念速查
 
-| 概念 | Kotlin/Java 等价 | Go 写法 |
+| 概念 | Kotlin/Java 等价 | Go 写法                                 |
 |---|---|---|
-| 类 | `class Capsule` | `type Capsule struct { ... }` |
-| 方法 | `fun Capsule.save()` | `func (c *Capsule) Save()` |
-| 接口 | `interface CapsuleRepository` | `type Repository interface { ... }` |
-| 构造函数 | `class Capsule(...)` | `func NewCapsule(...) *Capsule` |
-| 异常 | `try/catch` | `if err != nil { return err }` |
-| null | `null` / `?` | `nil` |
-| 空接口 / any | `Any` / `Object` | `any`（Go 1.18+） |
-| 数组 | `List<T>` | `[]T`（切片，动态长度） |
-| Map | `Map<K,V>` | `map[K]V` |
-| 包 | `import xyz.taskapsule...` | `import "github.com/..."` |
-| 公开/私有 | `public` / `private` | 首字母大写=公开，小写=私有 |
+| 类 | `class Capsule` | `type Capsule struct { ... }`         |
+| 方法 | `fun Capsule.save()` | `func (c *Capsule) Save()`            |
+| 接口 | `interface CapsuleRepository` | `type Repository interface { ... }`   |
+| 构造函数 | `class Capsule(...)` | `func NewCapsule(...) *Capsule`       |
+| 异常 | `try/catch` | `if err != nil { return err }`        |
+| null | `null` / `?` | `nil`                                 |
+| 空接口 / any | `Any` / `Object` | `any`（Go 1.18+）                       |
+| 数组 | `List<T>` | `[]T`（切片，动态长度）                        |
+| Map | `Map<K,V>` | `map[K]V`                             |
+| 包 | `import xyz.taskapsule...` | `import "github.com/..."`             |
+| 公开/私有 | `public` / `private` | 首字母大写=公开，小写=私有                        |
 | HTTP 路由 | `@GetMapping("/health")` | `http.HandleFunc("/health", handler)` |
 
 ## 当前进度

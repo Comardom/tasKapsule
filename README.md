@@ -10,8 +10,11 @@
 
 
 
+## [2026-05-16] - 0.0.32
+* 重写pinia相关内容以适配新字段
 
-## [2026-05-14] - 0.0.31
+---
+## [2026-05-16] - 0.0.31
 * 删除原kotlin后端，新建go后端
 
 ---
@@ -233,7 +236,7 @@
     * 把原本负责权限管理的块中加入了对于EROFS的检测
     * createWindow()中的win改成了全局mainWindow
   * electron/preload.ts增加了对于监听主进程
-  * frontend/env.d.ts增加前后端连接（日志传递）的内容
+  * frontend/env.aDate.ts增加前后端连接（日志传递）的内容
   * frontend中loadingPageController.ts加入了监听与移除监听
   * 各vue稍作改造加入Loading信息的传入
 * 修复了package.json中旧的后端版本号不符的问题

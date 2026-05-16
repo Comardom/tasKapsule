@@ -1,19 +1,27 @@
-// TODO 重写
 import { defineStore } from 'pinia';
 import { capsuleApi } from '@/utils/apiService.ts';
 
+export type Classification = 'note' | 'urgent' | 'favourite' | 'sms' | 'inspiration';
+export type ScheduleStatus = 'pending' | 'executing' | 'completed' | 'cancelled' | 'blocked';
+export type DisplayMode = 'all' | 'first-last' | 'first' | 'last';
+export type ViewMode = 'single' | 'double';
+
 // 定义实体接口，提高开发效率,让 IDE 知道一个胶囊对象里有哪些字段
 export interface Capsule {
-  id: number;           // 对应数据库自增 ID
-  title: string;
-  content?: string;     // 使用 ? 因为它是 nullable
+  id: number;
+  createdAt: string;
+  contentText: string;
   audioPath?: string;
-  attachmentPaths?: string; // 如果后端直接丢出 JSON 字符串，这里就是 string
-  targetDate: string;   // 对应 LocalDate
-  startTime?: string;   // 对应 LocalTime
-  durationMinutes: number;
-  status: 'PENDING' | 'COMPLETED'; // 建议限定范围，比 string 更好用
-  createdAt: string;    // 对应 LocalDateTime
+  attachmentPaths?: string;
+  classification: Classification;
+  isWithSchedule: number;  // 0 | 1
+  scheduleIcon?: string;
+  scheduleContentText?: string;
+  scheduleStartAt?: string;  // "YYYY-MM-DD HH:mm:ss"
+  scheduleEndAt?: string;    // "YYYY-MM-DD HH:mm:ss"
+  scheduleStatus?: ScheduleStatus;
+  scheduleDeadline?: string;
+  alarmClocks?: string;
 }
 
 //管理应用中所有关于“日程胶囊”的状态和行为
@@ -26,51 +34,95 @@ export const useCapsuleStore = defineStore('capsule', {
     //ISO时间是2026-04-23T15:12:16Z的格式，在T处分割，生成一个数组，第一个就是日期
     //selectedDate: new Date().toISOString().split('T')[0],
     selectedDate: new Date().toLocaleDateString('sv-SE'),
-    // 存放从后端获取到的胶囊数组
-    capsules: [] as Capsule[],
-    // 全局加载状态。True 时，界面可以显示转圈圈动画
-    isLoading: false,
-    // 错误信息。如果后端报错，把错误存到这里展示给用户
-    error: null as string | null
+    allCapsules: [] as Capsule[],
+    isLoading: false as boolean,
+    error: null,
+    displayMode: 'all' as DisplayMode,
+    viewMode: 'single' as ViewMode,
   }),
 
   //修改数据的方法（相当于 Vue 组件的 methods）
   //支持异步操作，是与后端通讯的最佳场所
   actions: {
-    //fetchCapsules: 从服务器拉取当前选中日期的所有数据
     async fetchCapsules() {
-      //安全检查：如果没有日期，直接不干活
-      if (!this.selectedDate) return; // 如果没有日期，直接返回
-      //开始工作：设置加载状态，清空之前的错误
       this.isLoading = true;
       this.error = null;
-      this.capsules = [];
       try {
-        //通讯：调用之前封装好的 API 接口
-        const res = await capsuleApi.getByDate(this.selectedDate);
-        console.log("后端原始返回:", res);
-        // 假设 res.data 是数组
-        // 赋值：将后端返回的数组存入 state
-        // 使用 || [] 是为了防止后端返回 null 导致前端崩溃
-        this.capsules = res.data || [];
+        const res = await capsuleApi.getAll();
+        this.allCapsules = res.data || [];
       } catch (err: any) {
-        //异常处理：如果网络断了或后端挂了，记录错误原因
         this.error = err.message || '获取数据失败';
         console.error('Fetch Capsules Error:', err);
       } finally {
-        //无论成功还是失败，都关闭加载动画
         this.isLoading = false;
       }
     },
-
-    // setDate: 修改选中的日期
     setDate(date: string) {
-      // 只有当日期的确发生变化时才执行，避免重复请求
       if (this.selectedDate !== date) {
         this.selectedDate = date;
-        // 日期一变，立刻去重新拉取该日期下的数据
-        this.fetchCapsules().then(r => {});
       }
+    },
+    setDisplayMode(mode: DisplayMode) {
+      this.displayMode = mode;
+    },
+    setViewMode(mode: ViewMode) {
+      this.viewMode = mode;
+    }
+  },
+  getters: {
+    // A 模式用：全量按 createdAt 降序
+    byCreatedAt(state): Capsule[] {
+      return [...state.allCapsules].sort((a, b) =>
+          b.createdAt.localeCompare(a.createdAt)
+      );
+    },
+    // B 模式列1：有日程的胶囊按 displayMode 展开
+    scheduleTimeline(state): { capsule: Capsule; date: string }[] {
+      const result: { capsule: Capsule; date: string }[] = [];
+      const scheduled =
+          state.allCapsules.filter(item =>
+              item.isWithSchedule === 1 && item.scheduleStartAt);
+      for (const item of scheduled) {
+        const start = item.scheduleStartAt!.substring(0, 10);
+        const end = item.scheduleEndAt
+            ? item.scheduleEndAt.substring(0, 10)
+            : start;
+        const dates = getDateRange(start, end);
+        let displayDates: string[];
+        switch (state.displayMode) {
+          case 'first':       displayDates = [dates[0]!]; break;
+          case 'last':        displayDates = [dates[dates.length - 1]!]; break;
+          case 'first-last':  displayDates = [dates[0]!, dates[dates.length - 1]!]; break;
+          default:            displayDates = dates; // 'all'
+        }
+        for (const aDate of displayDates) {
+          result.push({ capsule: item, date: aDate });
+        }
+      }
+      result.sort((a, b) =>
+          a.date.localeCompare(b.date) ||
+          (a.capsule.scheduleStartAt || '').localeCompare(b.capsule.scheduleStartAt || '')
+      );
+      return result;
+    },
+    // B 模式列2：无日程胶囊按 createdAt 降序
+    withoutSchedule(state): Capsule[] {
+      return state.allCapsules
+          .filter(c => c.isWithSchedule === 0)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     }
   }
 });
+
+
+// 日期展开辅助
+function getDateRange(start: string, end: string): string[] {
+  const dates: string[] = [];
+  const current = new Date(start);
+  const last = new Date(end);
+  while (current <= last) {
+    dates.push(current.toISOString().substring(0, 10));
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+}
