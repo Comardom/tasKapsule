@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 export interface IElectronAPI {
-    onJvmStatus: (callback: (text: string) => void) => void;
-    removeJvmListeners: () => void;
+    onBackendStatus: (callback: (text: string) => void) => void;
+    removeBackendListeners: () => void;
 }
 declare global {
     interface Window {

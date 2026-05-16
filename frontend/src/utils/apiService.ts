@@ -1,4 +1,5 @@
 // src/utils/apiService.ts
+// TODO 重写
 import axios from 'axios';
 import type { Capsule } from '@/stores/capsule.ts';
 

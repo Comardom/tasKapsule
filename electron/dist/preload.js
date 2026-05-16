@@ -6,12 +6,12 @@ electron_1.contextBridge.exposeInMainWorld('api', {
     saveFile: (content) => electron_1.ipcRenderer.invoke('save-file', content)
 });
 electron_1.contextBridge.exposeInMainWorld('electronAPI', {
-    onJvmStatus: (callback) => {
+    onBackendStatus: (callback) => {
         const handler = (_event, value) => callback(value);
-        electron_1.ipcRenderer.on('jvm-status-update', handler);
-        return () => electron_1.ipcRenderer.removeListener('jvm-status-update', handler);
+        electron_1.ipcRenderer.on('backend-status-update', handler);
+        return () => electron_1.ipcRenderer.removeListener('backend-status-update', handler);
     },
-    removeJvmListeners: () => {
-        electron_1.ipcRenderer.removeAllListeners('jvm-status-update');
+    removeBackendListeners: () => {
+        electron_1.ipcRenderer.removeAllListeners('backend-status-update');
     }
 });

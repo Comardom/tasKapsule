@@ -1,3 +1,4 @@
+// TODO 重写
 import { ref, onMounted , onUnmounted } from 'vue';
 import { checkBackendHealth } from "@/utils/backendHealthCheck";
 
@@ -12,7 +13,7 @@ export function loadingPageController() {
 
         // 监听来自 Electron 的 JVM 状态更新，状态每次更新都会触发更新，状态来自electron/preload.ts
         if (window.electronAPI) {
-            window.electronAPI.onJvmStatus((status: string) => {
+            window.electronAPI.onBackendStatus((status: string) => {
                 loadingText.value = status;
             });
         }
@@ -38,7 +39,7 @@ export function loadingPageController() {
     onUnmounted(() => {
         // 组件销毁时移除监听
         if (window.electronAPI) {
-            window.electronAPI.removeJvmListeners();
+            window.electronAPI.removeBackendListeners();
         }
     });
 

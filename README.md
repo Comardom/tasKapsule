@@ -11,7 +11,10 @@
 
 
 
+## [2026-05-14] - 0.0.31
+* 删除原kotlin后端，新建go后端
 
+---
 ## [2026-05-14] - 0.0.30
 * 优化UI
 * 优化Calendar.vue的script内容顺序
@@ -318,11 +321,8 @@
 
 ---
 
-## JDK
-- 非 Windows：安装 **SDKMAN**
-- Windows：配置系统环境变量 `JAVA_HOME` 指向需要的版本，并更新 `PATH`
-- 下载JDK请去Adoptium网站，使用Java21
-### 注意！！！一定要看/jre/README.md！！！
+## Go
+- 自己查一下吧，挺简单的
 
 ---
 
@@ -385,7 +385,7 @@ pnpm build
 ```
 ```shell
 cd ../backend
-./gradlew build 
+go run .
 ```
 cd ../之后就要在根目录执行了！！检查路径！！！
 ```shell

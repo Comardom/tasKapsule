@@ -6,12 +6,12 @@ contextBridge.exposeInMainWorld('api', {
 })
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    onJvmStatus: (callback: (text: string) => void) => {
+    onBackendStatus: (callback: (text: string) => void) => {
         const handler = (_event: any, value: string) => callback(value);
-        ipcRenderer.on('jvm-status-update', handler);
-        return () => ipcRenderer.removeListener('jvm-status-update', handler);
+        ipcRenderer.on('backend-status-update', handler);
+        return () => ipcRenderer.removeListener('backend-status-update', handler);
     },
-    removeJvmListeners: () => {
-        ipcRenderer.removeAllListeners('jvm-status-update');
+    removeBackendListeners: () => {
+        ipcRenderer.removeAllListeners('backend-status-update');
     }
 });

@@ -4,18 +4,19 @@
 
 ## Architecture
 
-Three-tier desktop app — Electron is a shell, not an integrated runtime:
+Desktop app — Electron shell + Go backend (replaced Kotlin/Spring Boot):
 
 ```
-Electron main (electron/)  →  spawns Spring Boot JAR as child process (port 9999)
+Electron main (electron/)  →  spawns Go binary as child process (port 9999)
                            →  serves Vue SPA via loadFile()
 Vue renderer (frontend/)   →  talks to backend via REST (axios → localhost:9999)
-                           →  talks to main via IPC (file dialogs, JVM status)
-Backend (backend/)         →  Spring Boot 4 / Kotlin / SQLite
+                           →  talks to main via IPC (file dialogs, status updates)
+Backend (backend/)         →  Go / net/http / SQLite
 ```
 
 - Electron **does not serve** the frontend via HTTP. It loads `frontend/dist/index.html` directly.
-- The backend is **not a standalone service** — it lives only as long as Electron runs.
+- The backend is a single Go binary — `go build -o taskapsule-server` produces one file, no JRE needed.
+- The Kotlin/Spring Boot version is archived at `github.com/Comardom/tasKapsule-kotlin`.
 
 ## Dev commands (run from repo root)
 
@@ -23,12 +24,12 @@ Backend (backend/)         →  Spring Boot 4 / Kotlin / SQLite
 |---|---|
 | `pnpm dev` | Start all 3 in parallel (frontend :9998, backend :9999, Electron) |
 | `pnpm dev:frontend` | Vite dev server only |
-| `pnpm dev:backend` | `./gradlew bootRun` (or `gradlew.bat` on Windows) |
+| `pnpm dev:backend` | `cd backend && go run .` |
 | `pnpm dev:electron` | `electron .` in development mode |
-| `pnpm dist` | Production build: frontend → backend → electron TS → electron-builder |
-| `pnpm dist:win` | Same, but uses `gradlew.bat` for backend |
+| `pnpm build:backend` | `cd backend && go build -o taskapsule-server` |
+| `pnpm dist` | Production build: frontend → backend (go build) → electron TS → electron-builder |
 
-Ports are hard-wired: frontend dev on **9998**, backend on **9999**. Do not change without updating `vite.config.ts`, `apiService.ts`, `backendHealthCheck.ts`, and `electron/main.ts`. These are intentionally fixed for a self-contained desktop app.
+Ports are hard-wired: frontend dev on **9998**, backend on **9999**.
 
 ## Critical gotchas
 
@@ -44,23 +45,28 @@ They work in Chromium 108+, which the bundled Electron provides. Do NOT replace 
 
 `router/index.ts` uses `createWebHashHistory`. Electron loads via `file://` without a web server — hash-based routing is required. Do not change to `createWebHistory`.
 
-### Backend status relay via stdout regex
+### Backend status relay via stdout ✅ fixed
 
-The backend logs lines like `[STAGE] KEY: message` to stdout. Electron's `main.ts` parses this with a regex and sends the message to the renderer via IPC (`jvm-status-update`). The path is:
+`electron/main.ts` stdout block 已改为简单日志输出（A 方案），不再监听 `[STAGE]`。Go 启动极快（毫秒级），loading screen 仍存在但无后端状态输入，后续可考虑简化或移除。
 
-```
-Backend stdout → main.ts regex → preload.ts (contextBridge) → loadingPageController.ts → LoadingScreen.vue
-```
+### Go backend reference
 
-If you change the `[STAGE]` log format in the Kotlin controllers, the loading screen breaks.
-
-### Backend port cleanup on startup
-
-`electron/main.ts` calls `killPort(9999)` before spawning the JVM. If you change the backend port, you must update the kill port logic.
+`design/go-setup.md` covers the Go module setup, core concept mappings (Kotlin→Go), common commands, and the current database schema. Go backend is a single `main.go` + `capsule.go` + `go.mod` — no framework, no JVM.
 
 ### TimeManager: all date arithmetic uses UTC
 
 `TimeManager.ts` uses `Date.UTC()` + `getUTC*()` for all calendar math (day-of-week, days-in-month, etc.). This avoids timezone offset errors when `this.timeZone` differs from the system local timezone. When adding new date calculation methods, follow the same pattern — never use bare `new Date(year, month, day)` without `Date.UTC`.
+
+### Go binary name: `taskapsule-server`
+
+The Go backend compiles to `taskapsule-server` (not `backend-server`). Update any reference in:
+- `package.json` scripts (`build:backend`)
+- `electron/main.ts` (spawn path)
+- `electron-builder` extraResources config
+
+### Go dev: `go run .`
+
+Always use `go run .` (not `go run main.go capsule.go`) — Go automatically includes all `.go` files in the current package.
 
 ### Calendar cell color animation toggle
 
@@ -90,27 +96,19 @@ The `auto` fallback also prevents height collapse before `onMounted` fires.
 
 ### Dev mode backend management ✅ fixed
 
-`electron/main.ts` lines 58–62: when `!isProd` (development), Electron creates the window immediately and returns — skipping `killPort(9999)` and `spawn()`. The backend is managed independently by `./gradlew bootRun` via `dev:backend`. No double-backend conflict.
+`electron/main.ts` lines 58–62: when `!isProd` (development), Electron creates the window immediately and returns — skipping `killPort(9999)` and `spawn()`. The backend is managed independently via `dev:backend` (`go run .`). No double-backend conflict.
 
-### Backend: Capsule status enum ✅ fixed
+### Production: Go binary replaces Java JAR ✅ fixed
 
-`Capsule.kt` now uses `enum class CapsuleStatus { PENDING, COMPLETED }` with `@Enumerated(EnumType.STRING)` on the `status` field. The database stores the same `"PENDING"`/`"COMPLETED"` strings — no data migration needed. Compile-time enforcement prevents typos.
+`electron/main.ts` production spawns `taskapsule-server` directly. Single existence check + `chmod` — no JRE, no JAR.
 
 ### Timezone data lives in `frontend/src/data/timezones.ts`
 
 Calendar.vue imports `timeZoneOptions` from the shared data file. The `v-for` uses `:key="\`tz-${index}\`"` to avoid Vue's duplicate-key warnings from overlapping city-name and UTC-offset entries.
 
-### Backend: Jackson module coordinate
-
-Line 38 of `backend/build.gradle.kts`: the Jackson Kotlin module is declared as `tools.jackson.module:jackson-module-kotlin`. While it currently resolves (version 3.1.0), the canonical namespace is `com.fasterxml.jackson.module`. If the build ever fails to resolve it, change to `com.fasterxml.jackson.module:jackson-module-kotlin`.
-
 ### Backend: Production startup guards on electron/main.ts ✅ fixed
 
-Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` checks now `return` after `dialog.showErrorBox`, preventing the `ENOENT` crash that previously occurred when spawn() ran with invalid paths.
-
-### Backend: CapsuleController exception logging ✅ fixed
-
-`CapsuleController.kt` now logs caught exceptions via `logger.error(...)` before returning the empty list. The log output appears in Electron's stderr capture, making date-parse failures and DB errors visible during debugging.
+`electron/main.ts` now spawns `taskapsule-server` with existence check + `chmod`. All Java/JRE/JAR logic removed.
 
 ### TimeManager: `??` not `||` for fallback values ✅ fixed
 
@@ -124,36 +122,16 @@ Lines 87–126 of `electron/main.ts`: in production mode, `javaPath`/`jarPath` c
 
 `router/index.ts` includes `{ path: '/:pathMatch(.*)*', redirect: '/' }` as the last route. Any unrecognized hash path redirects to the home page.
 
-### Backend: CapsuleRepository null-safe sorting ✅ fixed
-
-`findByTargetDateOrderByStartTimeAsc` uses a `@Query` with `CASE WHEN c.startTime IS NULL THEN 1 ELSE 0 END` to push null `startTime` values to the end of the list. SQLite defaults to `NULLS FIRST`, which would put untimed capsules above timed ones.
-
-### Backend: Capsule CRUD now includes PUT endpoint ✅ fixed
-
-`CapsuleController.kt` has a `@PutMapping("/{id}")` that uses `findById` + field-by-field assignment on the managed entity, avoiding `.copy()` (Capsule is not a data class). Hibernate generates an `UPDATE` from the dirty-checked fields.
-
-### Backend: `targetDate` indexed ✅ fixed
-
-`Capsule.kt` `@Table` annotation includes `indexes = [Index(name = "idx_capsules_target_date", columnList = "targetDate")]`.
-
-### Backend: basic integration test ✅ fixed
-
-`BackendApplicationTests.kt` injects `CapsuleRepository` via `@Autowired` and asserts it's not null after context loads.
-
-### Backend: DatabaseConfig slimmed down ✅ fixed
-
-`DatabaseConfig.kt` no longer attempts `mkdirs()` — the directory is pre-created by `BackendApplication.main()` before Spring starts. Only `[STAGE]` progress logging remains.
-
 ## Issue tracker
 
-`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Rounds 1–3 complete. Round 4 (2026-05-13) complete — 3 fixed, 5 intentionally skipped.
+`design/issues.md` contains the full known-issues list organized by P0–P3 priority. Rounds 1–5 complete. Rounds 1–4 were from the Kotlin era; Round 5 covered the Go migration (all resolved). The next round should scan the Go backend for fresh issues.
 
 ## Project layout
 
 ```
 tasKapsule/
 ├── electron/           # Electron main + preload (TS → CommonJS → dist/)
-│   ├── main.ts         # Window creation, JVM spawn, IPC handlers
+│   ├── main.ts         # Window creation, Go binary spawn, IPC handlers
 │   ├── preload.ts      # contextBridge: exposes window.api + window.electronAPI
 │   └── killPort.ts     # Port cleanup utility
 ├── frontend/           # Vue 3 + Vite (port 9998 in dev)
@@ -163,13 +141,14 @@ tasKapsule/
 │       ├── router/     # vue-router (hash history)
 │       ├── utils/      # apiService, healthCheck, loadingPageController, TimeManager
 │       └── globalCSS/  # baseReset, themeVariables, baseNiceStyle
-├── backend/            # Spring Boot Kotlin (Gradle, port 9999)
-│   └── src/main/kotlin/xyz/taskapsule/backend/
-│       ├── controller/ # HomeController (/health), CapsuleController (REST CRUD)
-│       ├── entity/     # Capsule (JPA), CapsuleRepository
-│       └── config/     # DatabaseConfig ([STAGE] logging)
-├── jre/                # Bundled JRE per platform (win_x64, mac_arm, linux_x64)
-└── design/             # Design specs
+├── backend/            # Go (port 9999)
+│   ├── main.go         # Entry point + initDB + HTTP routes + CORS
+│   ├── capsule.go      # Capsule struct + 4 CRUD handlers + helpers
+│   ├── schema.sql      # IDE SQL dialect reference (not used at runtime)
+│   ├── go.mod          # Module declaration + deps
+│   └── go.sum          # Dependency checksums (auto-generated)
+├── legacy-backend-kotlin/  # Archived Kotlin/Spring Boot backend (kept for reference)
+├── design/             # Design specs
     ├── color.md        # Calendar color reference (fabric-texture palette)
     ├── issues.md       # Known issues tracker (P0–P3 priority)
     └── mvp-plan.md     # MVP Phase 1: skeleton (Centro layout, calendar click, CapsuleShelf)
@@ -179,13 +158,12 @@ tasKapsule/
 
 - **Package manager**: pnpm (not npm/yarn). Root orchestration uses `npm-run-all`.
 - **Node version**: lts/krypton (v24.14.0), managed via nvm.
-- **Java**: JDK 21 from Adoptium. Managed via sdkman (macOS/Linux) or JAVA_HOME (Windows).
-- **Database**: SQLite at `~/.taskapsule/data/app.db`. The `BackendApplication.kt` pre-creates the directory. Logs at `~/.taskapsule/logs/backend.log`.
-- **Gradle wrapper**: `./gradlew` (Linux/macOS) or `gradlew.bat` (Windows) — always use the wrapper.
+- **Go**: 1.26.2. Entry point: `backend/main.go`. Build: `go build -o taskapsule-server`. Run dev: `cd backend && go run .`. Go reference: `design/go-setup.md`.
+- **Database**: SQLite at `~/.taskapsule/data/app.db`. Logs at `~/.taskapsule/logs/backend.log`.
 - **Electron TS**: Compiles to CommonJS, output in `electron/dist/`. Entry point: `electron/dist/main.js` (set in root `package.json` main field).
 - **Path alias**: `@/` maps to `frontend/src/` (configured in `vite.config.ts` and `tsconfig.app.json`).
 - **No linter or formatter config exists yet.** No test scripts.
-- **Production JAR name**: Gradle `bootJar` names the output `backend-server.jar`. Electron-builder renames it to `backend.jar` in extraResources.
+- **Production binary name**: `taskapsule-server`. Go produces a single self-contained binary, no JRE needed. `package.json` extraResources already references `backend/taskapsule-server`.
 
 ## i18n & timezone
 
@@ -276,8 +254,8 @@ Variables `--camera-border` and `--camera-corner` in `themeVariables.css` are un
 
 ## Known stub / deprecated components
 
-- `CapsuleShelf/Capsule.vue` — single capsule card component (new).
-- `CapsuleShelf/CapsuleShelf.vue` — capsule list view (in progress).
+- `CapsuleShelf/Capsule.vue` — single capsule card component ✅ done.
+- `CapsuleShelf/CapsuleShelf.vue` — capsule list view (step 5 of MVP plan, pending store integration).
 - `EgoMe.vue` — empty stub, meant for personal profile page.
 - `ClockVibe.vue` — deprecated, will be removed.
 - `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.

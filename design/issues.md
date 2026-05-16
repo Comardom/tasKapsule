@@ -116,3 +116,26 @@
 | 58 | `BackendApplication.kt` | 16 | `mkdirs()` 返回值忽略 | ⏸️ 跳过 |
 | 59 | `electron/killPort.ts` | 13-15 | `netstat`/`lsof` 匹配主动出站连接 | ⏸️ 跳过 |
 | 60 | `electron/killPort.ts` | 19 | `execSync` 无超时 | ⏸️ 跳过 |
+
+---
+
+# Known Issues (2026-05-16 第五轮 — Go 迁移待办)
+
+## P0 — 不迁移则无法打包 ✅ 全部完成
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 61 | `package.json` | 9,14-15 | `dev:backend` 仍指向 Gradle → 改为 `go run .`；删除 `dev:backend:win` | ✅ 已修 |
+| 62 | `package.json` | 17-18 | `dist`/`dist:win` 引 Gradle build → 改为 `go build -o taskapsule-server` | ✅ 已修 |
+| 63 | `package.json` | 28-68 | `extraResources` 引 `backend.jar` + 三个平台 JRE → 改为 `taskapsule-server`，删 JRE | ✅ 已修 |
+| 64 | `electron/main.ts` | 70-136 | Java/JRE/JAR 路径检查逻辑 → 改为 Go 二进制 spawn | ✅ 已修 |
+| 65 | `electron/main.ts` | 158-167 | stdout `[STAGE]` 正则监听 → 改为简单 stdout 日志（A 方案） | ✅ 已修 |
+
+## P3 — 可清理 ✅ 全部完成
+
+| # | 文件 | 问题 | 状态 |
+|---|---|---|---|
+| 66 | `jre/` | 整个目录废弃（Go 不需要 JRE），约 100MB | ✅ 已不存在 |
+| 67 | Kotlin 残留 | `gradlew`、`gradlew.bat`、`gradle/`、`settings.gradle`、`build.gradle.kts` | ✅ 已删除（`legacy-backend-kotlin/` 保留作为存档） |
+| 68 | `backend/schema.sql` | IDE 已配真实数据库后不再需要 | ✅ 已不存在 |
+| 69 | `package.json` | `"description": "...Spring Boot"` → 去掉 Spring Boot | ✅ 已正确 |
