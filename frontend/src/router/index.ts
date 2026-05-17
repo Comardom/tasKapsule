@@ -3,7 +3,6 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 import Centro from '@/components/Centro.vue'
 import TestPage from '@/components/TestPage.vue'
 import TestPage1 from '@/components/TestPage1.vue'
-import TestPinia from "@/components/TestPinia.vue";
 import EgoMe from "@/components/EgoMe.vue";
 
 const router = createRouter({
@@ -24,11 +23,6 @@ const router = createRouter({
       path: '/test1',
       name: 'test1',
       component: TestPage1,
-    },
-    {
-      path: '/test-pinia',
-      name: 'test-pinia',
-      component: TestPinia,
     },
     {
       path: '/ego-me',

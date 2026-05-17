@@ -223,7 +223,9 @@ watch(() => capsuleStore.selectedDate, () => {
 2. `Calendar.vue` — 点击 + 三态逻辑 + 动画开关 + 伪元素渐变过渡 ✅
 3. `Centro.vue` — 改 flex 方向 ✅
 4. `Capsule.vue` — 单个胶囊卡片组件 ✅
-5. `CapsuleShelf.vue` — 完整骨架（引入 store + watch + 四状态渲染） ⬅️ 当前
+5. `CapsuleShelf.vue` — 渲染 CapsuleComponent 从 `store.byCreatedAt` ✅
+
+> 实际实现与原计划不同：CapsuleShelf 没有 date watch / loading 四状态，直接渲染全部胶囊。每个胶囊独立管理展开/收起（local `expanded` ref），无需 emit 链。Centro.vue 为纯布局容器。
 
 ---
 

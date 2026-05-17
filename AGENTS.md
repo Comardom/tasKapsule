@@ -254,9 +254,13 @@ Variables `--camera-border` and `--camera-corner` in `themeVariables.css` are un
 
 ## Known stub / deprecated components
 
-- `CapsuleShelf/Capsule.vue` — single capsule card component ✅ done.
-- `CapsuleShelf/CapsuleShelf.vue` — capsule list view (step 5 of MVP plan, pending store integration).
+- `CapsuleShelf/Capsule.vue` — single capsule card with independent expand/collapse toggle (local `expanded` ref), rounded rect design, text ellipsis via `inline-size: 100%` + `text-overflow: ellipsis`. ✅ done.
+- `CapsuleShelf/CapsuleShelf.vue` — renders capsule list from `store.byCreatedAt`, no date filter, no event chain. ✅ done.
 - `EgoMe.vue` — empty stub, meant for personal profile page.
 - `ClockVibe.vue` — deprecated, will be removed.
 - `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.
 - `TestPinia.vue` — capsule store integration test page.
+
+## Centro state
+
+`Centro.vue` is clean — just `<Calendar />` + `<CapsuleShelf />`. No event handling, no selected capsule state. Capsule toggle is self-contained in `Capsule.vue` via local `expanded` ref.

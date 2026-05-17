@@ -23,7 +23,6 @@ function goTo(path: string) {
         <button @click="goTo('/')">Centro</button>
         <button @click="goTo('/test')">主页</button>
         <button @click="goTo('/test1')">个人</button>
-        <button @click="goTo('/test-pinia')">TestPinia</button>
         <button @click="goTo('/ego-me')">EgoMe</button>
         <button @click="themeStore.toggleTheme">
           {{ themeStore.theme === 'dark' ? '🌙 暗色模式' : '🌞 亮色模式' }}
