@@ -29,3 +29,4 @@ pnpm build
 #### 本项目的部分 UI 组件参考或引用了 uiverse.io，感谢以下创作者：
 LoadingRectangle.vue - 
 参考了 [Tem Revil](https://github.com/TemRevil) 的设计。
+https://uiverse.io/profile/codebykay101

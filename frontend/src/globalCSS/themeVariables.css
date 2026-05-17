@@ -17,8 +17,8 @@
   --selection-text: #000000;
 
   /* ── 日历面板留白 ── */
-  --calendar-frame-bg: #F0F0F0;
-  --calendar-frame-bg-alt: #EDEDED;
+  --calendar-frame-bg: rgb(244 233 233 / 0.62);
+  --calendar-frame-bg-alt: rgb(241 234 234 / 0.6);
 
   /* ── 当月格子 ── */
   --calendar-cell-bg: #F3F3F3;
@@ -37,12 +37,17 @@
   --calendar-today-bg-mid:   #628CED;
   --calendar-today-bg-end:   #4E78E8;
   --calendar-today-text: #FFFFFF;
+  --calendar-today-unselected-text: rgb(136 131 131 / 0.7);
+
+  --calendar-other-month-bg: rgb(195 185 178 / 0.49);
+  --calendar-other-month-text: rgb(78 70 78 / 0.83);
 
   /* ── 格线 ── */
   --calendar-grid-line: #DADBDF;
 
-  --calendar-today-unselected-bg: #B8B8B8;
-  --calendar-today-unselected-shadow: #A0A0A0;
+  --calendar-today-unselected-bg: rgb(74 67 67 / 0.2);
+  --calendar-today-unselected-shadow: #3c3838;
+  --calendar-today-shadow: #F0F0F0;
 }
 
 [data-theme='dark'] {
@@ -62,12 +67,12 @@
   --selection-text: #ffffff;
 
   /* ── 日历面板留白 ── */
-  --calendar-frame-bg: #1C1C20;
-  --calendar-frame-bg-alt: #1A1A1E;
+  --calendar-frame-bg: rgb(1 16 30 / 0.51);
+  --calendar-frame-bg-alt: rgb(4 4 27 / 0.48);
 
   /* ── 当月格子 ── */
   --calendar-cell-bg: #2C2C32;
-  --calendar-cell-bg-alt: #2A2A30;
+  --calendar-cell-bg-alt: #2a2c30;
   --calendar-cell-text: #B0B0B8;
   --calendar-cell-text-small: #6A6A72;
 
@@ -78,14 +83,19 @@
   --calendar-cell-other-text-small: #34343C;
 
   /* ── 当天格子 ── */
-  --calendar-today-bg-start: #5B7CE0;
-  --calendar-today-bg-mid:   #4A6AD5;
-  --calendar-today-bg-end:   #3D5AC8;
+  --calendar-today-bg-start: rgb(244 114 182 / 0.73);  /* 浅粉色 */
+  --calendar-today-bg-mid: rgb(236 72 153 / 0.71);  /* 粉红色 */
+  --calendar-today-bg-end: rgb(219 39 119 / 0.61);  /* 深粉色 */
   --calendar-today-text: #FFFFFF;
+  --calendar-today-unselected-text: rgb(170 170 170 / 0.6);
+
+  --calendar-other-month-bg: #2f137c;
+  --calendar-other-month-text: rgb(165 177 173 / 0.87);
 
   /* ── 格线 ── */
   --calendar-grid-line: #3A3A40;
 
-  --calendar-today-unselected-bg: #222228;
-  --calendar-today-unselected-shadow: #0D0D12;
+  --calendar-today-unselected-bg: #0c0e0b;
+  --calendar-today-unselected-shadow: #4c574c;
+  --calendar-today-shadow: #F0F0F0;
 }

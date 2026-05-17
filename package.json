@@ -2,7 +2,7 @@
   "name": "taskapsule",
   "description": "Task management app with Electron + Vue + Go",
   "author": "Comardom",
-  "version": "0.0.31",
+  "version": "0.0.34",
   "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",

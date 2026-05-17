@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Footer from "@/components/CopyrightFooter.vue";
+import GlassTest from "@/components/glassTest.vue";
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import Footer from "@/components/CopyrightFooter.vue";
       <div class="slot-container">
         <slot />
       </div>
+      <GlassTest />
     </section>
     <Footer
       year="2026"

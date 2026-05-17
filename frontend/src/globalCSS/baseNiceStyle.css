@@ -28,7 +28,7 @@ button {
     cursor: pointer;
     vertical-align: middle;
 }
-button, input {
+button, input, select {
     /* 按钮需要变颜色和背景，单独写 */
     transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }

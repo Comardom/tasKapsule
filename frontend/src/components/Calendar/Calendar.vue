@@ -108,7 +108,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 </script>
 
 <template>
-  <div class="calendar" :class="{ 'no-animate': !useAnimate }">
+  <div class="calendar">
     <div class="calendar-header">
       <div class="clock">
         <button><span>这是clock区域</span></button>
@@ -129,9 +129,6 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
-      <button @click="useAnimate = !useAnimate">
-        {{ useAnimate ? '目前有动画：点击改为无动画' : '目前无动画：点击改为有动画' }}
-      </button>
     </div>
 
     <div class="calendar-body">
@@ -153,6 +150,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
           class="lastMonthTail"
           :class="{
             'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth,
+            'cell-gray':!(上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth)
           }"
           @click="cellClicked(上月天数 - 月初曜日 + day上月,true)"
       >
@@ -166,7 +164,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
           class="thisMonth"
           :class="{
             'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
-            'cell-gray': day此月 === 今天几号 && selectedDay != 今天几号,
+            'cell-gray-with-shadow': day此月 === 今天几号 && selectedDay != 今天几号,
           }"
           @click="cellClicked(day此月,false)"
       >
@@ -180,6 +178,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
           class="nextMonthHead"
           :class="{
             'cell-blue':day下月 === selectedDay && isSelectOtherMonth,
+            'cell-gray':!(day下月 === selectedDay && isSelectOtherMonth)
           }"
           @click="cellClicked(day下月,true)"
       >
@@ -206,11 +205,9 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   block-size: var(--full-block-size);
   /*这个是宽度*/
   inline-size: calc(var(--full-inline-size) + 3dvi);
-  background-color: var(--calendar-frame-bg);
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
-}
-.calendar.no-animate {
-  --cell-transition-duration: 0s;
+  background-color: color-mix(in srgb, var(--calendar-frame-bg) 70%, transparent);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+  /*backdrop-filter: blur(0.2rem);*/
 }
 .calendar-header{
   display: flex;
@@ -223,17 +220,20 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   inline-size: var(--full-inline-size);
 }
 .calendar-body{
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+
   display: grid;
   place-content: center;
   /*place-items: center;*/
   grid-template-columns: repeat(7, 1fr);
-  background-color: var(--calendar-cell-bg);
+  /*background-color: var(--calendar-cell-bg);*/
   /*这个是高度，由TS控制*/
   /*noinspection CssUnresolvedCustomProperty*/
   block-size: var(--this-month-height-in-dvi, auto);
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
+  /*background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);*/
+
 }
 .calendar-tail{
   display: flex;
@@ -245,19 +245,33 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }
-/* 蓝色渐变通过 Cell 组件的 ::after 伪元素 + opacity 过渡实现，见 Cell.vue */
-.cell-blue::after {
-  opacity: 1;
+.cell-blue {
+  background: linear-gradient(to bottom,
+  color-mix(in srgb, var(--calendar-today-bg-start) 75%, transparent),
+  color-mix(in srgb, var(--calendar-today-bg-mid) 75%, transparent),
+  color-mix(in srgb, var(--calendar-today-bg-end) 75%, transparent));
+  color: var(--calendar-today-text);
 }
 .cell-blue span {
   color: var(--calendar-today-text);
 }
-.cell-gray {
+.cell-gray-with-shadow {
   background-color: var(--calendar-today-unselected-bg);
-  box-shadow: inset 0 0 0.4rem 0.2rem var(--calendar-today-unselected-shadow);
-  color: var(--calendar-today-text);
+  /*box-shadow: inset 0 0 0.4rem 0.3rem var(--calendar-today-unselected-shadow);*/
+  box-shadow:
+      inset 0 0.1875rem 0.4rem 0.15rem rgba(0, 0, 0, 0.3),      /* 底部深阴影（重） */
+      inset 0 -0.0625rem 0.15rem 0.05rem rgba(255, 255, 255, 0.05)!important;  /* 顶部微弱亮光（轻） */
+
+  color: var(--calendar-today-unselected-text);
+}
+.cell-gray-with-shadow span {
+  color: var(--calendar-today-unselected-text);
+}
+.cell-gray {
+  background-color: var(--calendar-other-month-bg);
+  color: var(--calendar-other-month-text);
 }
 .cell-gray span {
-  color: var(--calendar-today-text);
+  color: var(--calendar-other-month-text);
 }
 </style>

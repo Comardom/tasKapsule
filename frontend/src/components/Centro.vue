@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import Calendar from "@/components/Calendar/Calendar.vue";
 import CapsuleShelf from "@/components/CapsuleShelf/CapsuleShelf.vue";
+import Placeholder from "@/components/Placeholder.vue";
 </script>
 
 <template>
   <div class="container">
+    <Placeholder />
     <Calendar />
     <CapsuleShelf
-        style="'flex'=1"
+        :style="{ flex: 1 }"
     />
+    <Placeholder />
   </div>
 </template>
 
