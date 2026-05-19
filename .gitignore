@@ -46,3 +46,6 @@ design/*.jpeg
 #这个不用上传
 .kotlin/
 legacy-backend-kotlin/
+
+*.docx
+*.doc

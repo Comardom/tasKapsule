@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Footer from "@/components/CopyrightFooter.vue";
+import NewGlassTest from "@/components/NewGlassTest.vue";
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import Footer from "@/components/CopyrightFooter.vue";
       <p>这是一个测试界面捏</p>
       <div class="slot-container">
         <slot />
+        <NewGlassTest />
       </div>
     </section>
     <Footer

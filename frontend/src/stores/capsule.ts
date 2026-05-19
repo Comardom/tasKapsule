@@ -90,10 +90,17 @@ export const useCapsuleStore = defineStore('capsule', {
         const dates = getDateRange(start, end);
         let displayDates: string[];
         switch (state.displayMode) {
-          case 'first':       displayDates = [dates[0]!]; break;
-          case 'last':        displayDates = [dates[dates.length - 1]!]; break;
-          case 'first-last':  displayDates = [dates[0]!, dates[dates.length - 1]!]; break;
-          default:            displayDates = dates; // 'all'
+          case 'first':
+            displayDates = [dates[0]!]; break;
+          case 'last':
+            displayDates = [dates[dates.length - 1]!]; break;
+          case 'first-last':
+            displayDates = dates.length > 1
+                ? [dates[0]!, dates[dates.length - 1]!]
+                : [dates[0]!];
+            break;
+          default:
+            displayDates = dates; // 'all'
         }
         for (const aDate of displayDates) {
           result.push({ capsule: item, date: aDate });

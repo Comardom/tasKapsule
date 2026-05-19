@@ -5,6 +5,7 @@ import Cell from "@/components/Calendar/Cell.vue";
 import { timeZoneOptions } from '@/data/timezones.ts'
 import {TimeManager} from '@/utils/TimeManager.ts'
 import useLocaleStore from "@/stores/locale.ts";
+import {useCapsuleStore} from "@/stores/capsule.ts";
 
 //固定内容
 const 曜日缩写 = computed(() => {
@@ -96,6 +97,11 @@ onUnmounted(() => {
   clearInterval(timer);
 })
 
+
+const capsuleStore = useCapsuleStore();
+
+
+
 //格子点击事件的处理
 const isSelectOtherMonth = ref<boolean>(false);
 const selectedDay = ref<number>(今天几号.value);
@@ -104,6 +110,10 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   isSelectOtherMonth.value = isOtherMonth;
   selectedDay.value = whatDay;
   // TODO: capsuleStore.setDate()，把 selectedDay 同步到全局 store，驱动 CapsuleShelf 刷新
+  const formatted:ReturnType<typeof timeManager.getFormatted> = timeManager.getFormatted();
+  const month = String(formatted.month + 1).padStart(2, '0');
+  const day = String(whatDay).padStart(2, '0');
+  capsuleStore.setDate(`${formatted.year}-${month}-${day}`);
 }
 </script>
 
@@ -195,7 +205,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
 <style scoped>
 .calendar{
   --cell-transition-duration: 0.25s;
-  --full-block-size : 85dvb;
+  --full-block-size : 100dvb;
   --full-inline-size : 35dvi;
   display: flex;
   flex-direction: column;
@@ -205,7 +215,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   block-size: var(--full-block-size);
   /*这个是宽度*/
   inline-size: calc(var(--full-inline-size) + 3dvi);
-  background-color: color-mix(in srgb, var(--calendar-frame-bg) 70%, transparent);
+  background-color: var(--calendar-bg);
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
   /*backdrop-filter: blur(0.2rem);*/
 }
@@ -215,7 +225,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   justify-content: center;
   align-items: center;
   /*这个是高度*/
-  block-size: 7dvb;
+  block-size: 12dvb;
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }
@@ -232,7 +242,7 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   block-size: var(--this-month-height-in-dvi, auto);
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
-  /*background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);*/
+  background: linear-gradient(155deg, rgba(255,255,255,0.01), transparent);
 
 }
 .calendar-tail{

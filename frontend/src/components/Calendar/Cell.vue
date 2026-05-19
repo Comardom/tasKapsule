@@ -37,15 +37,15 @@ const blockStyle = computed(() => ({
   overflow: hidden;
 
   /* === 玻璃效果三大核心 === */
-
+/*mask: radial-gradient(circle, black 0.01%, transparent 100%);*/
   /* 1. 半透明渐变 */
-  backdrop-filter: blur(0.75rem);
+  backdrop-filter: var(--cell-backdrop-filter);
   /* 2. 背景模糊 */
-  border: 0.125rem solid rgba(255, 255, 255, 0.1);
+  border:var(--cell-border);
   /* 3. 边缘高光 */
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+  background: var(--cell-bg);
   /* 立体感增强 */
-  box-shadow:0 0.75rem 0.9rem rgba(0, 0, 0, 0.25);
+  box-shadow:var(--cell-box-shadow);
 }
 .flex-block slot{
   user-select: none;

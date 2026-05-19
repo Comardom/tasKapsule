@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Footer from "@/components/CopyrightFooter.vue";
-import GlassTest from "@/components/glassTest.vue";
+import GlassTest from "@/components/GlassTest.vue";
 </script>
 
 <template>

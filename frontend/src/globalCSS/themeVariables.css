@@ -17,7 +17,7 @@
   --selection-text: #000000;
 
   /* ── 日历面板留白 ── */
-  --calendar-frame-bg: rgb(244 233 233 / 0.62);
+  --calendar-frame-bg: rgb(241 222 222 / 0.78);
   --calendar-frame-bg-alt: rgb(241 234 234 / 0.6);
 
   /* ── 当月格子 ── */
@@ -33,9 +33,9 @@
   --calendar-cell-other-text-small: #FEFEFE;
 
   /* ── 当天格子 ── */
-  --calendar-today-bg-start: #7198F0;
-  --calendar-today-bg-mid:   #628CED;
-  --calendar-today-bg-end:   #4E78E8;
+  --calendar-today-bg-start: rgb(113 152 240 / 0.92);
+  --calendar-today-bg-mid: rgb(98 140 237 / 0.89);
+  --calendar-today-bg-end: rgb(78 120 232 / 0.87);
   --calendar-today-text: #FFFFFF;
   --calendar-today-unselected-text: rgb(136 131 131 / 0.7);
 
@@ -48,6 +48,16 @@
   --calendar-today-unselected-bg: rgb(74 67 67 / 0.2);
   --calendar-today-unselected-shadow: #3c3838;
   --calendar-today-shadow: #F0F0F0;
+
+
+  --calendar-bg: color-mix(in srgb, var(--calendar-frame-bg) 75%, transparent);
+  --cell-box-shadow: 0 1.1rem 1.25rem rgba(0, 0, 0, 0.2);
+  --cell-bg:linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+  --cell-border: 0.125rem solid rgba(255, 255, 255, 0.15);
+  --cell-backdrop-filter: blur(0.04rem);
+
+
+  --capsule-shelf-bg: rgb(248 237 237 / 0.12);
 }
 
 [data-theme='dark'] {
@@ -67,13 +77,13 @@
   --selection-text: #ffffff;
 
   /* ── 日历面板留白 ── */
-  --calendar-frame-bg: rgb(1 16 30 / 0.51);
+  --calendar-frame-bg: rgb(25 39 50 / 0.51);
   --calendar-frame-bg-alt: rgb(4 4 27 / 0.48);
 
   /* ── 当月格子 ── */
   --calendar-cell-bg: #2C2C32;
   --calendar-cell-bg-alt: #2a2c30;
-  --calendar-cell-text: #B0B0B8;
+  --calendar-cell-text: rgb(176 176 184 / 0.87);
   --calendar-cell-text-small: #6A6A72;
 
   /* ── 非本月格子 ── */
@@ -86,10 +96,10 @@
   --calendar-today-bg-start: rgb(244 114 182 / 0.73);  /* 浅粉色 */
   --calendar-today-bg-mid: rgb(236 72 153 / 0.71);  /* 粉红色 */
   --calendar-today-bg-end: rgb(219 39 119 / 0.61);  /* 深粉色 */
-  --calendar-today-text: #FFFFFF;
+  --calendar-today-text: rgb(255 255 255 / 0.87);
   --calendar-today-unselected-text: rgb(170 170 170 / 0.6);
 
-  --calendar-other-month-bg: #2f137c;
+  --calendar-other-month-bg: rgb(26 26 28 / 0.68);
   --calendar-other-month-text: rgb(165 177 173 / 0.87);
 
   /* ── 格线 ── */
@@ -98,4 +108,13 @@
   --calendar-today-unselected-bg: #0c0e0b;
   --calendar-today-unselected-shadow: #4c574c;
   --calendar-today-shadow: #F0F0F0;
+
+
+  --calendar-bg: color-mix(in srgb, var(--calendar-frame-bg) 85%, transparent);
+  --cell-box-shadow: 0 0.95rem 1.5rem rgba(0, 0, 0, 0.7);
+  --cell-bg:linear-gradient(180deg, rgba(255,255,255,0.07), transparent);
+  --cell-border: 0.125rem solid rgba(255, 255, 255, 0.05);
+  --cell-backdrop-filter: blur(0.06rem);
+
+  --capsule-shelf-bg: rgb(16 23 21 / 0.09);
 }

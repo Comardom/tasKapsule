@@ -68,9 +68,18 @@ The Go backend compiles to `taskapsule-server` (not `backend-server`). Update an
 
 Always use `go run .` (not `go run main.go capsule.go`) — Go automatically includes all `.go` files in the current package.
 
-### Calendar cell color animation toggle
+### Cell.vue glass effect via CSS variables
 
-Calendar cells have smooth 0.25s transitions on `background-color`, `box-shadow`, and `opacity` (via `::after` pseudo-element overlay in `Cell.vue`). A toggle button in `.calendar-header` switches `--cell-transition-duration` between `0.25s` and `0s` via CSS class `.no-animate` on `.calendar`. The duration is read by `Cell.vue` via `var(--cell-transition-duration, 0.25s)`.
+`Cell.vue` renders a glassmorphism `<div class="flex-block">` using four CSS variables from `themeVariables.css`:
+
+| Variable | CSS property | Light value | Dark value |
+|---|---|---|---|
+| `--cell-backdrop-filter` | `backdrop-filter` | `blur(0.04rem)` | `blur(0.06rem)` |
+| `--cell-border` | `border` | `0.125rem solid rgba(255,255,255,0.15)` | `0.125rem solid rgba(255,255,255,0.05)` |
+| `--cell-bg` | `background` | `linear-gradient(180deg, rgba(255,255,255,0.25), transparent)` | `linear-gradient(180deg, rgba(255,255,255,0.07), transparent)` |
+| `--cell-box-shadow` | `box-shadow` | `0 1.1rem 1.25rem rgba(0,0,0,0.2)` | `0 0.95rem 1.5rem rgba(0,0,0,0.7)` |
+
+No `::after` pseudo-element. No `--cell-transition-duration` toggle exists.
 
 ### Theme: index.html and store use the same localStorage key
 
@@ -136,10 +145,11 @@ tasKapsule/
 │   └── killPort.ts     # Port cleanup utility
 ├── frontend/           # Vue 3 + Vite (port 9998 in dev)
 │   └── src/
-│       ├── components/ # Vue SFCs; Calendar/, LoadingScreen, ClockVibe, etc.
+│       ├── components/ # Vue SFCs; Calendar/, CapsuleShelf/, Centro, Placeholder, LoadingScreen, etc.
 │       ├── stores/     # Pinia: theme.ts, capsule.ts, locale.ts
 │       ├── router/     # vue-router (hash history)
 │       ├── utils/      # apiService, healthCheck, loadingPageController, TimeManager
+│       ├── data/       # timezones.ts, nameOfDaysOfWeek.ts
 │       └── globalCSS/  # baseReset, themeVariables, baseNiceStyle
 ├── backend/            # Go (port 9999)
 │   ├── main.go         # Entry point + initDB + HTTP routes + CORS
@@ -151,7 +161,10 @@ tasKapsule/
 ├── design/             # Design specs
     ├── color.md        # Calendar color reference (fabric-texture palette)
     ├── issues.md       # Known issues tracker (P0–P3 priority)
-    └── mvp-plan.md     # MVP Phase 1: skeleton (Centro layout, calendar click, CapsuleShelf)
+    ├── mvp-plan.md     # MVP Phase 1: skeleton (Centro layout, calendar click, CapsuleShelf)
+    ├── srs.md          # Software Requirements Specification
+    ├── usecases.md     # Use case descriptions
+    └── go-setup.md     # Go setup reference
 ```
 
 ## Key conventions
@@ -209,40 +222,59 @@ Color spec lives at `design/color.md`. The palette uses a "fabric texture" (布�
 
 ### Today cell highlighting
 
-Today's cell adds a dynamic CSS class in the `v-for` loop:
+Today's cell uses classes from `Calendar.vue`'s ternary state system:
 
 ```html
 <!-- Calendar.vue template: "thisMonth" cells only -->
-<Cell :class="{ today: day此月 === 今天几号 }" ...>
+<Cell
+  :class="{
+    'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
+    'cell-gray-with-shadow': day此月 === 今天几号 && selectedDay != 今天几号,
+  }"
+  @click="cellClicked(day此月,false)"
+>
 ```
 
-Styles use the `--calendar-today-*` variables (see below). `今天几号` is kept up-to-date by the 60s refresh loop.
+Three visual states:
+| State | Class | Appearance |
+|---|---|---|
+| Today, no selection | (none, default `thisMonth` bg) | Normal cell |
+| Today, another day selected | `cell-gray-with-shadow` | Inset shadow (depressed) + dimmed text via `--calendar-today-unselected-bg/shadow/text` |
+| Selected day | `cell-blue` | Blue gradient (light) / pink gradient (dark) + white text |
+
+Styles use `--calendar-today-*` variables. `今天几号` is kept up-to-date by the 60s refresh loop.
 
 ### Theme variable inventory
 
 Existing globals (unchanged): `--theme-bg-stripe-1`, `--theme-bg-stripe-2`, `--stripe-width`, `--theme-color`, `--theme-link`, `--theme-bg-button`, `--theme-bg-button-hover`, `--theme-border-button`, `--theme-color-button`, `--selection-bg`, `--selection-text`.
 
-Calendar-specific variables (from `design/color.md`, to be added to `themeVariables.css`):
+Calendar-specific variables (from `themeVariables.css`):
 
 | Variable | Light | Dark | Used by |
 |---|---|---|---|
-| `--calendar-frame-bg` | `#F0F0F0` | `#1C1C20` | `.calendar` panel background |
-| `--calendar-frame-bg-alt` | `#EDEDED` | `#1A1A1E` | Optional fabric grain |
+| `--calendar-frame-bg` | `rgb(241 222 222 / 0.78)` | `rgb(25 39 50 / 0.51)` | `.calendar` panel background |
+| `--calendar-frame-bg-alt` | `rgb(241 234 234 / 0.6)` | `rgb(4 4 27 / 0.48)` | Optional fabric grain |
 | `--calendar-cell-bg` | `#F3F3F3` | `#2C2C32` | `Cell.thisMonth` background |
-| `--calendar-cell-bg-alt` | `#F2F2F2` | `#2A2A30` | Fabric grain alternate |
+| `--calendar-cell-bg-alt` | `#F2F2F2` | `#2a2c30` | Fabric grain alternate |
 | `--calendar-cell-text` | `#666666` | `#B0B0B8` | This-month text color |
 | `--calendar-cell-text-small` | `#C8CBD2` | `#6A6A72` | This-month small text |
 | `--calendar-cell-other-bg` | `#E1E1E1` | `#1E1E22` | Non-month cell background |
 | `--calendar-cell-other-bg-alt` | `#E3E3E3` | `#202024` | Fabric grain alternate |
 | `--calendar-cell-other-text` | `#FFFFFF` | `#3E3E46` | Non-month text (deliberately low contrast) |
 | `--calendar-cell-other-text-small` | `#FEFEFE` | `#34343C` | Non-month small text |
-| `--calendar-today-bg-start` | `#7198F0` | `#5B7CE0` | Today gradient start |
-| `--calendar-today-bg-mid` | `#628CED` | `#4A6AD5` | Today gradient mid |
-| `--calendar-today-bg-end` | `#4E78E8` | `#3D5AC8` | Today gradient end |
+| `--calendar-today-bg-start` | `rgb(113 152 240 / 0.92)` | `rgb(244 114 182 / 0.73)` | Today gradient start |
+| `--calendar-today-bg-mid` | `rgb(98 140 237 / 0.89)` | `rgb(236 72 153 / 0.71)` | Today gradient mid |
+| `--calendar-today-bg-end` | `rgb(78 120 232 / 0.87)` | `rgb(219 39 119 / 0.61)` | Today gradient end |
 | `--calendar-today-text` | `#FFFFFF` | `#FFFFFF` | Today text color |
+| `--calendar-today-unselected-text` | `rgb(136 131 131 / 0.7)` | `rgb(170 170 170 / 0.6)` | Today text when another day selected |
+| `--calendar-today-unselected-bg` | `rgb(74 67 67 / 0.2)` | `#0c0e0b` | Today cell bg when unselected |
+| `--calendar-today-unselected-shadow` | `#3c3838` | `#4c574c` | Inset shadow for unselected today |
+| `--calendar-other-month-bg` | `rgb(195 185 178 / 0.49)` | `rgb(26 26 28 / 0.68)` | Other-month cell background |
+| `--calendar-other-month-text` | `rgb(78 70 78 / 0.83)` | `rgb(165 177 173 / 0.87)` | Other-month cell text |
 | `--calendar-grid-line` | `#DADBDF` | `#3A3A40` | Cell border color |
+| `--calendar-bg` | `color-mix(in srgb, var(--calendar-frame-bg) 75%, transparent)` | `color-mix(in srgb, var(--calendar-frame-bg) 85%, transparent)` | `.calendar` backdrop color-mix |
 
-Variables `--camera-border` and `--camera-corner` in `themeVariables.css` are unused — safe to delete.
+Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class in `Calendar.vue` applies today's gradient via `color-mix(in srgb, var(--calendar-today-bg-*) 75%, transparent)`. `--camera-border` / `--camera-corner` have been deleted.
 
 ## Pinia stores
 
@@ -257,10 +289,12 @@ Variables `--camera-border` and `--camera-corner` in `themeVariables.css` are un
 - `CapsuleShelf/Capsule.vue` — single capsule card with independent expand/collapse toggle (local `expanded` ref), rounded rect design, text ellipsis via `inline-size: 100%` + `text-overflow: ellipsis`. ✅ done.
 - `CapsuleShelf/CapsuleShelf.vue` — renders capsule list from `store.byCreatedAt`, no date filter, no event chain. ✅ done.
 - `EgoMe.vue` — empty stub, meant for personal profile page.
-- `ClockVibe.vue` — deprecated, will be removed.
+- `ClockVibe.vue` — deleted (was deprecated).
 - `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.
 - `TestPinia.vue` — capsule store integration test page.
 
 ## Centro state
 
-`Centro.vue` is clean — just `<Calendar />` + `<CapsuleShelf />`. No event handling, no selected capsule state. Capsule toggle is self-contained in `Capsule.vue` via local `expanded` ref.
+`Centro.vue` is a pure layout container — `<Placeholder />` | `<Calendar />` | `<CapsuleShelf />` | `<Placeholder />` in horizontal flex, with `background-size: cover` (image URL commented out). No event handling, no selected capsule state. Capsule toggle is self-contained in `Capsule.vue` via local `expanded` ref.
+
+`Placeholder.vue` exists — renders an empty flex div with configurable `width` and `height` props.
