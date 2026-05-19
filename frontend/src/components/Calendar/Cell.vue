@@ -47,7 +47,7 @@ const blockStyle = computed(() => ({
   /* 立体感增强 */
   box-shadow:var(--cell-box-shadow);
 }
-.flex-block slot{
+.flex-block :slotted(span){
   user-select: none;
   -webkit-user-select: none;  /* Safari */
   -moz-user-select: none;     /* Firefox */

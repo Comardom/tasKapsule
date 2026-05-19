@@ -1,73 +1,211 @@
 <script setup lang="ts">
 import type { Capsule } from '@/stores/capsule.ts';
-import {ref} from "vue";
+// 🌟引入 store 从而获取全局的 viewMode 状态
+import { useCapsuleStore } from '@/stores/capsule.ts';
+import { nextTick, onMounted, ref, watch } from "vue";
 import Placeholder from "@/components/Placeholder.vue";
+import gsap from "gsap";
+
+const store = useCapsuleStore();
 const expanded = ref(false);
 const props = defineProps<{
   capsule: Capsule;
 }>();
+
+const capsuleRef = ref<HTMLElement | null>(null);
+const contentRef = ref<HTMLElement | null>(null);
+let animCtx: gsap.core.Timeline | null = null;
+
+watch(expanded, async (newVal) => {
+  const prevWidth = capsuleRef.value?.offsetWidth || 0;
+  const prevHeight = capsuleRef.value?.offsetHeight || 0;
+
+  const topPlaceholder = capsuleRef.value?.firstElementChild as HTMLElement;
+  const prevTopHeight = topPlaceholder?.offsetHeight || 0;
+  const prevContentHeight = contentRef.value?.offsetHeight || 0;
+
+  await nextTick();
+
+  if (!capsuleRef.value) return;
+
+  const mainText = capsuleRef.value.querySelector('.main-text');
+
+  if (animCtx) {
+    animCtx.kill();
+    animCtx = null;
+  }
+
+  gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
+  if (mainText) gsap.set(mainText, { clearProps: "all" });
+  if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity" });
+  if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity" });
+
+  if (newVal) {
+    // ==================== 展开动画 ====================
+    const targetTopHeight = topPlaceholder?.offsetHeight || 0;
+    const targetContentHeight = contentRef.value?.offsetHeight || 0;
+    const targetHeight = capsuleRef.value.offsetHeight;
+
+    // 🌟【优化点】不再硬编码 "100%"！
+    // 双列依然走固定 25dvi，单列直接读取 nextTick 后浏览器根据 fit-content 动态算出的真实像素宽度
+    const targetWidth = store.viewMode === 'double'
+      ? "25dvi"
+      : `${capsuleRef.value.offsetWidth}px`;
+
+    gsap.set(capsuleRef.value, { overflow: "hidden" });
+    if (topPlaceholder) gsap.set(topPlaceholder, { opacity: 0, height: 0, overflow: "hidden" });
+    if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, y: -8, height: 0, overflow: "hidden" });
+
+    animCtx = gsap.timeline({
+      onComplete: () => {
+        gsap.set(capsuleRef.value, { clearProps: "width,height,overflow" });
+        if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity,overflow" });
+        if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity,overflow" });
+      }
+    });
+
+    animCtx.fromTo(capsuleRef.value,
+        {
+          width: prevWidth,
+          height: prevHeight
+        },
+        {
+          width: targetWidth,
+          height: targetHeight,
+          borderRadius: "1.5rem",
+          duration: 0.4,
+          ease: "backOut(0.3)",
+        },
+        0
+    );
+
+    if (topPlaceholder) {
+      animCtx.to(topPlaceholder, { height: targetTopHeight, opacity: 1, duration: 0.4, ease: "backOut(0.3)" }, 0);
+    }
+
+    if (contentRef.value) {
+      animCtx.to(contentRef.value, { height: targetContentHeight, opacity: 1, y: 0, duration: 0.4, ease: "backOut(0.3)" }, 0);
+    }
+  } else {
+    // ==================== 收缩动画 ====================
+    animCtx = gsap.timeline({
+      onComplete: () => {
+        if (topPlaceholder) gsap.set(topPlaceholder, { display: "none", clearProps: "height,opacity" });
+        if (contentRef.value) gsap.set(contentRef.value, { display: "none", clearProps: "height,opacity" });
+        if (mainText) gsap.set(mainText, { clearProps: "all" });
+        gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
+      }
+    });
+
+    const targetWidth = capsuleRef.value.offsetWidth;
+
+    gsap.set(capsuleRef.value, { alignItems: "center", overflow: "hidden" });
+    if (mainText) {
+      gsap.set(mainText, { display: "flex", justifyContent: "center" });
+    }
+
+    if (topPlaceholder) {
+      gsap.set(topPlaceholder, { display: "block", opacity: 1, height: prevTopHeight });
+      animCtx.to(topPlaceholder, { opacity: 0, duration: 0.15 }, 0);
+      animCtx.to(topPlaceholder, { height: 0, duration: 0.35, ease: "power2.inOut" }, 0);
+    }
+
+    if (contentRef.value) {
+      gsap.set(contentRef.value, { display: "block", opacity: 1, height: prevContentHeight });
+      animCtx.to(contentRef.value, { opacity: 0, y: -8, duration: 0.15 }, 0);
+      animCtx.to(contentRef.value, { height: 0, duration: 0.35, ease: "power2.inOut" }, 0);
+    }
+
+    animCtx.fromTo(capsuleRef.value,
+        {
+          width: prevWidth,
+          height: prevHeight
+        },
+        {
+          width: targetWidth,
+          height: "3rem",
+          borderRadius: "1.5rem",
+          duration: 0.35,
+          ease: "power2.inOut",
+          },
+        0
+    );
+  }
+});
 </script>
 
 <template>
-  <div v-if="!expanded"
-       class="small"
-       @click="expanded = true"
-       :class="[
-            props.capsule.classification,
-            'capsule',
-            ]"
+  <div
+      ref="capsuleRef"
+      class="capsule"
+      :class="[
+        props.capsule.classification,
+        store.viewMode,
+        { big: expanded, small: !expanded }
+      ]"
+      @click="expanded = !expanded"
   >
-    <span class="txt-box">{{ props.capsule.contentText }}</span>
-  </div>
+    <Placeholder v-show="expanded" height='2svb' width="25dvi" />
+    <span class="txt-box main-text">{{ props.capsule.contentText }}</span>
 
-  <!-- 展开状态 -->
-  <div v-else
-       class="big"
-       @click="expanded = false"
-       :class="[
-            props.capsule.classification,
-            'capsule',
-            ]"
-  >
-    <Placeholder
-        height='2svb'
-        width="25dvi"
-    />
-    <span class="txt-box">{{ props.capsule.contentText }}</span>
-    <!-- 可以添加更多展开后的内容 -->
-    <div class="details">
-      <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
-      <p class="txt-box">分类: {{ props.capsule.classification }}</p>
+    <div ref="contentRef" class="expanded-content" v-show="expanded">
+      <Placeholder height='2svb' width="25dvi" />
+      <div class="details">
+        <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
+        <p class="txt-box">分类: {{ props.capsule.classification }}</p>
+      </div>
+      <Placeholder height='1svb' width="25dvi" />
     </div>
-    <Placeholder
-        height='1svb'
-        width="25dvi"
-    />
   </div>
 </template>
 
 <style scoped>
+.expanded-content {
+  overflow: hidden;
+  width: 100%;
+}
+
+.small, .big {
+  will-change: transform, opacity;
+  transition: none;
+}
 .txt-box {
   display: grid;
   place-items: center;
   overflow: clip;
   color: var(--theme-color);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 .capsule{
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
-  padding-inline: 1dvi;
+  padding-inline: 1.25rem; /* 微调内边距，让流式宽度两端呼吸感更好 */
   flex-direction: column;
   justify-content: center;
-
+  box-sizing: border-box;
 
   box-shadow:
-      inset 0 0.0625rem 0 rgba(255, 255, 255, 0.5),    /* 顶部高光 */
-      inset 0 -0.0625rem 0 rgba(0, 0, 0, 0.1),         /* 底部边缘 */
-      inset 0 0 1.2rem rgba(255, 255, 255, 0.3);   /* 内部泛光 */
+      inset 0 0.0625rem 0 rgba(255, 255, 255, 0.5),
+      inset 0 -0.0625rem 0 rgba(0, 0, 0, 0.1),
+      inset 0 0 1.2rem rgba(255, 255, 255, 0.3);
   border: 0.0625rem solid rgba(255, 255, 255, 0.4);
   border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.2);
+}
+
+/* 双列布局防线 */
+.capsule.double {
+  max-inline-size: 25dvi;
+}
+
+/* 🌟【修改点 1】重塑单列布局流式策略 */
+.capsule.single {
+  inline-size: fit-content;      /* 核心：宽度天然包裹文本长度 */
+  /*min-inline-size: 8rem;*/         /* 容灾：防止文本只有1个字时胶囊缩得太小难点到 */
+  max-inline-size: 60dvi;        /* 边界：文本极长时，最大允许拉伸到屏幕的 75%，随后触发换行机制 */
 }
 
 .capsule:hover::before {
@@ -78,34 +216,49 @@ const props = defineProps<{
       rgba(255, 255, 255, 0) 70%
   );
 }
+
+/* 开启物理折行 */
 .capsule span {
-  display: inline-block;
+  display: block;
   inline-size: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
-
+/* 折叠时限制行数 */
 .small{
   block-size: 3rem;
-  /*min-inline-size: 8dvi;*/
-  max-inline-size: inherit;
-  border-radius: 1.5rem;/* 高度的一半，形成跑道形状 */
+  border-radius: 1.5rem;
   inline-size: fit-content;
   align-items: flex-start;
 }
-.big {
+.small .main-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.big.double {
   align-items: center;
   block-size: fit-content;
-  /*gap: 1dvb;*/
   inline-size: 25dvi;
-  border-radius: 1.5rem;   /* ← 和 .small 一致 */
+  border-radius: 1.5rem;
 }
-.big span{
-  display: flex;
-  justify-content: center;
+
+/* 🌟【修改点 2】单列展开时继承流式设置 */
+.big.single {
+  align-items: center;
+  block-size: fit-content;
+  /* 移除硬编码的 inline-size: 100%，使其完美顺延 .capsule.single 的 fit-content 与 max-inline-size */
+  border-radius: 1.5rem;
 }
+
+.big .main-text {
+  text-align: center;
+}
+
 .note{
   background-color: rgb(104 144 237 / 0.3);
 }

@@ -12,7 +12,7 @@ import Placeholder from "@/components/Placeholder.vue";
     />
     <Calendar />
     <Placeholder
-        v-for="i in 5"
+        v-for="i in 3"
         height='100svb'
         width="1.5rem"
     />

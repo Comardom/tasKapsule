@@ -34,6 +34,42 @@ const timelineGrouped = computed(() => {
   }
   return groups;
 });
+
+// 🌟【核心修改点 1】视图切换的点火开关
+const switchViewMode = (mode: 'single' | 'double') => {
+  // 如果浏览器不支持该 API（比如旧版浏览器），直接无缝降级硬切
+  if (!document.startViewTransition) {
+    store.setViewMode(mode);
+    return;
+  }
+  // 告诉浏览器捕捉当前快照，并在回调里修改状态，触发粒子飞跃
+  document.startViewTransition(() => {
+    store.setViewMode(mode);
+  });
+};
+
+// 🌟【核心修改点 2】过滤模式切换的点火开关（让双列切换显示模式时，胶囊也能飞）
+const switchDisplayMode = (mode: any) => {
+  if (!document.startViewTransition) {
+    store.setDisplayMode(mode);
+    return;
+  }
+  document.startViewTransition(() => {
+    store.setDisplayMode(mode);
+  });
+};
+
+// 🌟【新思路 1】智能动态身份证配对函数
+const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
+  const isLastMode = store.displayMode === 'last';
+  // 如果是仅末日模式，锚定结束日期；否则一律锚定开始日期
+  const targetDate = isLastMode
+    ? (capsule.scheduleEndAt || capsule.scheduleStartAt)?.substring(0, 10)
+    : capsule.scheduleStartAt?.substring(0, 10);
+
+  // 只有当当前格子刚好是我们要锚定的那一天时，才赋予飞跃超能力，完美避免影分身冲突
+  return groupDate === targetDate ? `capsule-${capsule.id}` : 'none';
+};
 </script>
 
 <template>
@@ -42,16 +78,16 @@ const timelineGrouped = computed(() => {
     <div class="toolbar">
       <button
           :class="{ active: store.viewMode === 'single' }"
-          @click="store.setViewMode('single')"
+          @click="switchViewMode('single')"
       >单列</button>
       <button
           :class="{ active: store.viewMode === 'double' }"
-          @click="store.setViewMode('double')"
+          @click="switchViewMode('double')"
       >双列</button>
       <select
           v-if="store.viewMode === 'double'"
           :value="store.displayMode"
-          @change="store.setDisplayMode(($event.target as HTMLSelectElement).value as any)"
+          @change="switchDisplayMode(($event.target as HTMLSelectElement).value as any)"
       >
         <option v-for="opt in displayModeOptions" :key="opt.value" :value="opt.value">
           {{ opt.label }}
@@ -64,6 +100,7 @@ const timelineGrouped = computed(() => {
           v-for="item in store.byCreatedAt"
           :key="item.id"
           :capsule="item"
+          :style="{ viewTransitionName: `capsule-${item.id}` }"
       />
     </div>
     <!-- 双列模式 -->
@@ -81,6 +118,7 @@ const timelineGrouped = computed(() => {
                 :key="`${group.date}-${item.capsule.id}-${i}`"
                 :capsule="item.capsule"
                 :showSchedule="true"
+                :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
             />
           </div>
         </div>
@@ -90,20 +128,43 @@ const timelineGrouped = computed(() => {
             v-for="item in store.withoutSchedule"
             :key="item.id"
             :capsule="item"
+            :style="{ viewTransitionName: `capsule-${item.id}` }"
         />
       </div>
     </div>
   </div>
 </template>
 
+<!-- ── 🌟 1. 全局轻量转场区（去掉 scoped） ── -->
+<style>
+/* 核心抗闪烁底座：锁死全屏 root 强刷 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* 针对全屏大范围位移特调的“长途慢车”节奏 */
+::view-transition-group(*) {
+  animation-duration: 0.52s;                 /* 稳稳拉长到 0.52 秒，让大范围飞跃有充足的时间平稳过渡 */
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* 顶级 Expo 减速曲线：前半段快速响应，后半段极其丝滑、漫长地减速定格 */
+}
+</style>
+
+
+<!-- ── 🌟 2. 组件私有布局区（保留 scoped） ── -->
 <style scoped>
+/* ── 工具栏定身符 ── */
+.toolbar {
+  /* 稳固顶部工具栏，防止它参与任何淡入淡出 */
+  view-transition-name: shelf-toolbar;
+}
+
 /* ── 容器 ── */
 .capsule-container {
   display: flex;
   flex-direction: column;
   block-size: 100svb;
-  /*background-color: var(--capsule-shelf-bg);
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);*/
 }
 .toolbar button {
   cursor: pointer;
@@ -160,7 +221,6 @@ const timelineGrouped = computed(() => {
 }
 .timeline-group {
   margin-block-end: 1dvb;
-
 }
 .date-header {
   font-size: 0.875rem;
