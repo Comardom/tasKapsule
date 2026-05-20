@@ -26,10 +26,35 @@ Backend (backend/)         →  Go / net/http / SQLite
 | `pnpm dev:frontend` | Vite dev server only |
 | `pnpm dev:backend` | `cd backend && go run .` |
 | `pnpm dev:electron` | `electron .` in development mode |
-| `pnpm build:backend` | `cd backend && go build -o taskapsule-server` |
-| `pnpm dist` | Production build: frontend → backend (go build) → electron TS → electron-builder |
+| `pnpm build:backend` | `cd backend && go build -o taskapsule-server` (native platform) |
+| `pnpm build:backend:win` | Cross-compile Windows amd64 binary (`.exe`) |
+| `pnpm build:backend:linux` | Cross-compile Linux amd64 binary |
+| `pnpm build:backend:freebsd` | Cross-compile FreeBSD amd64 binary |
+| `pnpm dist:linux` | Production build + Linux .deb / .rpm / .pkg.tar.zst |
+| `pnpm dist:win` | Production build + Windows NSIS installer |
+| `pnpm dist:freebsd` | Production build → Linux .deb (runs via FreeBSD Linuxulator) |
 
 Ports are hard-wired: frontend dev on **9998**, backend on **9999**.
+
+## Packaging & distribution
+
+### Prerequisites (must exist before `dist:*`)
+
+| Path | What | Size / format |
+|---|---|---|
+| `build/icon.png` | Linux app icon (deb/rpm/pacman) | 512×512 PNG |
+| `build/icon.ico` | Windows installer icon (NSIS) | ≥256×256 multi-res ICO |
+| `LICENSE` | License text (shown in NSIS installer) | Plain text |
+
+Without these files, `electron-builder` will fall back to defaults or error.
+
+### Platform targets
+
+| Command | Output(s) | Notes |
+|---|---|---|
+| `pnpm dist:linux` | `.deb` (Debian/Ubuntu), `.rpm` (Fedora), `.pkg.tar.zst` (Arch) | |
+| `pnpm dist:win` | `.exe` NSIS installer (oneClick=false, user can choose install path) | LICENSE shown during install |
+| `pnpm dist:freebsd` | `.deb` (runs under Linuxulator) | Electron has no FreeBSD binary, use the .deb |
 
 ## Critical gotchas
 
@@ -57,12 +82,14 @@ They work in Chromium 108+, which the bundled Electron provides. Do NOT replace 
 
 `TimeManager.ts` uses `Date.UTC()` + `getUTC*()` for all calendar math (day-of-week, days-in-month, etc.). This avoids timezone offset errors when `this.timeZone` differs from the system local timezone. When adding new date calculation methods, follow the same pattern — never use bare `new Date(year, month, day)` without `Date.UTC`.
 
-### Go binary name: `taskapsule-server`
+### Go binary naming by platform
 
-The Go backend compiles to `taskapsule-server` (not `backend-server`). Update any reference in:
-- `package.json` scripts (`build:backend`)
-- `electron/main.ts` (spawn path)
-- `electron-builder` extraResources config
+| Platform | Binary name | Script |
+|---|---|---|
+| Linux / FreeBSD | `taskapsule-server` | `build:backend` / `build:backend:linux` / `build:backend:freebsd` |
+| Windows | `taskapsule-server.exe` | `build:backend:win` |
+
+`electron/main.ts` selects the name via `process.platform === 'win32'`. electron-builder `extraResources` is split into `linux` / `win` platform blocks, each referencing the correct binary.
 
 ### Go dev: `go run .`
 
@@ -157,6 +184,8 @@ tasKapsule/
 │   ├── schema.sql      # IDE SQL dialect reference (not used at runtime)
 │   ├── go.mod          # Module declaration + deps
 │   └── go.sum          # Dependency checksums (auto-generated)
+├── build/              # Platform icons (icon.png, icon.ico)
+├── LICENSE             # License text (embedded in NSIS installer)
 ├── legacy-backend-kotlin/  # Archived Kotlin/Spring Boot backend (kept for reference)
 ├── design/             # Design specs
     ├── color.md        # Calendar color reference (fabric-texture palette)
@@ -176,7 +205,8 @@ tasKapsule/
 - **Electron TS**: Compiles to CommonJS, output in `electron/dist/`. Entry point: `electron/dist/main.js` (set in root `package.json` main field).
 - **Path alias**: `@/` maps to `frontend/src/` (configured in `vite.config.ts` and `tsconfig.app.json`).
 - **No linter or formatter config exists yet.** No test scripts.
-- **Production binary name**: `taskapsule-server`. Go produces a single self-contained binary, no JRE needed. `package.json` extraResources already references `backend/taskapsule-server`.
+- **Production binary naming**: Linux/FreeBSD → `taskapsule-server`, Windows → `taskapsule-server.exe`. `electron/main.ts` selects by `process.platform`. `package.json` `extraResources` is split into platform blocks.
+- **Packaging**: `pnpm dist:linux` produces `.deb` + `.rpm` + `.pacman`; `pnpm dist:win` produces NSIS installer with path selection and license page. Icons in `build/`, license in `LICENSE`.
 
 ## i18n & timezone
 

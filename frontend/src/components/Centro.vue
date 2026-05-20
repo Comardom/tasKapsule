@@ -15,7 +15,8 @@ import Placeholder from "@/components/Placeholder.vue";
         v-for="i in 3"
         height='100svb'
         width="1.5rem"
-    />
+        style="opacity: 0;"
+    >{{i}}</Placeholder>
     <CapsuleShelf
         :style="{ flex: 1 }"
     />
