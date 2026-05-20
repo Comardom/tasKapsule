@@ -8,6 +8,7 @@ import { spawn, ChildProcess } from 'child_process'
 import * as fs from 'fs'
 // 杀端口
 import {killPort} from "./killPort";
+import * as os from "node:os";
 
 
 // 定义全局变量，用于存储go后端进程对象，方便在应用关闭时销毁它
@@ -105,15 +106,20 @@ app.whenReady().then(() => {
     // 然后再传给frontend/src/utils/loadingPageController.ts，
     // 然后通过return传给frontend/src/App.vue，
     // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
+    const logStream = fs.createWriteStream(path.join(os.tmpdir(), 'backend.log'));
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data: Buffer) => {
             console.log('Backend:', data.toString().trim());
+            // @ts-ignore
+            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
         });
     }
 
     if (backendProcess.stderr) {
         backendProcess.stderr.on('data', (data: Buffer) => {
             console.error('Backend Error:', data.toString().trim());
+            // @ts-ignore
+            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
         });
     }
 
