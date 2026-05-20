@@ -3,8 +3,11 @@
 import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
 import type { Capsule } from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
+import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
 
+
+const showCreateModal = ref(false);
 
 const store = useCapsuleStore();
 onMounted(() => {
@@ -93,6 +96,7 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
           {{ opt.label }}
         </option>
       </select>
+      <button @click="showCreateModal = true">+ 新建</button>
     </div>
     <!-- 单列模式 -->
     <div v-if="store.viewMode === 'single'" class="single-shelf capsule-in">
@@ -133,6 +137,7 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
       </div>
     </div>
   </div>
+  <CreateCapsuleModal v-if="showCreateModal" @close="showCreateModal = false" />
 </template>
 
 <!-- ── 🌟 1. 全局轻量转场区（去掉 scoped） ── -->
