@@ -43,6 +43,7 @@ const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
 // 杀端口
 const killPort_1 = require("./killPort");
+const os = __importStar(require("node:os"));
 // 定义全局变量，用于存储go后端进程对象，方便在应用关闭时销毁它
 let backendProcess = null;
 // 提升 win 的作用域，方便在日志回调中使用
@@ -129,14 +130,19 @@ electron_1.app.whenReady().then(() => {
     // 然后再传给frontend/src/utils/loadingPageController.ts，
     // 然后通过return传给frontend/src/App.vue，
     // 然后通过props参数传给frontend/src/components/LoadingScreen.vue进行展示
+    const logStream = fs.createWriteStream(path.join(os.tmpdir(), 'backend.log'));
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data) => {
             console.log('Backend:', data.toString().trim());
+            // @ts-ignore
+            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
         });
     }
     if (backendProcess.stderr) {
         backendProcess.stderr.on('data', (data) => {
             console.error('Backend Error:', data.toString().trim());
+            // @ts-ignore
+            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
         });
     }
     // IPC 通信句柄 (给前端 Vue 使用)

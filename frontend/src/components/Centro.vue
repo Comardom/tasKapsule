@@ -34,7 +34,7 @@ import Placeholder from "@/components/Placeholder.vue";
   background-position: center; /* 关键：图片居中显示 */
   background-repeat: no-repeat; /* 防止重复平铺 */
   display: flex;
-  justify-content: space-between;
+  /*justify-content: space-between;*/
   align-items: center;
   block-size: 100svb;
   inline-size: 100svi;
