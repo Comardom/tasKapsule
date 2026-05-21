@@ -180,8 +180,7 @@ watch(expanded, async (newVal) => {
   -ms-user-select: none;
 }
 .capsule{
-  /*contain: layout style paint;
-  content-visibility: auto;*/
+  overflow-anchor: none;
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
@@ -238,7 +237,7 @@ watch(expanded, async (newVal) => {
 .small .main-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   overflow: hidden;
 }
 
@@ -258,7 +257,11 @@ watch(expanded, async (newVal) => {
 }
 
 .big .main-text {
+  display: block;
   text-align: center;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
 }
 
 .note{
