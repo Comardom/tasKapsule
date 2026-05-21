@@ -52,13 +52,13 @@ watch(expanded, async (newVal) => {
       ? "25dvi"
       : `${capsuleRef.value.offsetWidth}px`;
 
-    gsap.set(capsuleRef.value, { overflow: "hidden" });
+    gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
     if (topPlaceholder) gsap.set(topPlaceholder, { opacity: 0, height: 0, overflow: "hidden" });
     if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, y: -8, height: 0, overflow: "hidden" });
 
     animCtx = gsap.timeline({
       onComplete: () => {
-        gsap.set(capsuleRef.value, { clearProps: "width,height,overflow" });
+        gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
         if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity,overflow" });
         if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity,overflow" });
       }
@@ -67,11 +67,13 @@ watch(expanded, async (newVal) => {
     animCtx.fromTo(capsuleRef.value,
         {
           width: prevWidth,
-          height: prevHeight
+          height: prevHeight,
+          alignItems: "flex-start"
         },
         {
           width: targetWidth,
           height: targetHeight,
+          alignItems: "center",
           borderRadius: "1.5rem",
           duration: 0.4,
           ease: "backOut(0.3)",
@@ -92,17 +94,13 @@ watch(expanded, async (newVal) => {
       onComplete: () => {
         if (topPlaceholder) gsap.set(topPlaceholder, { display: "none", clearProps: "height,opacity" });
         if (contentRef.value) gsap.set(contentRef.value, { display: "none", clearProps: "height,opacity" });
-        if (mainText) gsap.set(mainText, { clearProps: "all" });
         gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
       }
     });
 
     const targetWidth = capsuleRef.value.offsetWidth;
 
-    gsap.set(capsuleRef.value, { alignItems: "center", overflow: "hidden" });
-    if (mainText) {
-      gsap.set(mainText, { display: "flex", justifyContent: "center" });
-    }
+    gsap.set(capsuleRef.value, { overflow: "hidden" });
 
     if (topPlaceholder) {
       gsap.set(topPlaceholder, { display: "block", opacity: 1, height: prevTopHeight });
@@ -119,11 +117,13 @@ watch(expanded, async (newVal) => {
     animCtx.fromTo(capsuleRef.value,
         {
           width: prevWidth,
-          height: prevHeight
+          height: prevHeight,
+          alignItems: "center"
         },
         {
           width: targetWidth,
           height: "3rem",
+          alignItems: "flex-start",
           borderRadius: "1.5rem",
           duration: 0.35,
           ease: "power2.inOut",
