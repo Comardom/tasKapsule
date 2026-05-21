@@ -53,12 +53,14 @@ watch(expanded, async (newVal) => {
       : `${capsuleRef.value.offsetWidth}px`;
 
     gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
+    if (mainText) gsap.set(mainText, { whiteSpace: "nowrap", overflow: "hidden" });
     if (topPlaceholder) gsap.set(topPlaceholder, { opacity: 0, height: 0, overflow: "hidden" });
     if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, y: -8, height: 0, overflow: "hidden" });
 
     animCtx = gsap.timeline({
       onComplete: () => {
         gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
+        if (mainText) gsap.set(mainText, { clearProps: "whiteSpace,overflow" });
         if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity,overflow" });
         if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity,overflow" });
       }
@@ -166,7 +168,7 @@ watch(expanded, async (newVal) => {
 }
 
 .small, .big {
-  will-change: transform, opacity;
+  will-change: opacity;
   transition: none;
 }
 .txt-box {
@@ -205,8 +207,7 @@ watch(expanded, async (newVal) => {
 /* 🌟【修改点 1】重塑单列布局流式策略 */
 .capsule.single {
   inline-size: fit-content;      /* 核心：宽度天然包裹文本长度 */
-  /*min-inline-size: 8rem;*/         /* 容灾：防止文本只有1个字时胶囊缩得太小难点到 */
-  max-inline-size: 60dvi;        /* 边界：文本极长时，最大允许拉伸到屏幕的 75%，随后触发换行机制 */
+  max-inline-size: 100%;        /* 边界：不超出父级 CapsuleShelf 容器宽度 */
 }
 
 .capsule:hover::before {
@@ -235,10 +236,11 @@ watch(expanded, async (newVal) => {
   align-items: flex-start;
 }
 .small .main-text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  display: block;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .big.double {
@@ -262,6 +264,8 @@ watch(expanded, async (newVal) => {
   -webkit-line-clamp: unset;
   overflow: visible;
   white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .note{
