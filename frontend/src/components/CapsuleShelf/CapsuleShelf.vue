@@ -99,7 +99,7 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
       <button @click="showCreateModal = true">+ 新建</button>
     </div>
     <!-- 单列模式 -->
-    <div v-if="store.viewMode === 'single'" class="single-shelf capsule-in">
+    <div v-show="store.viewMode === 'single'" class="single-shelf capsule-in">
       <CapsuleComponent
           v-for="item in store.byCreatedAt"
           :key="item.id"
@@ -108,7 +108,7 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
       />
     </div>
     <!-- 双列模式 -->
-    <div v-else class="double-shelf">
+    <div v-show="store.viewMode === 'double'" class="double-shelf">
       <div class="timeline-column">
         <div
             v-for="group in timelineGrouped"
@@ -165,11 +165,18 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
   view-transition-name: shelf-toolbar;
 }
 
+
+
+.single-shelf, .double-shelf {
+  contain: layout style;
+}
 /* ── 容器 ── */
 .capsule-container {
+  will-change: transform, opacity;
   display: flex;
   flex-direction: column;
   block-size: 100%;
+  inline-size: calc(65dvi - 7.5rem);
 }
 .toolbar button {
   cursor: pointer;
