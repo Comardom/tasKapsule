@@ -34,7 +34,7 @@ const blockStyle = computed(() => ({
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
+  /*overflow: hidden;*/
 
   /* === 玻璃效果三大核心 === */
 /*mask: radial-gradient(circle, black 0.01%, transparent 100%);*/

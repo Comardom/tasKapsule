@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {ref, watchEffect} from "vue";
 
-const useLocaleStore = defineStore('locale', ()=>{
+export const useLocaleStore = defineStore('locale', ()=>{
     const locale = ref(localStorage.getItem('locale') || 'zh');
     watchEffect(()=>{
         localStorage.setItem('locale', locale.value);
@@ -18,5 +18,3 @@ const useLocaleStore = defineStore('locale', ()=>{
     }
     return {locale, setLocale, timeZone, setTimezone};
 });
-
-export default useLocaleStore;

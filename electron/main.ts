@@ -109,17 +109,16 @@ app.whenReady().then(() => {
     const logStream = fs.createWriteStream(path.join(os.tmpdir(), 'backend.log'));
     if (backendProcess.stdout) {
         backendProcess.stdout.on('data', (data: Buffer) => {
-            console.log('Backend:', data.toString().trim());
-            // @ts-ignore
-            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
+            const text = data.toString().trim();
+            console.log('Backend:', text);
+            logStream.write(text + '\n');
         });
     }
-
     if (backendProcess.stderr) {
         backendProcess.stderr.on('data', (data: Buffer) => {
-            console.error('Backend Error:', data.toString().trim());
-            // @ts-ignore
-            backendProcess?.stdout.on('data', (data) => logStream.write(data.toString()));
+            const text = data.toString().trim();
+            console.error('Backend Error:', text);
+            logStream.write('[stderr] ' + text + '\n');
         });
     }
 

@@ -68,7 +68,7 @@ async function submit() {
 }
 .modal {
   background: var(--theme-bg-stripe-1);
-  padding: 2rem; border-radius: 1rem;
+  padding: 2rem;
   display: flex; flex-direction: column; gap: 0.75rem;
   inline-size: 28rem;
 }

@@ -128,7 +128,7 @@ The `auto` fallback also prevents height collapse before `onMounted` fires.
 
 ### Loading screen has timeout ✅ fixed
 
-`loadingPageController.ts` now caps retries at `MAX_RETRIES = 120` (2 minutes). On timeout, sets `loadingText` to an error message and stops polling. No changes needed to consumer components.
+`loadingPageController.ts` now caps retries at `MAX_RETRIES = 10` (10 seconds). On timeout, sets `loadingText` to an error message and stops polling. No changes needed to consumer components.
 
 ### Dev mode backend management ✅ fixed
 

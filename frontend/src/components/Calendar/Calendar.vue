@@ -4,7 +4,7 @@ import {Zh曜日,Jp曜日,En曜日} from "@/data/nameOfDaysOfWeek.ts";
 import Cell from "@/components/Calendar/Cell.vue";
 import { timeZoneOptions } from '@/data/timezones.ts'
 import {TimeManager} from '@/utils/TimeManager.ts'
-import useLocaleStore from "@/stores/locale.ts";
+import {useLocaleStore} from "@/stores/locale.ts";
 import {useCapsuleStore} from "@/stores/capsule.ts";
 
 //固定内容
@@ -109,11 +109,39 @@ const useAnimate = ref<boolean>(true);
 const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
   isSelectOtherMonth.value = isOtherMonth;
   selectedDay.value = whatDay;
-  // TODO: capsuleStore.setDate()，把 selectedDay 同步到全局 store，驱动 CapsuleShelf 刷新
-  const formatted:ReturnType<typeof timeManager.getFormatted> = timeManager.getFormatted();
-  const month = String(formatted.month + 1).padStart(2, '0');
+
+  const { year, month } = timeManager.getFormatted();
+  // 可能在一月和十二月有上一年或者下一年
+  // const targetYear = isOtherMonth
+  //     ? whatDay < 15
+  //         ? month === 11
+  //             ? year + 1
+  //             : year
+  //         : month === 0
+  //             ? year - 1
+  //             : year
+  //     : year
+  // ;
+  // 不是本月的情况
+  const monthOffset = !isOtherMonth ? 0 : (whatDay < 15 ? 1 : -1);
+  const actualMonth = month + monthOffset;
+  let targetYear = 1970, targetMonth = 0;
+  if(actualMonth > 11){
+    targetYear = year + 1;
+    targetMonth = 0;
+  }
+  else if(actualMonth < 0){
+    targetYear = year - 1;
+    targetMonth = 11;
+  }
+  else {
+    targetYear = year;
+    targetMonth = actualMonth;
+  }
   const day = String(whatDay).padStart(2, '0');
-  capsuleStore.setDate(`${formatted.year}-${month}-${day}`);
+  const monthStr = String(targetMonth + 1).padStart(2, '0');
+  // capsuleStore.setDate()，把 selectedDay 同步到全局 store，驱动 CapsuleShelf 刷新
+  capsuleStore.setDate(`${targetYear}-${monthStr}-${day}`);
 }
 </script>
 
