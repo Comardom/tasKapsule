@@ -176,7 +176,8 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
   display: flex;
   flex-direction: column;
   block-size: 100%;
-  inline-size: calc(65dvi - 7.5rem);
+  inline-size: calc(62dvi - 7.5rem);
+  flex: 1;
 }
 .toolbar button {
   cursor: pointer;

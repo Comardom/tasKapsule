@@ -192,8 +192,8 @@ watch(expanded, async (newVal) => {
   box-sizing: border-box;
 
   box-shadow:
-      /*inset 0 0.0625rem 0 rgba(255, 255, 255, 0.5),
-      inset 0 -0.0625rem 0 rgba(0, 0, 0, 0.1),*/
+      inset 0 0.0625rem 0 rgba(255, 255, 255, 0.5),
+      inset 0 -0.0625rem 0 rgba(0, 0, 0, 0.1),
       inset 0 0 1.2rem rgba(255, 255, 255, 0.3);
   border: 0.0625rem solid rgba(255, 255, 255, 0.4);
   border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.2);
