@@ -5,7 +5,7 @@
     "name":"Comardom",
     "email": "Comardom@outlook.com"
   },
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",
@@ -41,6 +41,9 @@
         "to": "frontend/dist"
       }
     ],
+    "mac": {
+      "icon": "build/icon.icns"
+    },
     "linux": {
       "target": ["AppImage","deb", "rpm", "pacman"],
       "category": "Utility",

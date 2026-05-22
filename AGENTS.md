@@ -44,6 +44,7 @@ Ports are hard-wired: frontend dev on **9998**, backend on **9999**.
 |---|---|---|
 | `build/icon.png` | Linux app icon (deb/rpm/pacman) | 512×512 PNG |
 | `build/icon.ico` | Windows installer icon (NSIS) | ≥256×256 multi-res ICO |
+| `build/icon.icns` | macOS app icon (DMG) | Multi-res ICNS (16→512 PNG) |
 | `LICENSE` | License text (shown in NSIS installer) | Plain text |
 
 Without these files, `electron-builder` will fall back to defaults or error.

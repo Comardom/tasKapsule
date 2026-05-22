@@ -30,4 +30,6 @@ pnpm build
 LoadingRectangle.vue - 
 参考了 [Tem Revil](https://github.com/TemRevil) 的设计。\
 Calendar.vue、Cell.vue - 
-参考了[codebykay101](https://uiverse.io/profile/codebykay101)的设计。
+参考了[codebykay101](https://uiverse.io/profile/codebykay101)的设计。\
+项目logo使用了[dyfIT](https://www.iconfont.cn/user/detail?spm=a313x.user_detail.i1.dcc7d6115.41183a81MXovie&userViewType=collections&uid=8177218&nid=g81LDHCVaGfX)
+的"胶囊"icon

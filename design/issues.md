@@ -139,3 +139,32 @@
 | 67 | Kotlin 残留 | `gradlew`、`gradlew.bat`、`gradle/`、`settings.gradle`、`build.gradle.kts` | ✅ 已删除（`legacy-backend-kotlin/` 保留作为存档） |
 | 68 | `backend/schema.sql` | IDE 已配真实数据库后不再需要 | ✅ 已不存在 |
 | 69 | `package.json` | `"description": "...Spring Boot"` → 去掉 Spring Boot | ✅ 已正确 |
+
+---
+
+# Known Issues (2026-05-22 第六轮扫描)
+
+## P0 — 会导致崩溃或数据错误
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 70 | `Calendar.vue` | 109-117 | `cellClicked` 其他月份日期未调整月份/年份 | ✅ 已修 |
+| 71 | `electron/main.ts` | 111-123 | stdout/stderr 监听器内部嵌套 `on('data')`，每次输出添加新监听 | ✅ 已修 |
+
+## P1 — 功能不正确
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 72 | `CapsuleShelf.vue` | 179 | `min-inline-size: calc(65dvi - 7.5rem)` 在 flex 布局中挤压日历 | ✅ 已改 inline-size |
+| 73 | `Cell.vue` | 38 | `overflow: hidden` 裁剪 box-shadow 溢出 | ✅ 已删 |
+| 74 | `locale.ts` | 4 | `export default` 与其他 Pinia store 的 `export const` 不一致 | ✅ 已改 named export |
+
+## P2 — 代码质量 / 体验问题
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 75 | `capsule.ts` | 126-135 | `getDateRange()` 本地时区 + `toISOString()` UTC 偏移 | ⏸️ 仅显示用，无需修改 |
+| 76 | `Calendar.vue` | 66 | `--this-month-height-in-dvi` 用 `dvi` 而非 `dvb` | ⏸️ 故意保留 |
+| 77 | `backend/capsule.go` | 345,430 | `SELECT *` 位置映射脆弱 | ⏸️ 无迁移场景，跳过 |
+| 78 | `loadingPageController.ts` | 16 | `MAX_RETRIES = 10`，AGENTS.md 曾记为 120 | ✅ 已统一为 10 |
+| 79 | `electron/preload.ts` | 9-16 | `onBackendStatus` 监听 `backend-status-update` 但 main.ts 从不发送 | ⏸️ 保留待改造 |
