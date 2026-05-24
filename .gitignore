@@ -21,7 +21,6 @@ backend/build/
 backend/.gradle/
 backend/out/
 .gradle/
-build/
 
 # IDE / Editor
 .idea/
