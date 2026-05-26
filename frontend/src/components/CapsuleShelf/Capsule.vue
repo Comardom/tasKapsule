@@ -155,6 +155,7 @@ watch(expanded, async (newVal) => {
       <div class="details">
         <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
         <p class="txt-box">分类: {{ props.capsule.classification }}</p>
+
       </div>
       <Placeholder height='1svb' width="25dvi" />
     </div>

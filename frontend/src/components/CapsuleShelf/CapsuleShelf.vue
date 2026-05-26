@@ -3,7 +3,7 @@
 import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
 import type { Capsule } from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
-import {computed, onMounted, ref} from "vue";
+import {computed, nextTick, onMounted, ref, watch} from "vue";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
 
 
@@ -38,20 +38,25 @@ const timelineGrouped = computed(() => {
   return groups;
 });
 
-// 🌟【核心修改点 1】视图切换的点火开关
-const switchViewMode = (mode: 'single' | 'double') => {
+
+
+const switchViewMode = async (mode: 'single' | 'double') => {
   // 如果浏览器不支持该 API（比如旧版浏览器），直接无缝降级硬切
   if (!document.startViewTransition) {
     store.setViewMode(mode);
     return;
   }
-  // 告诉浏览器捕捉当前快照，并在回调里修改状态，触发粒子飞跃
+  /*// 告诉浏览器捕捉当前快照，并在回调里修改状态，触发粒子飞跃
   document.startViewTransition(() => {
     store.setViewMode(mode);
-  });
+  });*/
+  const transition = document.startViewTransition(() => {
+    store.setViewMode(mode)
+  })
+  await transition.finished;
 };
 
-// 🌟【核心修改点 2】过滤模式切换的点火开关（让双列切换显示模式时，胶囊也能飞）
+
 const switchDisplayMode = (mode: any) => {
   if (!document.startViewTransition) {
     store.setDisplayMode(mode);
@@ -62,17 +67,55 @@ const switchDisplayMode = (mode: any) => {
   });
 };
 
-// 🌟【新思路 1】智能动态身份证配对函数
+
+
 const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
   const isLastMode = store.displayMode === 'last';
   // 如果是仅末日模式，锚定结束日期；否则一律锚定开始日期
   const targetDate = isLastMode
-    ? (capsule.scheduleEndAt || capsule.scheduleStartAt)?.substring(0, 10)
-    : capsule.scheduleStartAt?.substring(0, 10);
+      ? (capsule.scheduleEndAt || capsule.scheduleStartAt)?.substring(0, 10)
+      : capsule.scheduleStartAt?.substring(0, 10);
 
   // 只有当当前格子刚好是我们要锚定的那一天时，才赋予飞跃超能力，完美避免影分身冲突
-  return groupDate === targetDate ? `capsule-${capsule.id}` : 'none';
+  return groupDate === targetDate ? `capsule-${capsule.id}` : undefined;
 };
+
+watch(() => store.selectedDate, async (newDate) => {
+  if (store.viewMode !== 'double') {
+    await switchViewMode('double');
+  }
+  await nextTick()
+  const timelineCol = document.querySelector('.timeline-column')
+  if (!timelineCol) return
+  let target = timelineCol.querySelector(`[data-need-to-be-scrolled-date="${newDate}"]`) as HTMLElement | null
+  if (!target) {
+    const dates = timelineGrouped.value.map(g => g.date)
+    const nearest = findNearestDate(newDate, dates)
+    if (nearest) {
+      target = timelineCol.querySelector(`[data-need-to-be-scrolled-date="${nearest}"]`) as HTMLElement | null
+    }
+  }
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+})
+function findNearestDate(target: string, dates: string[]): string | null {
+  if (dates.length === 0) return null
+  const targetMs = new Date(target).getTime()
+  let nearest: string | null = null
+  let nearestDiff = Infinity
+  for (const d of dates) {
+    const diff = Math.abs(new Date(d).getTime() - targetMs)
+    if (diff < nearestDiff) {
+      nearestDiff = diff
+      nearest = d
+    } else if (diff === nearestDiff && nearest) {
+      // 等距取未来日期
+      if (new Date(d).getTime() > new Date(nearest).getTime()) {
+        nearest = d
+      }
+    }
+  }
+  return nearest
+}
 </script>
 
 <template>
@@ -107,26 +150,37 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
           :style="{ viewTransitionName: `capsule-${item.id}` }"
       />
     </div>
+
+
+
+
+
+
     <!-- 双列模式 -->
     <div v-show="store.viewMode === 'double'" class="double-shelf">
-      <div class="timeline-column">
-        <div
-            v-for="group in timelineGrouped"
-            :key="group.date"
-            class="timeline-group"
-        >
-          <div class="date-header"><span>{{ group.date }}</span></div>
-          <div class="capsule-in">
-            <CapsuleComponent
-                v-for="(item, i) in group.items"
-                :key="`${group.date}-${item.capsule.id}-${i}`"
-                :capsule="item.capsule"
-                :showSchedule="true"
-                :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
-            />
-          </div>
+
+
+
+      <div
+          v-for="group in timelineGrouped"
+          :key="group.date"
+          class="timeline-group"
+          :data-need-to-be-scrolled-date="group.date"
+      >
+        <div class="date-header"><span>{{ group.date }}</span></div>
+        <div class="capsule-in">
+          <CapsuleComponent
+              v-for="(item, i) in group.items"
+              :key="`${group.date}-${item.capsule.id}-${i}`"
+              :capsule="item.capsule"
+              :showSchedule="true"
+              :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
+          />
         </div>
       </div>
+
+
+
       <div class="unscheduled-column capsule-in">
         <CapsuleComponent
             v-for="item in store.withoutSchedule"
@@ -136,28 +190,17 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
         />
       </div>
     </div>
+
+
+
+
   </div>
   <CreateCapsuleModal v-if="showCreateModal" @close="showCreateModal = false" />
 </template>
 
-<!-- ── 🌟 1. 全局轻量转场区（去掉 scoped） ── -->
-<style>
-/* 核心抗闪烁底座：锁死全屏 root 强刷 */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none !important;
-  mix-blend-mode: normal !important;
-}
-
-/* 针对全屏大范围位移特调的“长途慢车”节奏 */
-::view-transition-group(*) {
-  animation-duration: 0.52s;                 /* 稳稳拉长到 0.52 秒，让大范围飞跃有充足的时间平稳过渡 */
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* 顶级 Expo 减速曲线：前半段快速响应，后半段极其丝滑、漫长地减速定格 */
-}
-</style>
 
 
-<!-- ── 🌟 2. 组件私有布局区（保留 scoped） ── -->
+
 <style scoped>
 /* ── 工具栏定身符 ── */
 .toolbar {
@@ -210,23 +253,15 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
   block-size: 100%;
   overflow: hidden;
 }
-.timeline-column {
-  flex: 1;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.timeline-column::-webkit-scrollbar {
-  display: none;
-}
+
 .unscheduled-column {
-  flex: 1;
+  /*flex: 1;*/
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1dvb;
 }
 .unscheduled-column::-webkit-scrollbar {
@@ -234,6 +269,15 @@ const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
 }
 .timeline-group {
   margin-block-end: 1dvb;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.timeline-group::-webkit-scrollbar {
+  display: none;
 }
 .date-header {
   font-size: 0.875rem;
