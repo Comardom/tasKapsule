@@ -161,25 +161,31 @@ function findNearestDate(target: string, dates: string[]): string | null {
 
 
 
-      <div
-          v-for="group in timelineGrouped"
-          :key="group.date"
-          class="timeline-group"
-          :data-need-to-be-scrolled-date="group.date"
-      >
-        <div class="date-header"><span>{{ group.date }}</span></div>
-        <div class="capsule-in">
-          <CapsuleComponent
-              v-for="(item, i) in group.items"
-              :key="`${group.date}-${item.capsule.id}-${i}`"
-              :capsule="item.capsule"
-              :showSchedule="true"
-              :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
-          />
+      <div class="timeline-column">
+        <div
+            v-for="group in timelineGrouped"
+            :key="group.date"
+            class="timeline-group"
+            :data-need-to-be-scrolled-date="group.date"
+        >
+          <div class="date-header"><span>{{ group.date }}</span></div>
+          <div class="capsule-in">
+            <CapsuleComponent
+                v-for="(item, i) in group.items"
+                :key="`${group.date}-${item.capsule.id}-${i}`"
+                :capsule="item.capsule"
+                :showSchedule="true"
+                :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
+            />
+          </div>
         </div>
       </div>
 
 
+
+      <div class="gate-gap">
+<!--        v-for一堆短竖条然后鼠标hover就张开？但是会影响正常的体验-->
+      </div>
 
       <div class="unscheduled-column capsule-in">
         <CapsuleComponent
@@ -255,7 +261,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
 }
 
 .unscheduled-column {
-  /*flex: 1;*/
+  flex: 1;
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -267,17 +273,23 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .unscheduled-column::-webkit-scrollbar {
   display: none;
 }
+.timeline-column {
+  flex: 1;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.timeline-column::-webkit-scrollbar {
+  display: none;
+}
 .timeline-group {
   margin-block-end: 1dvb;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
-.timeline-group::-webkit-scrollbar {
-  display: none;
+.timeline-group .capsule-in {
+  align-items: flex-end;
 }
 .date-header {
   font-size: 0.875rem;
