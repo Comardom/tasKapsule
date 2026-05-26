@@ -4,6 +4,7 @@ import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
 import type { Capsule } from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
+import gsap from "gsap";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
 
 
@@ -40,45 +41,104 @@ const timelineGrouped = computed(() => {
 
 
 
-const switchViewMode = async (mode: 'single' | 'double') => {
-  // 如果浏览器不支持该 API（比如旧版浏览器），直接无缝降级硬切
-  if (!document.startViewTransition) {
-    store.setViewMode(mode);
-    return;
-  }
-  /*// 告诉浏览器捕捉当前快照，并在回调里修改状态，触发粒子飞跃
-  document.startViewTransition(() => {
-    store.setViewMode(mode);
-  });*/
-  const transition = document.startViewTransition(() => {
-    store.setViewMode(mode)
-  })
-  await transition.finished;
-};
+const gateRef = ref<HTMLElement | null>(null)
+const gateHoverY = ref(0)
+const onGatePointerEnter = (e: PointerEvent) => {
+  const rect = gateRef.value?.getBoundingClientRect()
+  if (!rect) return
+  gateHoverY.value = e.clientY - rect.top
+}
+const onGatePointerLeave = () => {
+}
 
+const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
+  if (mode === store.viewMode) return
+
+  if (mode === 'double') {
+    const singleEl = document.querySelector('.single-shelf') as HTMLElement
+    if (!singleEl) { store.setViewMode('double'); return }
+
+    const origOverflow = singleEl.style.overflow
+    singleEl.style.overflow = 'visible'
+    await new Promise<void>(resolve => {
+      gsap.to(singleEl, {
+        x: '100dvi', opacity: 0, duration: 0.35, ease: 'power2.in',
+        onComplete: () => {
+          singleEl.style.overflow = origOverflow
+          gsap.set(singleEl, { clearProps: 'all' })
+          resolve()
+        }
+      })
+    })
+    store.setViewMode('double')
+    await nextTick()
+
+    const tlCol = document.querySelector('.timeline-column') as HTMLElement
+    const unsCol = document.querySelector('.unscheduled-column') as HTMLElement
+    const gate = document.querySelector('.gate-gap') as HTMLElement
+    if (gate) gsap.set(gate, { opacity: 1 })
+
+    const doubleShelf = document.querySelector('.double-shelf') as HTMLElement
+    if (doubleShelf && tlCol && unsCol) {
+      const shelfW = doubleShelf.offsetWidth
+      gsap.set(tlCol, { x: shelfW })
+      gsap.set(unsCol, { x: -shelfW })
+      await new Promise<void>(resolve => {
+        const tl = gsap.timeline({ onComplete: resolve })
+        tl.to(tlCol, { x: 0, duration: 0.45, ease: 'backOut(1.2)' }, 0)
+        tl.to(unsCol, { x: 0, duration: 0.45, ease: 'backOut(1.2)' }, 0)
+      })
+    }
+  } else {
+    const tlCol = document.querySelector('.timeline-column') as HTMLElement
+    const unsCol = document.querySelector('.unscheduled-column') as HTMLElement
+    const gate = document.querySelector('.gate-gap') as HTMLElement
+
+    const doubleShelf = document.querySelector('.double-shelf') as HTMLElement
+    if (doubleShelf && tlCol && unsCol) {
+      const shelfW = doubleShelf.offsetWidth
+      await new Promise<void>(resolve => {
+        const tl = gsap.timeline({ onComplete: resolve })
+        if (gate) tl.to(gate, { opacity: 0, duration: 0.1 }, 0)
+        tl.to(tlCol, { x: shelfW, duration: 0.35, ease: 'power2.in' }, 0)
+        tl.to(unsCol, { x: -shelfW, duration: 0.35, ease: 'power2.in' }, 0)
+      })
+    }
+
+    const singleEl = document.querySelector('.single-shelf') as HTMLElement
+    let origOverflow = ''
+    if (singleEl) {
+      origOverflow = singleEl.style.overflow
+      gsap.set(singleEl, { x: '100dvi', opacity: 0, overflow: 'visible' })
+    }
+
+    store.setViewMode('single')
+    await nextTick()
+
+    if (!singleEl) return
+
+    await new Promise<void>(resolve => {
+      gsap.to(singleEl!, {
+        x: 0, opacity: 1, duration: 0.35, ease: 'power2.out',
+        onComplete: () => {
+          singleEl!.style.overflow = origOverflow
+          gsap.set(singleEl!, { clearProps: 'all' })
+          resolve()
+        }
+      })
+    })
+  }
+}
 
 const switchDisplayMode = (mode: any) => {
-  if (!document.startViewTransition) {
-    store.setDisplayMode(mode);
-    return;
-  }
-  document.startViewTransition(() => {
-    store.setDisplayMode(mode);
-  });
+  store.setDisplayMode(mode);
 };
 
-
-
-const getCapsuleTransitionName = (capsule: Capsule, groupDate: string) => {
-  const isLastMode = store.displayMode === 'last';
-  // 如果是仅末日模式，锚定结束日期；否则一律锚定开始日期
-  const targetDate = isLastMode
-      ? (capsule.scheduleEndAt || capsule.scheduleStartAt)?.substring(0, 10)
-      : capsule.scheduleStartAt?.substring(0, 10);
-
-  // 只有当当前格子刚好是我们要锚定的那一天时，才赋予飞跃超能力，完美避免影分身冲突
-  return groupDate === targetDate ? `capsule-${capsule.id}` : undefined;
-};
+const nextDisplayMode = () => {
+  const modes = ['all', 'first-last', 'first', 'last']
+  const idx = modes.indexOf(store.displayMode)
+  store.setDisplayMode(modes[(idx + 1) % modes.length])
+}
 
 watch(() => store.selectedDate, async (newDate) => {
   if (store.viewMode !== 'double') {
@@ -122,23 +182,6 @@ function findNearestDate(target: string, dates: string[]): string | null {
   <div class="capsule-container">
     <!-- 工具栏 -->
     <div class="toolbar">
-      <button
-          :class="{ active: store.viewMode === 'single' }"
-          @click="switchViewMode('single')"
-      >单列</button>
-      <button
-          :class="{ active: store.viewMode === 'double' }"
-          @click="switchViewMode('double')"
-      >双列</button>
-      <select
-          v-if="store.viewMode === 'double'"
-          :value="store.displayMode"
-          @change="switchDisplayMode(($event.target as HTMLSelectElement).value as any)"
-      >
-        <option v-for="opt in displayModeOptions" :key="opt.value" :value="opt.value">
-          {{ opt.label }}
-        </option>
-      </select>
       <button @click="showCreateModal = true">+ 新建</button>
     </div>
     <!-- 单列模式 -->
@@ -147,7 +190,6 @@ function findNearestDate(target: string, dates: string[]): string | null {
           v-for="item in store.byCreatedAt"
           :key="item.id"
           :capsule="item"
-          :style="{ viewTransitionName: `capsule-${item.id}` }"
       />
     </div>
 
@@ -175,16 +217,22 @@ function findNearestDate(target: string, dates: string[]): string | null {
                 :key="`${group.date}-${item.capsule.id}-${i}`"
                 :capsule="item.capsule"
                 :showSchedule="true"
-                :style="{ viewTransitionName: getCapsuleTransitionName(item.capsule, group.date) }"
             />
           </div>
         </div>
       </div>
 
-
-
-      <div class="gate-gap">
-<!--        v-for一堆短竖条然后鼠标hover就张开？但是会影响正常的体验-->
+      <div
+          ref="gateRef"
+          class="gate-gap"
+          @pointerenter="onGatePointerEnter"
+          @pointerleave="onGatePointerLeave"
+      >
+        <div class="gate-btn-group" :style="{ '--hover-y': gateHoverY + 'px' }">
+          <button class="gate-btn" @click="switchViewMode('single')">单</button>
+          <button class="gate-btn" @click="showCreateModal = true">+</button>
+          <button class="gate-btn" @click="nextDisplayMode">···</button>
+        </div>
       </div>
 
       <div class="unscheduled-column capsule-in">
@@ -192,13 +240,9 @@ function findNearestDate(target: string, dates: string[]): string | null {
             v-for="item in store.withoutSchedule"
             :key="item.id"
             :capsule="item"
-            :style="{ viewTransitionName: `capsule-${item.id}` }"
         />
       </div>
     </div>
-
-
-
 
   </div>
   <CreateCapsuleModal v-if="showCreateModal" @close="showCreateModal = false" />
@@ -208,20 +252,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
 
 
 <style scoped>
-/* ── 工具栏定身符 ── */
-.toolbar {
-  /* 稳固顶部工具栏，防止它参与任何淡入淡出 */
-  view-transition-name: shelf-toolbar;
-}
-
-
-
-.single-shelf, .double-shelf {
-  contain: layout style;
-}
 /* ── 容器 ── */
 .capsule-container {
-  will-change: transform, opacity;
   display: flex;
   flex-direction: column;
   block-size: 100%;
@@ -234,6 +266,9 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .toolbar button.active {
   background: var(--theme-link);
   color: #fff;
+}
+.single-shelf, .double-shelf {
+  contain: layout style;
 }
 .capsule-in {
   display: flex;
@@ -258,6 +293,54 @@ function findNearestDate(target: string, dates: string[]): string | null {
   gap: 1dvi;
   block-size: 100%;
   overflow: hidden;
+}
+
+.gate-gap {
+  inline-size: 0.125rem;
+  flex-shrink: 0;
+  background: var(--calendar-grid-line);
+  cursor: pointer;
+  position: relative;
+  transition: inline-size 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.gate-gap:hover {
+  inline-size: 4rem;
+}
+.gate-btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: absolute;
+  top: 0;
+  transform: translateY(calc(var(--hover-y, 50%) - 50%));
+  opacity: 0;
+  transition: opacity 0.2s 0.15s;
+  pointer-events: none;
+}
+.gate-gap:hover .gate-btn-group {
+  opacity: 1;
+  pointer-events: auto;
+}
+.gate-btn {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--theme-bg-button);
+  color: var(--theme-color);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+}
+.gate-btn:hover {
+  background: var(--theme-link);
+  color: #fff;
 }
 
 .unscheduled-column {
