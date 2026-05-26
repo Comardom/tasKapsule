@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { capsuleApi } from '@/utils/apiService.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
 import type { Classification, ScheduleStatus } from '@/stores/capsule.ts';
 const store = useCapsuleStore();
 const emit = defineEmits<{ close: [] }>();
+const props = defineProps<{ preselectedDate?: string }>();
 const contentText = ref('');
 const classification = ref<Classification>('note');
 const isWithSchedule = ref(false);
@@ -12,6 +13,14 @@ const scheduleContentText = ref('');
 const scheduleStartAt = ref('');
 const scheduleEndAt = ref('');
 const scheduleStatus = ref<ScheduleStatus>('pending');
+
+onMounted(() => {
+  if (props.preselectedDate) {
+    isWithSchedule.value = true;
+    scheduleStartAt.value = `${props.preselectedDate}T00:00`;
+    scheduleEndAt.value = `${props.preselectedDate}T23:59`;
+  }
+});
 async function submit() {
   if (!contentText.value.trim()) return;
   await capsuleApi.create({

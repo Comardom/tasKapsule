@@ -44,6 +44,64 @@
 
 只保留 `+ 新建` 按钮。模式切换和筛选下拉移到门的按钮组里。
 
+## 浮动球 FAB
+
+单列模式下，胶囊列表右下角的一个圆形浮动按钮，用于快速新建胶囊。
+
+### 位置
+
+圆心与胶囊卡片右边缘对齐（同「跑道」圆心的纵线）。位于 `.single-shelf` 右下角。
+
+```
+.capsule-container
+├── .toolbar
+├── .single-shelf          ← 胶囊列表（右对齐）
+│   └── (胶囊卡片右缘 = 跑道线)
+├── .fab                   ← 圆形 + 号
+├── .double-shelf
+```
+
+### 行为
+
+| 模式 | 显示 | 点击 |
+|---|---|---|
+| 单列 | ✅ 显示 | 打开新建 modal（无日程，空白） |
+| 双列 | ❌ 隐藏 | —（门里已经有 + 号） |
+
+### 动画跟随
+
+FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里：
+
+```
+单→双：.fab + .single-shelf 同时
+  x: 0 → 100dvi  0.35s power2.in, opacity: 1 → 0
+  （FAB 和胶囊同速向右飞出）
+
+双→单：.fab + .single-shelf 同时
+  从 x: 100dvi → 0  0.35s power2.out, opacity: 0 → 1
+  （FAB 和胶囊同速从右侧滑入）
+```
+
+### CSS
+
+```css
+.fab {
+  position: absolute;
+  right: 0;              /* 与胶囊右缘对齐 */
+  bottom: 1.5rem;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  background: var(--theme-link);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+}
+```
+
 ## GSAP 动画（替代 `document.startViewTransition`）
 
 所有动画使用 **translateX 滑动平移**，不涉及 clip-path。

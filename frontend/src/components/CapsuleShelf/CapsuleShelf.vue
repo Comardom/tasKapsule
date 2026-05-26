@@ -3,12 +3,14 @@
 import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
 import type { Capsule } from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
+import { useCalendarAction } from '@/composables/useCalendarAction';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import gsap from "gsap";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
 
 
-const showCreateModal = ref(false);
+const showCreateModal= ref<boolean>(false);
+const { navigateToDate, pendingCreateDate, setPendingCreateDate } = useCalendarAction();
 
 const store = useCapsuleStore();
 onMounted(() => {
@@ -55,7 +57,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
   if (mode === store.viewMode) return
 
   if (mode === 'double') {
-    const singleEl = document.querySelector('.single-shelf') as HTMLElement
+    const singleEl = document.querySelector('.single-shelf-mode') as HTMLElement
     if (!singleEl) { store.setViewMode('double'); return }
 
     const origOverflow = singleEl.style.overflow
@@ -105,7 +107,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
       })
     }
 
-    const singleEl = document.querySelector('.single-shelf') as HTMLElement
+    const singleEl = document.querySelector('.single-shelf-mode') as HTMLElement
     let origOverflow = ''
     if (singleEl) {
       origOverflow = singleEl.style.overflow
@@ -140,13 +142,14 @@ const nextDisplayMode = () => {
   store.setDisplayMode(modes[(idx + 1) % modes.length])
 }
 
-watch(() => store.selectedDate, async (newDate) => {
+watch(() => navigateToDate.value, async (newDate) => {
+  if (!newDate) return
   if (store.viewMode !== 'double') {
     await switchViewMode('double');
   }
   await nextTick()
   const timelineCol = document.querySelector('.timeline-column')
-  if (!timelineCol) return
+  if (!timelineCol) { navigateToDate.value = ''; return }
   let target = timelineCol.querySelector(`[data-need-to-be-scrolled-date="${newDate}"]`) as HTMLElement | null
   if (!target) {
     const dates = timelineGrouped.value.map(g => g.date)
@@ -156,7 +159,18 @@ watch(() => store.selectedDate, async (newDate) => {
     }
   }
   target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  setTimeout(() => { navigateToDate.value = '' })
 })
+watch(pendingCreateDate, (date) => {
+  if (date) showCreateModal.value = true
+})
+
+function onCloseModal() {
+  showCreateModal.value = false
+  setPendingCreateDate('')
+}
+
+
 function findNearestDate(target: string, dates: string[]): string | null {
   if (dates.length === 0) return null
   const targetMs = new Date(target).getTime()
@@ -181,16 +195,19 @@ function findNearestDate(target: string, dates: string[]): string | null {
 <template>
   <div class="capsule-container">
     <!-- 工具栏 -->
-    <div class="toolbar">
+<!--    <div class="toolbar">
       <button @click="showCreateModal = true">+ 新建</button>
-    </div>
+    </div>-->
     <!-- 单列模式 -->
-    <div v-show="store.viewMode === 'single'" class="single-shelf capsule-in">
-      <CapsuleComponent
-          v-for="item in store.byCreatedAt"
-          :key="item.id"
-          :capsule="item"
-      />
+    <div v-show="store.viewMode === 'single'" class="single-shelf-mode">
+      <button class="fab" @click="showCreateModal = true">+</button>
+      <div class="single-shelf capsule-in">
+        <CapsuleComponent
+            v-for="item in store.byCreatedAt"
+            :key="item.id"
+            :capsule="item"
+        />
+      </div>
     </div>
 
 
@@ -245,7 +262,11 @@ function findNearestDate(target: string, dates: string[]): string | null {
     </div>
 
   </div>
-  <CreateCapsuleModal v-if="showCreateModal" @close="showCreateModal = false" />
+  <CreateCapsuleModal
+    v-if="showCreateModal"
+    :preselectedDate="pendingCreateDate"
+    @close="onCloseModal"
+  />
 </template>
 
 
@@ -285,6 +306,40 @@ function findNearestDate(target: string, dates: string[]): string | null {
 }
 .single-shelf::-webkit-scrollbar {
   display: none;
+}
+/* ── 单列模式（FAB + 胶囊列表） ── */
+.single-shelf-mode {
+  display: flex;
+  flex-direction: row;
+  block-size: 100%;
+  position: relative;
+}
+.single-shelf {
+  flex: 1;
+}
+.fab {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-inline-start: 1.75rem;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--theme-link);
+  color: #fff;
+  font-size: 1.75rem;
+  cursor: pointer;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.fab:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0.35rem 1rem rgba(0,0,0,0.4);
 }
 /* ── 双列 ── */
 .double-shelf {

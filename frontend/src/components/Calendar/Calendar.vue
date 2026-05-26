@@ -6,6 +6,7 @@ import { timeZoneOptions } from '@/data/timezones.ts'
 import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
 import {useCapsuleStore} from "@/stores/capsule.ts";
+import { useCalendarAction } from '@/composables/useCalendarAction';
 
 //固定内容
 const 曜日缩写 = computed(() => {
@@ -99,49 +100,70 @@ onUnmounted(() => {
 
 
 const capsuleStore = useCapsuleStore();
-
-
+const { setNavigateToDate, setPendingCreateDate } = useCalendarAction();
 
 //格子点击事件的处理
 const isSelectOtherMonth = ref<boolean>(false);
 const selectedDay = ref<number>(今天几号.value);
-const useAnimate = ref<boolean>(true);
-const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
-  isSelectOtherMonth.value = isOtherMonth;
-  selectedDay.value = whatDay;
 
+function computeDate(whatDay: number, isOtherMonth: boolean): string {
   const { year, month } = timeManager.getFormatted();
-  // 可能在一月和十二月有上一年或者下一年
-  // const targetYear = isOtherMonth
-  //     ? whatDay < 15
-  //         ? month === 11
-  //             ? year + 1
-  //             : year
-  //         : month === 0
-  //             ? year - 1
-  //             : year
-  //     : year
-  // ;
-  // 不是本月的情况
   const monthOffset = !isOtherMonth ? 0 : (whatDay < 15 ? 1 : -1);
   const actualMonth = month + monthOffset;
   let targetYear = 1970, targetMonth = 0;
-  if(actualMonth > 11){
+  if (actualMonth > 11) {
     targetYear = year + 1;
     targetMonth = 0;
-  }
-  else if(actualMonth < 0){
+  } else if (actualMonth < 0) {
     targetYear = year - 1;
     targetMonth = 11;
-  }
-  else {
+  } else {
     targetYear = year;
     targetMonth = actualMonth;
   }
   const day = String(whatDay).padStart(2, '0');
   const monthStr = String(targetMonth + 1).padStart(2, '0');
-  // capsuleStore.setDate()，把 selectedDay 同步到全局 store，驱动 CapsuleShelf 刷新
-  capsuleStore.setDate(`${targetYear}-${monthStr}-${day}`);
+  return `${targetYear}-${monthStr}-${day}`;
+}
+
+function singleClick(whatDay: number, isOtherMonth: boolean) {
+  isSelectOtherMonth.value = isOtherMonth;
+  selectedDay.value = whatDay;
+  capsuleStore.setDate(computeDate(whatDay, isOtherMonth));
+}
+
+function doubleClick(whatDay: number, isOtherMonth: boolean) {
+  isSelectOtherMonth.value = isOtherMonth;
+  selectedDay.value = whatDay;
+  const date = computeDate(whatDay, isOtherMonth);
+  capsuleStore.setDate(date);
+  setNavigateToDate(date);
+}
+
+function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEvent) {
+  event.preventDefault();
+  setPendingCreateDate(computeDate(whatDay, isOtherMonth));
+}
+
+const clickTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+const pendingCell = ref<{ whatDay: number; isOtherMonth: boolean } | null>(null);
+function handleCellClick(whatDay: number, isOtherMonth: boolean) {
+  if (clickTimer.value && pendingCell.value?.whatDay === whatDay && pendingCell.value?.isOtherMonth === isOtherMonth) {
+    clearTimeout(clickTimer.value);
+    clickTimer.value = null;
+    pendingCell.value = null;
+    doubleClick(whatDay, isOtherMonth);
+    return;
+  }
+  if (clickTimer.value) {
+    clearTimeout(clickTimer.value);
+  }
+  pendingCell.value = { whatDay, isOtherMonth };
+  clickTimer.value = setTimeout(() => {
+    clickTimer.value = null;
+    pendingCell.value = null;
+    singleClick(whatDay, isOtherMonth);
+  }, 200);
 }
 </script>
 
@@ -190,7 +212,8 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
             'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth,
             'cell-gray':!(上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth)
           }"
-          @click="cellClicked(上月天数 - 月初曜日 + day上月,true)"
+          @click="handleCellClick(上月天数 - 月初曜日 + day上月,true)"
+          @contextmenu="handleRightClick(上月天数 - 月初曜日 + day上月,true,$event)"
       >
         <span>{{ 上月天数 - 月初曜日 + day上月 }}</span>
       </Cell>
@@ -204,7 +227,8 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
             'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
             'cell-gray-with-shadow': day此月 === 今天几号 && selectedDay != 今天几号,
           }"
-          @click="cellClicked(day此月,false)"
+          @click="handleCellClick(day此月,false)"
+          @contextmenu="handleRightClick(day此月,false,$event)"
       >
         <span>{{ day此月 }}</span>
       </Cell>
@@ -218,7 +242,8 @@ const cellClicked = (whatDay:number,isOtherMonth:boolean) => {
             'cell-blue':day下月 === selectedDay && isSelectOtherMonth,
             'cell-gray':!(day下月 === selectedDay && isSelectOtherMonth)
           }"
-          @click="cellClicked(day下月,true)"
+          @click="handleCellClick(day下月,true)"
+          @contextmenu="handleRightClick(day下月,true,$event)"
       >
         <span>{{ day下月 }}</span>
       </Cell>
