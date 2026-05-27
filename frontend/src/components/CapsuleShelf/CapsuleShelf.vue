@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
-import type { Capsule } from '@/stores/capsule.ts';
+import type {Capsule, DisplayMode} from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
 import { useCalendarAction } from '@/composables/useCalendarAction';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
@@ -139,7 +139,7 @@ const switchDisplayMode = (mode: any) => {
 const nextDisplayMode = () => {
   const modes = ['all', 'first-last', 'first', 'last']
   const idx = modes.indexOf(store.displayMode)
-  store.setDisplayMode(modes[(idx + 1) % modes.length])
+  store.setDisplayMode(modes[(idx + 1) % modes.length] as DisplayMode)
 }
 
 watch(() => navigateToDate.value, async (newDate) => {
@@ -372,6 +372,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   gap: 0.75rem;
   position: absolute;
   top: 0;
+  /*noinspection CssUnresolvedCustomProperty*/
   transform: translateY(calc(var(--hover-y, 50%) - 50%));
   opacity: 0;
   transition: opacity 0.2s 0.15s;

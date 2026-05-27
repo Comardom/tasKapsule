@@ -225,7 +225,7 @@ function handleCellClick(whatDay: number, isOtherMonth: boolean) {
           class="thisMonth"
           :class="{
             'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
-            'cell-gray-with-shadow': day此月 === 今天几号 && selectedDay != 今天几号,
+            'cell-gray-with-shadow': day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth),
           }"
           @click="handleCellClick(day此月,false)"
           @contextmenu="handleRightClick(day此月,false,$event)"
