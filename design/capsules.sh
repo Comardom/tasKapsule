@@ -1,4 +1,4 @@
-$ cat << 'SCRIPT'
+cat << 'SCRIPT'
 #!/bin/bash
 API="http://localhost:9999/api/v1/capsules"
 echo "正在插入胶囊数据..."
