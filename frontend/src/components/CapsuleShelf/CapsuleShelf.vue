@@ -70,7 +70,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
     singleEl.style.overflow = 'visible'
     await new Promise<void>(resolve => {
       gsap.to(singleEl, {
-        x: '100dvi', opacity: 0, duration: 0.35, ease: 'power2.in',
+        x: window.innerWidth, opacity: 0, duration: 0.35, ease: 'power2.in',
         onComplete: () => {
           singleEl.style.overflow = origOverflow
           gsap.set(singleEl, { clearProps: 'all' })
@@ -89,8 +89,8 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
     const doubleShelf = document.querySelector('.double-shelf') as HTMLElement
     if (doubleShelf && tlCol && unsCol) {
       const shelfW = doubleShelf.offsetWidth
-      gsap.set(tlCol, { x: shelfW })
-      gsap.set(unsCol, { x: -shelfW })
+      gsap.set(tlCol, { x: shelfW, opacity: 1 })
+      gsap.set(unsCol, { x: -shelfW, opacity: 1 })
       await new Promise<void>(resolve => {
         const tl = gsap.timeline({ onComplete: resolve })
         tl.to(tlCol, { x: 0, duration: 0.45, ease: 'backOut(1.2)' }, 0)
@@ -110,8 +110,8 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
       await new Promise<void>(resolve => {
         const tl = gsap.timeline({ onComplete: resolve })
         if (gate) tl.to(gate, { opacity: 0, duration: 0.1 }, 0)
-        tl.to(tlCol, { x: shelfW, duration: 0.35, ease: 'power2.in' }, 0)
-        tl.to(unsCol, { x: -shelfW, duration: 0.35, ease: 'power2.in' }, 0)
+        tl.to(tlCol, { x: shelfW, opacity: 0, duration: 0.3, ease: 'power1.inOut' }, 0)
+        tl.to(unsCol, { x: -shelfW, opacity: 0, duration: 0.3, ease: 'power1.inOut' }, 0)
       })
     }
 
@@ -119,7 +119,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
     let origOverflow = ''
     if (singleEl) {
       origOverflow = singleEl.style.overflow
-      gsap.set(singleEl, { x: '100dvi', opacity: 0, overflow: 'visible' })
+      gsap.set(singleEl, { x: window.innerWidth, opacity: 0, overflow: 'visible' })
     }
 
     store.setViewMode('single')
@@ -346,6 +346,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   flex-direction: row;
   block-size: 100%;
   position: relative;
+  will-change: transform;
 }
 
 /* ── FAB 浮动按钮 ── 绝对定位在胶囊列右侧居中，跟随 single-shelf-mode 动画 ── */
@@ -447,6 +448,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   flex-direction: column;
   align-items: flex-start;
   gap: 1dvb;
+  will-change: transform;
 }
 .unscheduled-column::-webkit-scrollbar {
   display: none;
@@ -458,6 +460,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  will-change: transform;
 }
 .timeline-column::-webkit-scrollbar {
   display: none;

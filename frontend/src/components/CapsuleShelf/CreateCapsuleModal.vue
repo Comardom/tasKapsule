@@ -9,10 +9,15 @@ const props = defineProps<{ preselectedDate?: string }>();
 const contentText = ref('');
 const classification = ref<Classification>('note');
 const isWithSchedule = ref(false);
+const scheduleIcon = ref('');
 const scheduleContentText = ref('');
 const scheduleStartAt = ref('');
 const scheduleEndAt = ref('');
 const scheduleStatus = ref<ScheduleStatus>('pending');
+const scheduleDeadline = ref('');
+const audioPath = ref('');
+const attachmentPaths = ref('');
+const alarmClocks = ref('');
 
 onMounted(() => {
   if (props.preselectedDate) {
@@ -27,10 +32,15 @@ async function submit() {
     contentText: contentText.value,
     classification: classification.value,
     isWithSchedule: isWithSchedule.value ? 1 : 0,
-    scheduleContentText: isWithSchedule.value ? scheduleContentText.value : undefined,
-    scheduleStartAt: isWithSchedule.value ? scheduleStartAt.value : undefined,
-    scheduleEndAt: isWithSchedule.value ? scheduleEndAt.value : undefined,
-    scheduleStatus: isWithSchedule.value ? scheduleStatus.value : undefined,
+    scheduleIcon: isWithSchedule.value ? scheduleIcon.value || undefined : undefined,
+    scheduleContentText: isWithSchedule.value ? scheduleContentText.value || undefined : undefined,
+    scheduleStartAt: isWithSchedule.value ? scheduleStartAt.value || undefined : undefined,
+    scheduleEndAt: isWithSchedule.value ? scheduleEndAt.value || undefined : undefined,
+    scheduleStatus: isWithSchedule.value ? scheduleStatus.value || undefined : undefined,
+    scheduleDeadline: isWithSchedule.value ? scheduleDeadline.value || undefined : undefined,
+    audioPath: audioPath.value || undefined,
+    attachmentPaths: attachmentPaths.value || undefined,
+    alarmClocks: alarmClocks.value || undefined,
   });
   await store.fetchCapsules();
   emit('close');
@@ -50,6 +60,7 @@ async function submit() {
       </select>
       <label><input type="checkbox" v-model="isWithSchedule" /> 有日程</label>
       <template v-if="isWithSchedule">
+        <input v-model="scheduleIcon" placeholder="日程图标" />
         <input v-model="scheduleContentText" placeholder="日程内容" />
         <input v-model="scheduleStartAt" type="datetime-local" />
         <input v-model="scheduleEndAt" type="datetime-local" />
@@ -60,7 +71,11 @@ async function submit() {
           <option value="cancelled">已取消</option>
           <option value="blocked">被阻塞</option>
         </select>
+        <input v-model="scheduleDeadline" type="datetime-local" placeholder="截止时间" />
       </template>
+      <input v-model="audioPath" placeholder="音频路径" />
+      <input v-model="attachmentPaths" placeholder="附件路径" />
+      <input v-model="alarmClocks" placeholder="闹钟 (JSON)" />
       <div class="modal-actions">
         <button @click="emit('close')">取消</button>
         <button @click="submit">保存</button>

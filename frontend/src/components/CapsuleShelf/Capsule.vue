@@ -49,8 +49,8 @@ watch(expanded, async (newVal) => {
     // 🌟【优化点】不再硬编码 "100%"！
     // 双列依然走固定 25dvi，单列直接读取 nextTick 后浏览器根据 fit-content 动态算出的真实像素宽度
     const targetWidth = store.viewMode === 'double'
-      ? "25dvi"
-      : `${capsuleRef.value.offsetWidth}px`;
+        ? "25dvi"
+        : `${capsuleRef.value.offsetWidth}px`;
 
     gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
     if (mainText) gsap.set(mainText, { whiteSpace: "nowrap", overflow: "hidden" });
@@ -129,7 +129,7 @@ watch(expanded, async (newVal) => {
           borderRadius: "1.5rem",
           duration: 0.35,
           ease: "power2.inOut",
-          },
+        },
         0
     );
   }
@@ -155,7 +155,16 @@ watch(expanded, async (newVal) => {
       <div class="details">
         <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
         <p class="txt-box">分类: {{ props.capsule.classification }}</p>
-
+        <p class="txt-box">有日程: {{ props.capsule.isWithSchedule === 1 ? '是' : '否' }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleIcon">日程图标: {{ props.capsule.scheduleIcon }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleContentText">日程内容: {{ props.capsule.scheduleContentText }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleStartAt">开始: {{ props.capsule.scheduleStartAt }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleEndAt">结束: {{ props.capsule.scheduleEndAt }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleStatus">状态: {{ props.capsule.scheduleStatus }}</p>
+        <p class="txt-box" v-if="props.capsule.scheduleDeadline">截止: {{ props.capsule.scheduleDeadline }}</p>
+        <p class="txt-box" v-if="props.capsule.audioPath">音频: {{ props.capsule.audioPath }}</p>
+        <p class="txt-box" v-if="props.capsule.attachmentPaths">附件: {{ props.capsule.attachmentPaths }}</p>
+        <p class="txt-box" v-if="props.capsule.alarmClocks">闹钟: {{ props.capsule.alarmClocks }}</p>
       </div>
       <Placeholder height='1svb' width="25dvi" />
     </div>
