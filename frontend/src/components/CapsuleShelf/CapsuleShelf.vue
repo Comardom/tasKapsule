@@ -3,6 +3,7 @@
 import CapsuleComponent from "@/components/CapsuleShelf/Capsule.vue"
 import type {Capsule, DisplayMode} from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
+// useCalendarAction 是 module-level ref 事件总线，与 Calendar.vue 共享双击/右键信号
 import { useCalendarAction } from '@/composables/useCalendarAction';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import gsap from "gsap";
@@ -10,6 +11,7 @@ import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue
 
 
 const showCreateModal= ref<boolean>(false);
+// 从事件总线读取导航信号和创建信号；Calendar 双击→navigateToDate，右键→pendingCreateDate
 const { navigateToDate, pendingCreateDate, setPendingCreateDate } = useCalendarAction();
 
 const store = useCapsuleStore();
@@ -21,15 +23,15 @@ const props = defineProps<{
   selectedCapsule?: Capsule | null;
 }>();
 
-const displayModeOptions = [
-  { value: 'all', label: '全部日期' },
-  { value: 'first-last', label: '首尾日期' },
-  { value: 'first', label: '仅首日' },
-  { value: 'last', label: '仅末日' },
-] as const;
 
+// 将平铺的 scheduleTimeline 按日期分组，每个日期只显示一次标题
+// [{ date:"05-20", items:[capsuleA, capsuleB] }, { date:"05-21", items:[capsuleC] }]
 const timelineGrouped = computed(() => {
-  const groups: { date: string; items: { capsule: Capsule }[] }[] = [];
+  const groups:
+      {
+        date: string;
+        items: { capsule: Capsule }[]
+      }[] = [];
   for (const entry of store.scheduleTimeline) {
     const last = groups[groups.length - 1];
     if (last && last.date === entry.date) {
@@ -43,6 +45,7 @@ const timelineGrouped = computed(() => {
 
 
 
+// 门缝（gate-gap）的指针捕获：鼠标进入时记录 Y 坐标，按钮组固定在该位置
 const gateRef = ref<HTMLElement | null>(null)
 const gateHoverY = ref(0)
 const onGatePointerEnter = (e: PointerEvent) => {
@@ -53,6 +56,9 @@ const onGatePointerEnter = (e: PointerEvent) => {
 const onGatePointerLeave = () => {
 }
 
+// ── 单列 ↔ 双列 模式切换动画 ──
+// 单→双：单列滑出（右移 100dvi + 淡出），双栏列从两侧滑入
+// 双→单：双栏列滑出到两侧，单列从右侧滑入
 const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
   if (mode === store.viewMode) return
 
@@ -92,6 +98,8 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
       })
     }
   } else {
+    // ── double → single ──
+    // 双栏列滑出到两侧，然后单列从右侧滑入
     const tlCol = document.querySelector('.timeline-column') as HTMLElement
     const unsCol = document.querySelector('.unscheduled-column') as HTMLElement
     const gate = document.querySelector('.gate-gap') as HTMLElement
@@ -132,16 +140,15 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
   }
 }
 
-const switchDisplayMode = (mode: any) => {
-  store.setDisplayMode(mode);
-};
 
+// 循环切换 displayMode：all → first-last → first → last → all
 const nextDisplayMode = () => {
   const modes = ['all', 'first-last', 'first', 'last']
   const idx = modes.indexOf(store.displayMode)
   store.setDisplayMode(modes[(idx + 1) % modes.length] as DisplayMode)
 }
 
+// 监听双击导航信号：切换到双栏并滚动到目标日期，处理完后清空信号
 watch(() => navigateToDate.value, async (newDate) => {
   if (!newDate) return
   if (store.viewMode !== 'double') {
@@ -161,16 +168,19 @@ watch(() => navigateToDate.value, async (newDate) => {
   target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   setTimeout(() => { navigateToDate.value = '' })
 })
+// 监听右键创建信号：打开弹窗
 watch(pendingCreateDate, (date) => {
   if (date) showCreateModal.value = true
 })
 
+// 关闭弹窗时清理创建信号
 function onCloseModal() {
   showCreateModal.value = false
   setPendingCreateDate('')
 }
 
 
+// 在日期数组中查找与 target 最接近的日期（按毫秒差）；等距时取未来日期
 function findNearestDate(target: string, dates: string[]): string | null {
   if (dates.length === 0) return null
   const targetMs = new Date(target).getTime()
@@ -194,13 +204,17 @@ function findNearestDate(target: string, dates: string[]): string | null {
 
 <template>
   <div class="capsule-container">
-    <!-- 工具栏 -->
-<!--    <div class="toolbar">
-      <button @click="showCreateModal = true">+ 新建</button>
-    </div>-->
-    <!-- 单列模式 -->
+
+
+
+
+    <!-- ── 单列模式 ──
+         v-show 由 viewMode 控制，GSAP 动画通过 translateX 驱动显示/隐藏
+         .single-shelf-mode 是 FAB + 胶囊列表的外层容器，GSAP 动画作用在这个元素上 -->
     <div v-show="store.viewMode === 'single'" class="single-shelf-mode">
+      <!-- FAB 浮动按钮：居中对齐胶囊列右侧，仅单列模式可见 -->
       <button class="fab" @click="showCreateModal = true">+</button>
+      <!-- 胶囊列表，按 createdAt 降序排列 -->
       <div class="single-shelf capsule-in">
         <CapsuleComponent
             v-for="item in store.byCreatedAt"
@@ -252,6 +266,10 @@ function findNearestDate(target: string, dates: string[]): string | null {
         </div>
       </div>
 
+
+
+
+
       <div class="unscheduled-column capsule-in">
         <CapsuleComponent
             v-for="item in store.withoutSchedule"
@@ -262,6 +280,16 @@ function findNearestDate(target: string, dates: string[]): string | null {
     </div>
 
   </div>
+
+
+
+
+
+
+
+
+
+
   <CreateCapsuleModal
     v-if="showCreateModal"
     :preselectedDate="pendingCreateDate"
@@ -273,7 +301,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
 
 
 <style scoped>
-/* ── 容器 ── */
+/* ── 容器 ── 弹性列布局，占满剩余宽度 ── */
 .capsule-container {
   display: flex;
   flex-direction: column;
@@ -288,35 +316,39 @@ function findNearestDate(target: string, dates: string[]): string | null {
   background: var(--theme-link);
   color: #fff;
 }
+/* 单列/双列容器共用：限制布局和样式作用域，避免 GSAP 动画时重排 */
 .single-shelf, .double-shelf {
   contain: layout style;
 }
+/* 胶囊列表通用：竖直排列、等距间隔 */
 .capsule-in {
   display: flex;
   flex-direction: column;
   gap: 1dvb;
   block-size: 100%;
 }
-/* ── 单列 ── */
+
+/* ── 单列 ── 可滚动、隐藏滚动条、胶囊右对齐 ── */
 .single-shelf {
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
   align-items: flex-end;
+  flex: 1;
 }
 .single-shelf::-webkit-scrollbar {
   display: none;
 }
-/* ── 单列模式（FAB + 胶囊列表） ── */
+
+/* ── 单列模式外层（FAB + 胶囊列表） ── 水平 flex，GSAP 动画作用于此 ── */
 .single-shelf-mode {
   display: flex;
   flex-direction: row;
   block-size: 100%;
   position: relative;
 }
-.single-shelf {
-  flex: 1;
-}
+
+/* ── FAB 浮动按钮 ── 绝对定位在胶囊列右侧居中，跟随 single-shelf-mode 动画 ── */
 .fab {
   position: absolute;
   left: 100%;
@@ -341,7 +373,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 0.35rem 1rem rgba(0,0,0,0.4);
 }
-/* ── 双列 ── */
+
+/* ── 双列 ── 水平 flex，两列 + 门缝，溢出隐藏以配合滑动动画 ── */
 .double-shelf {
   display: flex;
   flex-direction: row;
@@ -350,6 +383,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   overflow: hidden;
 }
 
+/* ── 门缝（gate-gap） ── 初始 2px 竖线，hover 展宽至 4rem ── */
 .gate-gap {
   inline-size: 0.125rem;
   flex-shrink: 0;
@@ -365,6 +399,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .gate-gap:hover {
   inline-size: 4rem;
 }
+
+/* ── 门缝按钮组 ── 默认透明不可点，hover 门缝时渐显 ── */
 .gate-btn-group {
   display: flex;
   flex-direction: column;
@@ -382,6 +418,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
   opacity: 1;
   pointer-events: auto;
 }
+
+/* ── 门缝圆形按钮 ── */
 .gate-btn {
   inline-size: 2.5rem;
   block-size: 2.5rem;
@@ -399,6 +437,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
   color: #fff;
 }
 
+/* ── 右列：无日程胶囊 ── 可滚动、胶囊左对齐 ── */
 .unscheduled-column {
   flex: 1;
   overflow-y: scroll;
@@ -412,6 +451,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .unscheduled-column::-webkit-scrollbar {
   display: none;
 }
+
+/* ── 左列：日程胶囊（按日期分组） ── 可滚动 ── */
 .timeline-column {
   flex: 1;
   overflow-y: scroll;
@@ -421,6 +462,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .timeline-column::-webkit-scrollbar {
   display: none;
 }
+
+/* ── 左列每组：胶囊右对齐，组间留白 ── */
 .timeline-group {
   margin-block-end: 1dvb;
   display: flex;
@@ -430,6 +473,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
 .timeline-group .capsule-in {
   align-items: flex-end;
 }
+
+/* ── 日期标题 ── 小字号、浅色 ── */
 .date-header {
   font-size: 0.875rem;
   color: var(--calendar-cell-text-small);

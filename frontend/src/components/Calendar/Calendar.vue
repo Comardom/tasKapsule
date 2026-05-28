@@ -59,7 +59,7 @@ function refreshCalendar(){
 }
 
 
-
+//这里是获取日历宽度，然后计算出高度
 const setCalendarHeight = () => {
   const calendarBodyEl = document.querySelector('.calendar-body') as HTMLElement;
   if (calendarBodyEl && cellInlineSize.value) {
@@ -100,12 +100,15 @@ onUnmounted(() => {
 
 
 const capsuleStore = useCapsuleStore();
+//setNavigateToDate是左键双击使用的日期, setPendingCreateDate是右键单击使用的日期
 const { setNavigateToDate, setPendingCreateDate } = useCalendarAction();
 
-//格子点击事件的处理
+// 格子点击事件：单击高亮、双击跳转到双栏、右键弹创建弹窗
+// 使用原生 @click / @dblclick / @contextmenu 区分，无防抖延迟
 const isSelectOtherMonth = ref<boolean>(false);
 const selectedDay = ref<number>(今天几号.value);
 
+// 根据点击的格子和是否为其他月，算出标准的 YYYY-MM-DD 字符串
 function computeDate(whatDay: number, isOtherMonth: boolean): string {
   const { year, month } = timeManager.getFormatted();
   const monthOffset = !isOtherMonth ? 0 : (whatDay < 15 ? 1 : -1);
@@ -126,12 +129,15 @@ function computeDate(whatDay: number, isOtherMonth: boolean): string {
   return `${targetYear}-${monthStr}-${day}`;
 }
 
+// 单击 → 只更新选中日期的样式（高亮），不切换视图模式
 function singleClick(whatDay: number, isOtherMonth: boolean) {
   isSelectOtherMonth.value = isOtherMonth;
   selectedDay.value = whatDay;
   capsuleStore.setDate(computeDate(whatDay, isOtherMonth));
 }
 
+// 双击 → 更新选中日期 + 通知 CapsuleShelf 切换到双栏并滚动到该日期
+// 原生 dblclick 会先触发两次 singleClick，第二次 setDate 值相同时为 no-op
 function doubleClick(whatDay: number, isOtherMonth: boolean) {
   isSelectOtherMonth.value = isOtherMonth;
   selectedDay.value = whatDay;
@@ -140,30 +146,10 @@ function doubleClick(whatDay: number, isOtherMonth: boolean) {
   setNavigateToDate(date);
 }
 
+// 右键 → 弹出创建弹窗并预填日期
 function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEvent) {
   event.preventDefault();
   setPendingCreateDate(computeDate(whatDay, isOtherMonth));
-}
-
-const clickTimer = ref<ReturnType<typeof setTimeout> | null>(null);
-const pendingCell = ref<{ whatDay: number; isOtherMonth: boolean } | null>(null);
-function handleCellClick(whatDay: number, isOtherMonth: boolean) {
-  if (clickTimer.value && pendingCell.value?.whatDay === whatDay && pendingCell.value?.isOtherMonth === isOtherMonth) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-    pendingCell.value = null;
-    doubleClick(whatDay, isOtherMonth);
-    return;
-  }
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-  }
-  pendingCell.value = { whatDay, isOtherMonth };
-  clickTimer.value = setTimeout(() => {
-    clickTimer.value = null;
-    pendingCell.value = null;
-    singleClick(whatDay, isOtherMonth);
-  }, 200);
 }
 </script>
 
@@ -212,7 +198,8 @@ function handleCellClick(whatDay: number, isOtherMonth: boolean) {
             'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth,
             'cell-gray':!(上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth)
           }"
-          @click="handleCellClick(上月天数 - 月初曜日 + day上月,true)"
+          @click="singleClick(上月天数 - 月初曜日 + day上月,true)"
+          @dblclick="doubleClick(上月天数 - 月初曜日 + day上月,true)"
           @contextmenu="handleRightClick(上月天数 - 月初曜日 + day上月,true,$event)"
       >
         <span>{{ 上月天数 - 月初曜日 + day上月 }}</span>
@@ -227,7 +214,8 @@ function handleCellClick(whatDay: number, isOtherMonth: boolean) {
             'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
             'cell-gray-with-shadow': day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth),
           }"
-          @click="handleCellClick(day此月,false)"
+          @click="singleClick(day此月,false)"
+          @dblclick="doubleClick(day此月,false)"
           @contextmenu="handleRightClick(day此月,false,$event)"
       >
         <span>{{ day此月 }}</span>
@@ -242,7 +230,8 @@ function handleCellClick(whatDay: number, isOtherMonth: boolean) {
             'cell-blue':day下月 === selectedDay && isSelectOtherMonth,
             'cell-gray':!(day下月 === selectedDay && isSelectOtherMonth)
           }"
-          @click="handleCellClick(day下月,true)"
+          @click="singleClick(day下月,true)"
+          @dblclick="doubleClick(day下月,true)"
           @contextmenu="handleRightClick(day下月,true,$event)"
       >
         <span>{{ day下月 }}</span>
