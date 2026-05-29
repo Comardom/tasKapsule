@@ -475,6 +475,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
 }
 .timeline-group .capsule-in {
   align-items: flex-end;
+  inline-size: 100%;
 }
 
 /* ── 日期标题 ── 小字号、浅色 ── */

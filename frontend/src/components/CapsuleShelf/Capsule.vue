@@ -211,7 +211,7 @@ watch(expanded, async (newVal) => {
 
 /* 双列布局防线 */
 .capsule.double {
-  max-inline-size: 25dvi;
+  max-inline-size: 100%;
 }
 
 /* 🌟【修改点 1】重塑单列布局流式策略 */
@@ -256,7 +256,7 @@ watch(expanded, async (newVal) => {
 .big.double {
   align-items: center;
   block-size: fit-content;
-  inline-size: 25dvi;
+  inline-size: 100%;
   border-radius: 1.5rem;
 }
 
