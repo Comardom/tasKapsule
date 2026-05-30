@@ -34,22 +34,37 @@ watch(()=>localeStore.timeZone,(newTz)=>{
 //timeManager
 const timeManager = new TimeManager(localeStore.timeZone);
 
+//准备给其他的年份
+const displayYear = computed(() => {
+  const { year, month } = timeManager.getFormatted();
+  const total = month + monthOffset.value;
+  return year + Math.floor(total / 12);
+});
+const displayMonth = computed(() => {
+  const { month } = timeManager.getFormatted();
+  return ((month + monthOffset.value) % 12 + 12) % 12;
+});
+
 const 今天几号 = ref<number>(timeManager.get今天几号());
-const 当月天数 = ref<number>(timeManager.get当月天数());
-const 上月天数 = ref<number>(timeManager.get上月天数());
+/*const 当月天数 = ref<number>(timeManager.get当月天数());*/
+const 当月天数 = computed(() => timeManager.get此月天数ByYM(displayYear.value, displayMonth.value));
+/*const 上月天数 = ref<number>(timeManager.get上月天数());*/
+const 上月天数 = computed(() => timeManager.get此月天数ByYM(displayYear.value, displayMonth.value - 1));
 //当天曜日、月末曜日未使用，但是暂时保留
 const 当天曜日 = ref<number>(timeManager.get当天曜日());
-const 月初曜日 = ref<number>(timeManager.get月初曜日());
-const 月末曜日 = ref<number>(timeManager.get月末曜日());
+/*const 月初曜日 = ref<number>(timeManager.get月初曜日());*/
+const 月初曜日 = computed(() => timeManager.get曜日ByYMD(displayYear.value, displayMonth.value, 1));
+/*const 月末曜日 = ref<number>(timeManager.get月末曜日());*/
+const 月末曜日 = computed(() => timeManager.get曜日ByYMD(displayYear.value, displayMonth.value + 1, 0));
 
 function refreshCalendar(){
   timeManager.update();
   今天几号.value = timeManager.get今天几号();
-  当月天数.value = timeManager.get当月天数();
-  上月天数.value = timeManager.get上月天数();
+  /*当月天数.value = timeManager.get当月天数();
+  上月天数.value = timeManager.get上月天数();*/
   当天曜日.value = timeManager.get当天曜日();
-  月初曜日.value = timeManager.get月初曜日();
-  月末曜日.value = timeManager.get月末曜日();
+  /*月初曜日.value = timeManager.get月初曜日();
+  月末曜日.value = timeManager.get月末曜日();*/
   if([27, 28, 29, 30, 31, 1, 2].includes(今天几号.value))
   {
     nextTick(()=>{
@@ -99,6 +114,19 @@ onUnmounted(() => {
 })
 
 
+//滚轮事件：切换月份，滚轮有延迟的
+const monthOffset = ref<number>(0);
+const wheelLocked = ref<boolean>(false);
+function onWheel(e: WheelEvent) {
+  e.preventDefault();
+  if (wheelLocked.value) return;
+  wheelLocked.value = true;
+  if (e.deltaY > 0) monthOffset.value++;
+  else monthOffset.value--;
+  setTimeout(() => { wheelLocked.value = false; }, 600);
+  nextTick(() => setCalendarHeight());
+}
+
 const capsuleStore = useCapsuleStore();
 //setNavigateToDate是左键双击使用的日期, setPendingCreateDate是右键单击使用的日期
 const { setNavigateToDate, setPendingCreateDate } = useCalendarAction();
@@ -110,7 +138,9 @@ const selectedDay = ref<number>(今天几号.value);
 
 // 根据点击的格子和是否为其他月，算出标准的 YYYY-MM-DD 字符串
 function computeDate(whatDay: number, isOtherMonth: boolean): string {
-  const { year, month } = timeManager.getFormatted();
+  /*const { year, month } = timeManager.getFormatted();*/
+  const year = displayYear.value;
+  const month = displayMonth.value;
   const monthOffset = !isOtherMonth ? 0 : (whatDay < 15 ? 1 : -1);
   const actualMonth = month + monthOffset;
   let targetYear = 1970, targetMonth = 0;
@@ -157,7 +187,7 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
   <div class="calendar">
     <div class="calendar-header">
       <div class="clock">
-        <button><span>这是clock区域</span></button>
+        <button><span>{{monthOffset}}</span></button>
       </div>
       <select
           v-model="localeStore.timeZone"
@@ -177,7 +207,7 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
       </select>
     </div>
 
-    <div class="calendar-body">
+    <div class="calendar-body" @wheel.prevent="onWheel">
       <Cell
           v-for="曜日 in 曜日缩写"
           :key="曜日"
@@ -212,7 +242,10 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
           class="thisMonth"
           :class="{
             'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
-            'cell-gray-with-shadow': day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth),
+            'cell-gray-with-shadow':
+              (monthOffset === 0)
+              &&
+              (day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth)),
           }"
           @click="singleClick(day此月,false)"
           @dblclick="doubleClick(day此月,false)"

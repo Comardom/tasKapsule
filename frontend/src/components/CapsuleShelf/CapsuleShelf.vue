@@ -70,7 +70,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
     singleEl.style.overflow = 'visible'
     await new Promise<void>(resolve => {
       gsap.to(singleEl, {
-        x: window.innerWidth, opacity: 0, duration: 0.35, ease: 'power2.in',
+        x: window.innerWidth, opacity: 0, duration: 0.45, ease: 'power2.in',
         onComplete: () => {
           singleEl.style.overflow = origOverflow
           gsap.set(singleEl, { clearProps: 'all' })
@@ -93,8 +93,8 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
       gsap.set(unsCol, { x: -shelfW, opacity: 1 })
       await new Promise<void>(resolve => {
         const tl = gsap.timeline({ onComplete: resolve })
-        tl.to(tlCol, { x: 0, duration: 0.45, ease: 'backOut(1.2)' }, 0)
-        tl.to(unsCol, { x: 0, duration: 0.45, ease: 'backOut(1.2)' }, 0)
+        tl.to(tlCol, { x: 0, duration: 0.55, ease: 'backOut(1.2)' }, 0)
+        tl.to(unsCol, { x: 0, duration: 0.55, ease: 'backOut(1.2)' }, 0)
       })
     }
   } else {
@@ -109,9 +109,9 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
       const shelfW = doubleShelf.offsetWidth
       await new Promise<void>(resolve => {
         const tl = gsap.timeline({ onComplete: resolve })
-        if (gate) tl.to(gate, { opacity: 0, duration: 0.1 }, 0)
-        tl.to(tlCol, { x: shelfW, opacity: 0, duration: 0.3, ease: 'power1.inOut' }, 0)
-        tl.to(unsCol, { x: -shelfW, opacity: 0, duration: 0.3, ease: 'power1.inOut' }, 0)
+        if (gate) tl.to(gate, { opacity: 0, duration: 0.15 }, 0)
+        tl.to(tlCol, { x: shelfW, opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 0)
+        tl.to(unsCol, { x: -shelfW, opacity: 0, duration: 0.4, ease: 'power1.inOut' }, 0)
       })
     }
 
@@ -129,7 +129,7 @@ const switchViewMode = async (mode: 'single' | 'double'): Promise<void> => {
 
     await new Promise<void>(resolve => {
       gsap.to(singleEl!, {
-        x: 0, opacity: 1, duration: 0.35, ease: 'power2.out',
+        x: 0, opacity: 1, duration: 0.45, ease: 'power2.out',
         onComplete: () => {
           singleEl!.style.overflow = origOverflow
           gsap.set(singleEl!, { clearProps: 'all' })
