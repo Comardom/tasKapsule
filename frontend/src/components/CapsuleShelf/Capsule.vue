@@ -53,14 +53,12 @@ watch(expanded, async (newVal) => {
         : `${capsuleRef.value.offsetWidth}px`;
 
     gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
-    if (mainText) gsap.set(mainText, { whiteSpace: "nowrap", overflow: "hidden" });
     if (topPlaceholder) gsap.set(topPlaceholder, { opacity: 0, height: 0, overflow: "hidden" });
     if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, y: -8, height: 0, overflow: "hidden" });
 
     animCtx = gsap.timeline({
       onComplete: () => {
         gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
-        if (mainText) gsap.set(mainText, { clearProps: "whiteSpace,overflow" });
         if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity,overflow" });
         if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity,overflow" });
       }
