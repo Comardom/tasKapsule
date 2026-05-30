@@ -49,7 +49,7 @@ watch(expanded, async (newVal) => {
     // 🌟【优化点】不再硬编码 "100%"！
     // 双列依然走固定 25dvi，单列直接读取 nextTick 后浏览器根据 fit-content 动态算出的真实像素宽度
     const targetWidth = store.viewMode === 'double'
-        ? "25dvi"
+        ? "100%"
         : `${capsuleRef.value.offsetWidth}px`;
 
     gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
