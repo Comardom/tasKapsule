@@ -7,6 +7,7 @@ import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
 import {useCapsuleStore} from "@/stores/capsule.ts";
 import { useCalendarAction } from '@/composables/useCalendarAction';
+import Clock from "@/components/Calendar/Clock.vue";
 
 //固定内容
 const 曜日缩写 = computed(() => {
@@ -186,25 +187,8 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
 <template>
   <div class="calendar">
     <div class="calendar-header">
-      <div class="clock">
-        <button><span>{{monthOffset}}</span></button>
-      </div>
-      <select
-          v-model="localeStore.timeZone"
-      >
-        <option
-            v-for="(item, index) in timeZoneOptions"
-            :key="`tz-${index}`"
-            :value="item.value"
-        >
-          {{ item.label }}
-        </option>
-      </select>
-      <select v-model="localeStore.locale">
-        <option value="zh">中文</option>
-        <option value="ja">日本語</option>
-        <option value="en">English</option>
-      </select>
+      <Clock :display-year="displayYear" :display-month="displayMonth" />
+
     </div>
 
     <div class="calendar-body" @wheel.prevent="onWheel">
@@ -272,7 +256,25 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
     </div>
 
     <div class="calendar-tail">
-
+      <div class="clock-in">
+        <button><span>{{monthOffset}}</span></button>
+      </div>
+      <select
+          v-model="localeStore.timeZone"
+      >
+        <option
+            v-for="(item, index) in timeZoneOptions"
+            :key="`tz-${index}`"
+            :value="item.value"
+        >
+          {{ item.label }}
+        </option>
+      </select>
+      <select v-model="localeStore.locale">
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
     </div>
   </div>
 </template>
@@ -300,13 +302,14 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
   justify-content: center;
   align-items: center;
   /*这个是高度*/
-  block-size: 12dvb;
+  flex: 1;
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }
 .calendar-body{
   font-size: 1.25rem;
-
+  /*margin-block: auto;*/
+  flex: none;
   display: grid;
   place-content: center;
   /*place-items: center;*/
@@ -326,7 +329,7 @@ function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEv
   justify-content: center;
   align-items: center;
   /*这个是高度*/
-  /*min-block-size: 15dvb;*/
+  flex: 1;
   /*这个是宽度，和父容器一致*/
   inline-size: var(--full-inline-size);
 }

@@ -21,13 +21,13 @@
   /* === 玻璃效果三大核心 === */
   background: linear-gradient(#fff2, transparent);
   /* 1. 半透明渐变 */
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(0.625rem);
   /* 2. 背景模糊 */
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 0.0625rem solid rgba(255, 255, 255, 0.1);
   /* 3. 边缘高光 */
 
   /* 立体感增强 */
-  box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1.5625rem 1.5625rem rgba(0, 0, 0, 0.25);
 
   /* 布局 */
   display: flex;
