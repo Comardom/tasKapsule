@@ -119,7 +119,7 @@ Both `index.html` (inline anti-FOUC script) and `stores/theme.ts` read/write key
 
 ### `--this-month-height-in-dvi` CSS variable false positive
 
-This variable is set at runtime via JS (`style.setProperty()` in `Calendar.vue:68`), not declared in any `.css` file. VS Code / CSS linters will flag it as unresolved — this is a **false positive**. To silence it, use the `var()` fallback syntax:
+This variable is set at runtime via JS (`style.setProperty()` in `CalendarBody.vue:76`), not declared in any `.css` file. VS Code / CSS linters will flag it as unresolved — this is a **false positive**. To silence it, use the `var()` fallback syntax:
 
 ```css
 block-size: var(--this-month-height-in-dvi, auto);
@@ -141,7 +141,7 @@ The `auto` fallback also prevents height collapse before `onMounted` fires.
 
 ### Timezone data lives in `frontend/src/data/timezones.ts`
 
-Calendar.vue imports `timeZoneOptions` from the shared data file. The `v-for` uses `:key="\`tz-${index}\`"` to avoid Vue's duplicate-key warnings from overlapping city-name and UTC-offset entries.
+Calendar.vue imports `timeZoneOptions` for the `<select>` in `.calendar-tail`. The `v-for` uses `:key="\`tz-${index}\`"` to avoid Vue's duplicate-key warnings from overlapping city-name and UTC-offset entries.
 
 ### Backend: Production startup guards on electron/main.ts ✅ fixed
 
@@ -173,7 +173,7 @@ tasKapsule/
 │   └── killPort.ts     # Port cleanup utility
 ├── frontend/           # Vue 3 + Vite (port 9998 in dev)
 │   └── src/
-│       ├── components/ # Vue SFCs; Calendar/, CapsuleShelf/, Centro, Placeholder, LoadingScreen, etc.
+│       ├── components/ # Vue SFCs; Calendar/ (Calendar.vue, CalendarBody.vue, Clock.vue, Cell.vue), CapsuleShelf/, Centro, Placeholder, LoadingScreen, etc.
 │       ├── stores/     # Pinia: theme.ts, capsule.ts, locale.ts
 │       ├── router/     # vue-router (hash history)
 │       ├── utils/      # apiService, healthCheck, loadingPageController, TimeManager
@@ -220,17 +220,24 @@ Composition API style. Persists to localStorage. Fields:
 | `locale` | `'zh'` / `'ja'` / `'en'` | `'locale'` |
 | `timeZone` | IANA timezone string | `'timezone'` |
 
-### How Calendar.vue uses it
+### How Calendar components use it
+
+Architecture: Calendar.vue is the layout shell (owns `monthOffset`, renders Clock + CalendarBody + tail selects). CalendarBody.vue does the grid rendering internally.
 
 ```
-localeStore.timeZone ──→ TimeManager constructor ──→ getFormatted() uses target timezone
-localeStore.locale   ──→ 曜日缩写 computed ──→ selects Zh曜日/Jp曜日/En曜日
-watch(timeZone)      ──→ timeManager.setTimeZone() + refreshCalendar()
+Calendar.vue (layout shell)
+├── Clock.vue             ← receives displayYear/displayMonth as props
+├── CalendarBody.vue      ← receives all 5 props, owns grid computation
+│   ├── localeStore.locale   ──→ 曜日缩写 computed ──→ selects Zh曜日/Jp曜日/En曜日
+│   ├── localeStore.timeZone ──→ watch → timeManager.setTimeZone() + refreshCalendar()
+│   └── timeManager.get此月天数ByYM() / get曜日ByYMD() ──→ grid data computed
+└── calendar-tail         ← two `<select>` dropdowns for timezone + locale
 ```
 
 - **Always access `localeStore.locale` directly** (via Pinia reactive proxy). Do NOT destructure with `const { locale } = useLocaleStore()` — loses reactivity.
-- Calendar refreshes every 60s (`setInterval` in `onMounted`, cleared in `onUnmounted`). This handles midnight rollover.
+- CalendarBody refreshes every 60s (`setInterval` in `onMounted`, cleared in `onUnmounted`). This handles midnight rollover.
 - TimeManager's `getFormatted()` uses `Intl.DateTimeFormat('zh-CN', ...)` with numeric-only options — the `'zh-CN'` locale has zero effect on output, no need to i18n it.
+- CalendarBody emits `@wheel(direction)` to Calendar.vue for month navigation; parent mutates `monthOffset`. No prop mutation.
 
 ### Day name arrays
 
@@ -238,7 +245,7 @@ watch(timeZone)      ──→ timeManager.setTimeZone() + refreshCalendar()
 
 ### Language / timezone UI
 
-Calendar.vue's `.calendar-header` contains two `<select>` dropdowns:
+Calendar.vue's `.calendar-tail` contains two `<select>` dropdowns:
 
 ```html
 <select v-model="localeStore.timeZone"> ... </select>  <!-- IANA timezone list -->
@@ -253,16 +260,21 @@ Color spec lives at `design/color.md`. The palette uses a "fabric texture" (布�
 
 ### Today cell highlighting
 
-Today's cell uses classes from `Calendar.vue`'s ternary state system:
+Today's cell uses classes from `CalendarBody.vue`'s ternary state system:
 
 ```html
-<!-- Calendar.vue template: "thisMonth" cells only -->
+<!-- CalendarBody.vue template: "thisMonth" cells only -->
 <Cell
   :class="{
     'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
-    'cell-gray-with-shadow': day此月 === 今天几号 && selectedDay != 今天几号,
+    'cell-gray-with-shadow':
+      (monthOffset === 0)
+      &&
+      (day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth)),
   }"
-  @click="cellClicked(day此月,false)"
+  @click="singleClick(day此月,false)"
+  @dblclick="doubleClick(day此月,false)"
+  @contextmenu="handleRightClick(day此月,false,$event)"
 >
 ```
 
@@ -273,7 +285,7 @@ Three visual states:
 | Today, another day selected | `cell-gray-with-shadow` | Inset shadow (depressed) + dimmed text via `--calendar-today-unselected-bg/shadow/text` |
 | Selected day | `cell-blue` | Blue gradient (light) / pink gradient (dark) + white text |
 
-Styles use `--calendar-today-*` variables. `今天几号` is kept up-to-date by the 60s refresh loop.
+Styles use `--calendar-today-*` variables. `今天几号` is kept up-to-date by the 60s refresh loop. Interaction split: `singleClick` (select only), `doubleClick` (navigate + switch mode), `handleRightClick` (open create modal).
 
 ### Theme variable inventory
 
@@ -305,7 +317,7 @@ Calendar-specific variables (from `themeVariables.css`):
 | `--calendar-grid-line` | `#DADBDF` | `#3A3A40` | Cell border color |
 | `--calendar-bg` | `color-mix(in srgb, var(--calendar-frame-bg) 75%, transparent)` | `color-mix(in srgb, var(--calendar-frame-bg) 85%, transparent)` | `.calendar` backdrop color-mix |
 
-Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class in `Calendar.vue` applies today's gradient via `color-mix(in srgb, var(--calendar-today-bg-*) 75%, transparent)`. `--camera-border` / `--camera-corner` have been deleted.
+Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class in `CalendarBody.vue` applies today's gradient via `color-mix(in srgb, var(--calendar-today-bg-*) 75%, transparent)`. `--camera-border` / `--camera-corner` have been deleted.
 
 ## Pinia stores
 
@@ -319,6 +331,7 @@ Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class 
 
 - `CapsuleShelf/Capsule.vue` — single capsule card with independent expand/collapse toggle (local `expanded` ref), rounded rect design, text ellipsis via `inline-size: 100%` + `text-overflow: ellipsis`. ✅ done.
 - `CapsuleShelf/CapsuleShelf.vue` — renders capsule list from `store.byCreatedAt`, no date filter, no event chain. ✅ done.
+- `Calendar/Clock.vue` — receives `displayYear`/`displayMonth` as props, shows formatted year+month. ✅ done.
 - `EgoMe.vue` — empty stub, meant for personal profile page.
 - `ClockVibe.vue` — deleted (was deprecated).
 - `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.

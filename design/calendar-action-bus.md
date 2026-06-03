@@ -40,13 +40,25 @@ export function useCalendarAction() {
 ### 谁用
 
 | 组件 | 读/写 | 字段 |
-|---|---|---|
-| Calendar.vue | 写 | `setNavigateToDate`（双击）、`setPendingCreateDate`（右键） |
+|---|---|---|---|
+| CalendarBody.vue | 写 | `setNavigateToDate`（双击）、`setPendingCreateDate`（右键） |
 | CapsuleShelf.vue | 读+写 | `navigateToDate` watch → 切换双栏+滚动后清空；`pendingCreateDate` watch → 打开弹窗后清空 |
 | CreateCapsuleModal.vue | 不直接引用 | `preselectedDate` 由 CapsuleShelf 作为 prop 传入 |
 
 ### 数据流
 
+```
+CalendarBody 双击
+  → setNavigateToDate('2026-05-20')
+  → CapsuleShelf watcher 检测到 navigateToDate 非空
+  → switchViewMode('double') + scroll
+  → navigateToDate = '' (清空)
+
+CalendarBody 右键
+  → setPendingCreateDate('2026-05-20')
+  → CapsuleShelf watcher 检测到 pendingCreateDate 非空
+  → showCreateModal = true + 传入 :preselectedDate
+  → 弹窗关闭 → onCloseModal() → pendingCreateDate = '' (清空)
 ```
 Calendar 双击
   → setNavigateToDate('2026-05-20')

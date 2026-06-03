@@ -105,6 +105,10 @@ onMounted(() => {
 ## 不涉及改动
 
 - 其他月格子的交互不变（也走新的 click/dblclick/rightclick）
-- Calendar 的 `cellClicked` 函数拆为三个：`singleClick` / `doubleClick` / `rightClick`
+- CalendarBody 的 `cellClicked` 函数拆为三个：`singleClick` / `doubleClick` / `handleRightClick`
 - 现有 `switchViewMode` 动画不变
 - CapsuleShelf 的 `watch(selectedDate)` 只响应双击和手动切换，单击不触发
+
+## 实际实现
+
+交互逻辑实现在 `CalendarBody.vue`（不是 `Calendar.vue`），因为 CalendarBody 负责网格渲染和日期数据。Calendar.vue 以布局壳角色只管理 `monthOffset` 和整体布局。

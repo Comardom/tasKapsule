@@ -226,6 +226,8 @@ watch(() => capsuleStore.selectedDate, () => {
 5. `CapsuleShelf.vue` — 渲染 CapsuleComponent 从 `store.byCreatedAt` ✅
 
 > 实际实现与原计划不同：CapsuleShelf 没有 date watch / loading 四状态，直接渲染全部胶囊。每个胶囊独立管理展开/收起（local `expanded` ref），无需 emit 链。Centro.vue 为纯布局容器。
+>
+> 后续重构：CalendarBody.vue 从 Calendar.vue 中提取为独立组件，负责网格渲染和交互事件；Clock.vue 为独立头部组件；Calendar.vue 简化为布局壳（管理 `monthOffset`、渲染 Clock + CalendarBody + tail selects）。交互事件（单击/双击/右键）实现在 CalendarBody 中，通过 composable (`useCalendarAction`) 向 CapsuleShelf 发送信号。
 
 ---
 

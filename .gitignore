@@ -51,3 +51,6 @@ legacy-backend-kotlin/
 *.docx
 *.doc
 
+pkg/
+
+*.zst
