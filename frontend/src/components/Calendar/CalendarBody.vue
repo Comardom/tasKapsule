@@ -7,7 +7,7 @@ import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
 import {useCapsuleStore} from "@/stores/capsule.ts";
 import { useCalendarAction } from '@/composables/useCalendarAction';
-import gsap from "gsap";
+import CalendarBodyTransition from "@/components/Calendar/CalendarBodyTransition.vue";
 
 
 
@@ -198,10 +198,21 @@ function onWheel(e: WheelEvent) {
   setTimeout(() => { wheelLocked.value = false; }, 600);
   nextTick(() => setCalendarHeight());
 }
+
+const monthKey = computed(() => `${props.displayYear}-${props.displayMonth}`)
+
+const transitionDirection = ref<1 | -1>(1)
+watch(() => props.monthOffset, (n, o) => {
+  if (n !== o) transitionDirection.value = n > o ? 1 : -1
+})
 </script>
 
 <template>
-  <div class="calendar-body" @wheel.prevent="onWheel">
+  <CalendarBodyTransition
+    :direction="transitionDirection"
+    @wheel="onWheel"
+  >
+    <div class="calendar-body" :key="monthKey">
       <Cell
           v-for="曜日 in 曜日缩写"
           :key="曜日"
@@ -264,6 +275,7 @@ function onWheel(e: WheelEvent) {
         <span>{{ day下月 }}</span>
       </Cell>
     </div>
+  </CalendarBodyTransition>
 </template>
 
 <style scoped>
