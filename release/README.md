@@ -1,1 +1,0 @@
-此处为release，AppImage在这里生成

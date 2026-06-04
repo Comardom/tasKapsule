@@ -54,7 +54,6 @@ function createWindow() {
         width: 1200,
         height: 800,
         autoHideMenuBar: true, // 设置为自动隐藏
-        icon: path.join(__dirname, "resources", "icon.png"),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             // contextIsolation: 开启上下文隔离（安全核心），防止前端脚本直接访问 Node API
@@ -63,8 +62,8 @@ function createWindow() {
             nodeIntegration: false
         }
     });
-    // path.join(__dirname, "resources") 在生产环境下指向安装目录下的 resources 文件夹
-    const indexPath = path.join(path.join(__dirname, "resources"), 'frontend', 'dist', 'index.html');
+    // process.resourcesPath 在生产环境下指向安装目录下的 resources 文件夹
+    const indexPath = path.join(process.resourcesPath, 'frontend', 'dist', 'index.html');
     // 加载 Vue 打包后的静态资源文件
     if (fs.existsSync(indexPath)) {
         mainWindow.loadFile(indexPath); // 使用 loadFile 替代 loadURL
@@ -74,12 +73,12 @@ function createWindow() {
     }
     // mainWindow.loadURL(`file://${indexPath}`)
     // path.resolve 用于将路径解析为绝对路径，方便在调试日志中查看确切位置
-    console.log('Frontend path:', path.resolve(path.join(__dirname, "resources"), 'frontend', 'dist', 'index.html'));
+    console.log('Frontend path:', path.resolve(process.resourcesPath, 'frontend', 'dist', 'index.html'));
 }
 // app.whenReady(): 当 Electron 完成初始化，准备好创建窗口和调用 API 时触发
 electron_1.app.whenReady().then(() => {
     // 获取当前环境：app.isPackaged 为 true 表示是打包后的生产环境，false 为开发环境
-    const isProd = true;
+    const isProd = electron_1.app.isPackaged;
     if (!isProd) {
         // 开发模式：Electron 只负责开窗口，后端由go管理
         createWindow();
@@ -91,7 +90,7 @@ electron_1.app.whenReady().then(() => {
     const backendExe = process.platform === 'win32'
         ? 'taskapsule-server.exe'
         : 'taskapsule-server';
-    const backendPath = path.join(path.join(__dirname, "resources"), backendExe);
+    const backendPath = path.join(process.resourcesPath, backendExe);
     console.log('Target Backend Path:', backendPath);
     if (!fs.existsSync(backendPath)) {
         electron_1.dialog.showErrorBox('后端丢失', `找不到后端文件:\n${backendPath}`);
@@ -119,7 +118,7 @@ electron_1.app.whenReady().then(() => {
     // 启动子进程：启动go后端
     // stdio: 'pipe' (默认) 会创建管道。
     backendProcess = (0, child_process_1.spawn)(backendPath, [], {
-        cwd: path.join(__dirname, "resources"),
+        cwd: process.resourcesPath,
         stdio: 'pipe'
     });
     backendProcess.on('error', (err) => {
