@@ -5,6 +5,8 @@ import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
 import Clock from "@/components/Calendar/Clock.vue";
 import CalendarBody from "@/components/Calendar/CalendarBody.vue";
+import WeatherWidget from "@/components/Calendar/WeatherWidget.vue";
+import {useWeather} from "@/composables/useWeather";
 
 
 //pinia
@@ -16,6 +18,12 @@ const timeManager = new TimeManager(localeStore.timeZone);
 
 
 const monthOffset = ref<number>(0);
+
+
+const {
+  currentWeather, dailyMap, loading,
+  location, setLocationByCity,
+} = useWeather();
 
 //准备给其他的年份
 const displayYear = computed(() => {
@@ -49,6 +57,13 @@ const displayMonth = computed(() => {
     />
 
     <div class="calendar-tail">
+      <WeatherWidget
+        :current="currentWeather"
+        :daily="dailyMap"
+        :location-name="location.name"
+        :loading="loading"
+        @set-location-by-city="setLocationByCity"
+      />
       <select
           v-model="localeStore.timeZone"
       >
