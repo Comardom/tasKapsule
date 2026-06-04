@@ -19,7 +19,10 @@ const plugin = computed(() => (animationTypes[props.type] ?? def) as AnimationPl
 function beforeLeave(el: Element) {
   const e = el as HTMLElement
   const w = e.closest('.calendar-body-wrapper') as HTMLElement
-  if (w) w.style.blockSize = `${w.offsetHeight}px`
+  if (w) {
+    w.style.blockSize = `${w.offsetHeight}px`
+    w.style.overflow = 'hidden'
+  }
   e.style.position = 'absolute'
   e.style.width = '100%'
 }
@@ -36,7 +39,10 @@ function afterEnter(el: Element) {
   const e = el as HTMLElement
   e.style.position = ''
   const w = e.closest('.calendar-body-wrapper') as HTMLElement
-  if (w) w.style.blockSize = ''
+  if (w) {
+    w.style.blockSize = ''
+    w.style.overflow = ''
+  }
 }
 </script>
 
@@ -57,7 +63,6 @@ function afterEnter(el: Element) {
 <style scoped>
 .calendar-body-wrapper {
   position: relative;
-  overflow: hidden;
   inline-size: var(--full-inline-size);
 }
 </style>

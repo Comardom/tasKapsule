@@ -66,6 +66,7 @@ const displayMonth = computed(() => {
       />
       <select
           v-model="localeStore.timeZone"
+          v-show="false"
       >
         <option
             v-for="(item, index) in timeZoneOptions"
@@ -75,7 +76,10 @@ const displayMonth = computed(() => {
           {{ item.label }}
         </option>
       </select>
-      <select v-model="localeStore.locale">
+      <select
+          v-model="localeStore.locale"
+          v-show="false"
+      >
         <option value="zh">中文</option>
         <option value="ja">日本語</option>
         <option value="en">English</option>

@@ -80,15 +80,17 @@ function handleLocationClick() {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  user-select: none;
+  block-size: 4dvi;
   gap: 0.3rem;
-  block-size: 2.2rem;
-  inline-size: 100%;
-  font-size: 0.85rem;
+  /*block-size: 2.2rem;*/
+  inline-size: 35dvi;
+  /*font-size: 0.85rem;*/
   backdrop-filter: var(--cell-backdrop-filter);
   border: var(--cell-border);
   background: var(--cell-bg);
   box-shadow: var(--cell-box-shadow);
-  user-select: none;
+  padding-inline: 0.5rem;
 }
 .weather-widget.loading {
   opacity: 0.6;
