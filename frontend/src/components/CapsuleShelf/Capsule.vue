@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Capsule } from '@/stores/capsule.ts';
-// 🌟引入 store 从而获取全局的 viewMode 状态
 import { useCapsuleStore } from '@/stores/capsule.ts';
 import { nextTick, onMounted, ref, watch } from "vue";
 import Placeholder from "@/components/Placeholder.vue";
 import gsap from "gsap";
 
 const store = useCapsuleStore();
+const emit = defineEmits<{ edit: [capsule: Capsule]; delete: [capsule: Capsule] }>();
 const expanded = ref(false);
 const props = defineProps<{
   capsule: Capsule;
@@ -164,6 +164,10 @@ watch(expanded, async (newVal) => {
         <p class="txt-box" v-if="props.capsule.attachmentPaths">附件: {{ props.capsule.attachmentPaths }}</p>
         <p class="txt-box" v-if="props.capsule.alarmClocks">闹钟: {{ props.capsule.alarmClocks }}</p>
       </div>
+      <div class="capsule-actions">
+        <button class="action-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
+        <button class="action-btn" @click.stop="emit('delete', props.capsule)">删除</button>
+      </div>
       <Placeholder height='1svb' width="25dvi" />
     </div>
   </div>
@@ -274,6 +278,25 @@ watch(expanded, async (newVal) => {
   white-space: normal;
   word-break: normal;
   overflow-wrap: normal;
+}
+.capsule-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-block-start: 0.5rem;
+}
+.action-btn {
+  padding: 0.25rem 0.75rem;
+  border: 0.0625rem solid rgba(255,255,255,0.3);
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.15);
+  color: var(--theme-color);
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+.action-btn:hover {
+  background: var(--theme-bg-button-hover);
+  color: var(--theme-color-button);
 }
 
 .note{

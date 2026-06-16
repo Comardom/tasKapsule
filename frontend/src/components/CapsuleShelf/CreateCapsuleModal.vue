@@ -2,10 +2,10 @@
 import { ref, onMounted } from 'vue';
 import { capsuleApi } from '@/utils/apiService.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
-import type { Classification, ScheduleStatus } from '@/stores/capsule.ts';
+import type { Capsule, Classification, ScheduleStatus } from '@/stores/capsule.ts';
 const store = useCapsuleStore();
 const emit = defineEmits<{ close: [] }>();
-const props = defineProps<{ preselectedDate?: string }>();
+const props = defineProps<{ preselectedDate?: string; editCapsule?: Capsule }>();
 const contentText = ref('');
 const classification = ref<Classification>('note');
 const isWithSchedule = ref(false);
@@ -20,7 +20,20 @@ const attachmentPaths = ref('');
 const alarmClocks = ref('');
 
 onMounted(() => {
-  if (props.preselectedDate) {
+  if (props.editCapsule) {
+    contentText.value = props.editCapsule.contentText;
+    classification.value = props.editCapsule.classification;
+    isWithSchedule.value = props.editCapsule.isWithSchedule === 1;
+    scheduleIcon.value = props.editCapsule.scheduleIcon ?? '';
+    scheduleContentText.value = props.editCapsule.scheduleContentText ?? '';
+    scheduleStartAt.value = props.editCapsule.scheduleStartAt ?? '';
+    scheduleEndAt.value = props.editCapsule.scheduleEndAt ?? '';
+    scheduleStatus.value = props.editCapsule.scheduleStatus ?? 'pending';
+    scheduleDeadline.value = props.editCapsule.scheduleDeadline ?? '';
+    audioPath.value = props.editCapsule.audioPath ?? '';
+    attachmentPaths.value = props.editCapsule.attachmentPaths ?? '';
+    alarmClocks.value = props.editCapsule.alarmClocks ?? '';
+  } else if (props.preselectedDate) {
     isWithSchedule.value = true;
     scheduleStartAt.value = `${props.preselectedDate}T00:00`;
     scheduleEndAt.value = `${props.preselectedDate}T23:59`;
@@ -28,7 +41,7 @@ onMounted(() => {
 });
 async function submit() {
   if (!contentText.value.trim()) return;
-  await capsuleApi.create({
+  const data = {
     contentText: contentText.value,
     classification: classification.value,
     isWithSchedule: isWithSchedule.value ? 1 : 0,
@@ -41,7 +54,12 @@ async function submit() {
     audioPath: audioPath.value || undefined,
     attachmentPaths: attachmentPaths.value || undefined,
     alarmClocks: alarmClocks.value || undefined,
-  });
+  };
+  if (props.editCapsule) {
+    await capsuleApi.update(props.editCapsule.id, data);
+  } else {
+    await capsuleApi.create(data);
+  }
   await store.fetchCapsules();
   emit('close');
 }

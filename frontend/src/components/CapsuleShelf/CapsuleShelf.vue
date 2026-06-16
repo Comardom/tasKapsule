@@ -8,11 +8,15 @@ import { useCalendarAction } from '@/composables/useCalendarAction';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import gsap from "gsap";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
+import ConfirmDialog from "@/components/CapsuleShelf/ConfirmDialog.vue";
 import {useThemeStore} from "@/stores/theme.ts";
 import {useFontStore} from "@/stores/font.ts";
+import {capsuleApi} from "@/utils/apiService.ts";
 
 
 const showCreateModal= ref<boolean>(false);
+const editingCapsule = ref<Capsule | null>(null);
+const deletingCapsule = ref<Capsule | null>(null);
 // 从事件总线读取导航信号和创建信号；Calendar 双击→navigateToDate，右键→pendingCreateDate
 const { navigateToDate, pendingCreateDate, setPendingCreateDate } = useCalendarAction();
 
@@ -186,10 +190,27 @@ watch(pendingCreateDate, (date) => {
   if (date) showCreateModal.value = true
 })
 
-// 关闭弹窗时清理创建信号
+// 关闭弹窗时清理创建/编辑信号
 function onCloseModal() {
   showCreateModal.value = false
+  editingCapsule.value = null
   setPendingCreateDate('')
+}
+
+function onEdit(capsule: Capsule) {
+  editingCapsule.value = capsule
+}
+
+function onDelete(capsule: Capsule) {
+  deletingCapsule.value = capsule
+}
+
+async function confirmDelete() {
+  if (!deletingCapsule.value) return
+  const id = deletingCapsule.value.id
+  deletingCapsule.value = null
+  await capsuleApi.delete(id)
+  await store.fetchCapsules()
 }
 
 
@@ -233,6 +254,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
             v-for="item in store.byCreatedAt"
             :key="item.id"
             :capsule="item"
+            @edit="onEdit"
+            @delete="onDelete"
         />
       </div>
     </div>
@@ -261,6 +284,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
                 :key="`${group.date}-${item.capsule.id}-${i}`"
                 :capsule="item.capsule"
                 :showSchedule="true"
+                @edit="onEdit"
+                @delete="onDelete"
             />
           </div>
         </div>
@@ -290,6 +315,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
             v-for="item in store.withoutSchedule"
             :key="item.id"
             :capsule="item"
+            @edit="onEdit"
+            @delete="onDelete"
         />
       </div>
     </div>
@@ -306,9 +333,16 @@ function findNearestDate(target: string, dates: string[]): string | null {
 
 
   <CreateCapsuleModal
-    v-if="showCreateModal"
+    v-if="showCreateModal || editingCapsule"
     :preselectedDate="pendingCreateDate"
+    :editCapsule="editingCapsule ?? undefined"
     @close="onCloseModal"
+  />
+  <ConfirmDialog
+    v-if="deletingCapsule"
+    message="确定要删除这条胶囊？此操作不可恢复。"
+    @confirm="confirmDelete"
+    @cancel="deletingCapsule = null"
   />
 </template>
 
