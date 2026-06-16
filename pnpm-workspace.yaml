@@ -5,5 +5,3 @@ allowBuilds:
   electron-winstaller: true
 minimumReleaseAgeExclude:
   - electron@42.3.3
-onlyBuiltDependencies:
-  - electron

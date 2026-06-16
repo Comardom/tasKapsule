@@ -19,6 +19,14 @@ const audioPath = ref('');
 const attachmentPaths = ref('');
 const alarmClocks = ref('');
 
+const startRef = ref<HTMLInputElement>();
+const endRef = ref<HTMLInputElement>();
+const deadlineRef = ref<HTMLInputElement>();
+
+function openPicker(el: HTMLInputElement | undefined) {
+  el?.showPicker();
+}
+
 onMounted(() => {
   if (props.editCapsule) {
     contentText.value = props.editCapsule.contentText;
@@ -67,7 +75,7 @@ async function submit() {
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal">
-      <h2>新建胶囊</h2>
+      <h2>{{ props.editCapsule ? '编辑胶囊' : '新建胶囊' }}</h2>
       <textarea v-model="contentText" placeholder="内容" />
       <select v-model="classification">
         <option value="note">笔记</option>
@@ -80,8 +88,8 @@ async function submit() {
       <template v-if="isWithSchedule">
         <input v-model="scheduleIcon" placeholder="日程图标" />
         <input v-model="scheduleContentText" placeholder="日程内容" />
-        <input v-model="scheduleStartAt" type="datetime-local" />
-        <input v-model="scheduleEndAt" type="datetime-local" />
+        <input ref="startRef" v-model="scheduleStartAt" type="datetime-local" @click="openPicker(startRef)" />
+        <input ref="endRef" v-model="scheduleEndAt" type="datetime-local" @click="openPicker(endRef)" />
         <select v-model="scheduleStatus">
           <option value="pending">待完成</option>
           <option value="executing">进行中</option>
@@ -89,14 +97,14 @@ async function submit() {
           <option value="cancelled">已取消</option>
           <option value="blocked">被阻塞</option>
         </select>
-        <input v-model="scheduleDeadline" type="datetime-local" placeholder="截止时间" />
+        <input ref="deadlineRef" v-model="scheduleDeadline" type="datetime-local" placeholder="截止时间" @click="openPicker(deadlineRef)" />
       </template>
       <input v-model="audioPath" placeholder="音频路径" />
       <input v-model="attachmentPaths" placeholder="附件路径" />
       <input v-model="alarmClocks" placeholder="闹钟 (JSON)" />
       <div class="modal-actions">
         <button @click="emit('close')">取消</button>
-        <button @click="submit">保存</button>
+        <button @click="submit">{{ props.editCapsule ? '更新' : '保存' }}</button>
       </div>
     </div>
   </div>
