@@ -18,7 +18,11 @@ function goTo(path: string) {
   <div id="app-all">
     <LoadingScreen v-if="!isBackendReady" :status-text="loadingText" />
     <main v-if="isBackendReady">
-      <nav class="global-nav" style="position: absolute; right: 0;bottom: 0; z-index: 10;"><!--测试用的切换顶栏-->
+      <nav
+          class="global-nav"
+          style="position: absolute; right: 0;bottom: 0; z-index: 10;"
+          v-show="false"
+      ><!--测试用的切换顶栏-->
 <!--        注意这里的按钮文字不同会导致按钮高度不同、位置不同，不要中英混用-->
         <button @click="goTo('/')">Centro</button>
         <button @click="goTo('/test')">主页</button>

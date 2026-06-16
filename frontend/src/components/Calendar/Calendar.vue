@@ -85,7 +85,10 @@ const displayMonth = computed(() => {
         <option value="ja">日本語</option>
         <option value="en">English</option>
       </select>
-      <select v-model="fontStore.fontBody">
+      <select
+          v-model="fontStore.fontBody"
+          v-show="false"
+      >
         <option
             v-for="opt in fontStore.FONT_OPTIONS"
             :key="opt.value"

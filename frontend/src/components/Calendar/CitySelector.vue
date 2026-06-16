@@ -68,13 +68,13 @@ function select(r: CityResult) {
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal">
-      <h2>Search City</h2>
+      <h2>切换城市</h2>
       <input
         v-model="query"
-        placeholder="Type a city name..."
+        placeholder="请输入城市名称（英语）"
         autofocus
       />
-      <div v-if="searching" class="hint">Searching...</div>
+      <div v-if="searching" class="hint">搜寻中...</div>
       <div v-else-if="error" class="hint error">{{ error }}</div>
       <ul v-else-if="results.length" class="city-list">
         <li
@@ -85,10 +85,10 @@ function select(r: CityResult) {
           {{ r.name }}
         </li>
       </ul>
-      <div v-else-if="query && !searching" class="hint">No results</div>
-      <div class="modal-actions">
-        <button @click="emit('close')">Cancel</button>
-      </div>
+      <div v-else-if="query && !searching" class="hint">无相关结果</div>
+<!--      <div class="modal-actions">
+        <button @click="emit('close')">取消</button>
+      </div>-->
     </div>
   </div>
 </template>

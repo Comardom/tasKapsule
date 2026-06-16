@@ -8,6 +8,8 @@ import { useCalendarAction } from '@/composables/useCalendarAction';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import gsap from "gsap";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
+import {useThemeStore} from "@/stores/theme.ts";
+import {useFontStore} from "@/stores/font.ts";
 
 
 const showCreateModal= ref<boolean>(false);
@@ -15,6 +17,9 @@ const showCreateModal= ref<boolean>(false);
 const { navigateToDate, pendingCreateDate, setPendingCreateDate } = useCalendarAction();
 
 const store = useCapsuleStore();
+const themeStore = useThemeStore();
+const fontStore = useFontStore();
+
 onMounted(() => {
   store.fetchCapsules();
 });
@@ -148,6 +153,14 @@ const nextDisplayMode = () => {
   store.setDisplayMode(modes[(idx + 1) % modes.length] as DisplayMode)
 }
 
+// 循环切换字体
+const nextFont = () => {
+  const opts = fontStore.FONT_OPTIONS
+  const idx = opts.findIndex(o => o.value === fontStore.fontBody)
+  const next = opts[(idx + 1) % opts.length]
+  if (next) fontStore.setFontBody(next.value)
+}
+
 // 监听双击导航信号：切换到双栏并滚动到目标日期，处理完后清空信号
 watch(() => navigateToDate.value, async (newDate) => {
   if (!newDate) return
@@ -263,6 +276,8 @@ function findNearestDate(target: string, dates: string[]): string | null {
           <button class="gate-btn" @click="switchViewMode('single')">单</button>
           <button class="gate-btn" @click="showCreateModal = true">+</button>
           <button class="gate-btn" @click="nextDisplayMode">···</button>
+          <button class="gate-btn" @click="nextFont">字</button>
+          <button class="gate-btn" @click="themeStore.toggleTheme">{{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}</button>
         </div>
       </div>
 
