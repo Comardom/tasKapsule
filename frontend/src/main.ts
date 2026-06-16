@@ -7,6 +7,7 @@ import App from './App.vue'
 import '@/globalCSS/baseReset.css'
 import '@/globalCSS/themeVariables.css'
 import '@/globalCSS/baseNiceStyle.css'
+import '@/globalCSS/fonts.css'
 
 
 console.log('--- [Main.ts] 脚本开始加载 ---');

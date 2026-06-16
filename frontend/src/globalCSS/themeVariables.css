@@ -2,6 +2,7 @@
 
 :root {
   color-scheme: light;
+  --font-body: 'App Sans', system-ui, sans-serif;
   /* 亮色模式变量 */
   --theme-bg-stripe-1: #f0f0f0;
   --theme-bg-stripe-2: #ffffff;

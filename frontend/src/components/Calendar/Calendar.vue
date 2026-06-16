@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import { timeZoneOptions } from '@/data/timezones.ts'
 import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
+import {useFontStore} from "@/stores/font.ts";
 import Clock from "@/components/Calendar/Clock.vue";
 import CalendarBody from "@/components/Calendar/CalendarBody.vue";
 import WeatherWidget from "@/components/Calendar/WeatherWidget.vue";
@@ -11,6 +12,7 @@ import {useWeather} from "@/composables/useWeather";
 
 //pinia
 const localeStore = useLocaleStore();
+const fontStore = useFontStore();
 
 
 //timeManager
@@ -83,6 +85,15 @@ const displayMonth = computed(() => {
         <option value="zh">中文</option>
         <option value="ja">日本語</option>
         <option value="en">English</option>
+      </select>
+      <select v-model="fontStore.fontBody">
+        <option
+            v-for="opt in fontStore.FONT_OPTIONS"
+            :key="opt.value"
+            :value="opt.value"
+        >
+          {{ opt.label }}
+        </option>
       </select>
     </div>
   </div>

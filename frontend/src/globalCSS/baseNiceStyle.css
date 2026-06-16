@@ -1,4 +1,5 @@
 #app-all {
+    font-family: var(--font-body);
     background: repeating-linear-gradient(
             to right,
             var(--theme-bg-stripe-1),
