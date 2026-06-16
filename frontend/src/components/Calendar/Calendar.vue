@@ -23,8 +23,8 @@ const monthOffset = ref<number>(0);
 
 
 const {
-  currentWeather, dailyMap, loading,
-  location, setLocationByCity,
+  dailyMap, loading,
+  location, setLocation,
 } = useWeather();
 
 //准备给其他的年份
@@ -60,11 +60,10 @@ const displayMonth = computed(() => {
 
     <div class="calendar-tail">
       <WeatherWidget
-        :current="currentWeather"
         :daily="dailyMap"
         :location-name="location.name"
         :loading="loading"
-        @set-location-by-city="setLocationByCity"
+        @set-location="(lat, lon, name) => setLocation(lat, lon, name)"
       />
       <select
           v-model="localeStore.timeZone"

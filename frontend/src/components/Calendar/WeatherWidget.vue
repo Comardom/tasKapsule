@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useCapsuleStore } from '@/stores/capsule'
-import type { CurrentWeather, DailyWeather } from '@/composables/useWeather'
+import type { DailyWeather } from '@/composables/useWeather'
+import CitySelector from '@/components/Calendar/CitySelector.vue'
 
 interface Props {
-  current: CurrentWeather | null
   daily: Record<string, DailyWeather>
   locationName: string
   loading: boolean
@@ -12,16 +12,14 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  setLocationByCity: [city: string]
+  setLocation: [lat: number, lon: number, name: string]
 }>()
+
+const showSelector = ref(false)
 
 const capsuleStore = useCapsuleStore()
 
 const selectedDate = computed(() => capsuleStore.selectedDate)
-
-const today = computed(() => new Date().toLocaleDateString('sv-SE'))
-
-const isToday = computed(() => selectedDate.value === today.value)
 
 const dayWeather = computed(() => props.daily[selectedDate.value] ?? null)
 
@@ -39,22 +37,31 @@ function weatherEmoji(code: number): string {
 
 const displayTemp = computed(() => {
   const d = dayWeather.value
-  const c = props.current
-  if (isToday.value && c) return c.temperature
   return d ? Math.round((d.max + d.min) / 2) : null
 })
 
-const displayCode = computed(() => {
-  if (isToday.value && props.current) return props.current.code
-  return dayWeather.value?.code ?? null
-})
+const displayCode = computed(() => dayWeather.value?.code ?? null)
 
 function handleLocationClick() {
-  const input = window.prompt('Enter city name (e.g. Shanghai, Tokyo):')
-  if (input?.trim()) {
-    emit('setLocationByCity', input.trim())
-  }
+  showSelector.value = true
 }
+
+function onCitySelect(city: { lat: number; lon: number; name: string }) {
+  showSelector.value = false
+  emit('setLocation', city.lat, city.lon, city.name)
+}
+
+import { watch } from 'vue'
+
+watch([selectedDate, () => props.daily, displayCode, displayTemp], () => {
+  console.log('WeatherWidget:', {
+    selectedDate: selectedDate.value,
+    dailyHas: selectedDate.value in props.daily,
+    displayCode: displayCode.value,
+    displayTemp: displayTemp.value,
+    dailyKeys: Object.keys(props.daily),
+  })
+})
 </script>
 
 <template>
@@ -71,6 +78,13 @@ function handleLocationClick() {
     <span class="weather-location" title="Click to change city" @click="handleLocationClick">
       {{ locationName }}
     </span>
+    <Teleport to="body">
+      <CitySelector
+        v-if="showSelector"
+        @select="onCitySelect"
+        @close="showSelector = false"
+      />
+    </Teleport>
   </div>
 </template>
 
