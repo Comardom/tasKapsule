@@ -9,12 +9,14 @@ import {computed, nextTick, onMounted, ref, watch} from "vue";
 import gsap from "gsap";
 import CreateCapsuleModal from "@/components/CapsuleShelf/CreateCapsuleModal.vue";
 import ConfirmDialog from "@/components/CapsuleShelf/ConfirmDialog.vue";
+import ImportExportDialog from "@/components/CapsuleShelf/ImportExportDialog.vue";
 import {useThemeStore} from "@/stores/theme.ts";
 import {useFontStore} from "@/stores/font.ts";
 import {capsuleApi} from "@/utils/apiService.ts";
 
 
 const showCreateModal= ref<boolean>(false);
+const showImportExport = ref(false);
 const editingCapsule = ref<Capsule | null>(null);
 const deletingCapsule = ref<Capsule | null>(null);
 // 从事件总线读取导航信号和创建信号；Calendar 双击→navigateToDate，右键→pendingCreateDate
@@ -303,6 +305,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
           <button class="gate-btn" @click="nextDisplayMode">···</button>
           <button class="gate-btn" @click="nextFont">字</button>
           <button class="gate-btn" @click="themeStore.toggleTheme">{{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}</button>
+          <button class="gate-btn" @click="showImportExport = true">⇅</button>
         </div>
       </div>
 
@@ -343,6 +346,10 @@ function findNearestDate(target: string, dates: string[]): string | null {
     message="确定要删除这条胶囊？此操作不可恢复。"
     @confirm="confirmDelete"
     @cancel="deletingCapsule = null"
+  />
+  <ImportExportDialog
+    v-if="showImportExport"
+    @close="showImportExport = false"
   />
 </template>
 

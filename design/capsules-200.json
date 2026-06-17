@@ -1,0 +1,1295 @@
+[
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#1]",
+    "classification": "note",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-1.m4a",
+    "attachmentPaths": "[\"/files/note-1.pdf\"]",
+    "alarmClocks": "[{\"time\":\"09:00\",\"type\":\"oneShot\"}]"
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#2]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-27 04:47:00",
+    "scheduleEndAt": "2026-04-29 04:47:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#3]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-24 06:14:00",
+    "scheduleEndAt": "2026-03-24 08:14:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#4]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#5]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#6]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-02 05:44:00",
+    "scheduleEndAt": "2026-03-02 23:44:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#7]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#8]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-25 11:54:00",
+    "scheduleEndAt": "2026-03-26 04:54:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#9]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#10]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#11]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#12]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#13]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#14]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-28 09:05:00",
+    "scheduleEndAt": "2026-04-28 16:05:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#15]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#16]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-30 06:42:00",
+    "scheduleEndAt": "2026-06-01 02:42:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#17]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#18]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#19]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-21 07:43:00",
+    "scheduleEndAt": "2026-07-21 11:43:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#20]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-20 12:17:00",
+    "scheduleEndAt": "2026-05-24 12:17:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#21]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#22]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#23]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-22 17:16:00",
+    "scheduleEndAt": "2026-07-23 21:16:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#24]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-26 04:32:00",
+    "scheduleEndAt": "2026-04-26 08:32:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#25]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-10 21:27:00",
+    "scheduleEndAt": "2026-04-11 22:27:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#26]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#27]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#28]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-30 21:56:00",
+    "scheduleEndAt": "2026-03-31 15:56:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#29]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-15 13:10:00",
+    "scheduleEndAt": "2026-05-17 12:10:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#30]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-07 05:32:00",
+    "scheduleEndAt": "2026-07-08 22:32:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#31]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#32]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-11 17:49:00",
+    "scheduleEndAt": "2026-04-11 18:49:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#33]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#34]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-18 07:03:00",
+    "scheduleEndAt": "2026-05-19 20:03:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#35]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-03 02:48:00",
+    "scheduleEndAt": "2026-07-03 11:48:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#36]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#37]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-17 06:59:00",
+    "scheduleEndAt": "2026-06-19 05:59:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#38]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#39]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#40]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#41]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-17 10:01:00",
+    "scheduleEndAt": "2026-03-18 01:01:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#42]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-16 07:04:00",
+    "scheduleEndAt": "2026-03-17 05:04:00",
+    "scheduleStatus": "executing",
+    "scheduleDeadline": "2026-03-15 07:04:00"
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#43]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-03 06:34:00",
+    "scheduleEndAt": "2026-07-08 06:34:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#44]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#45]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-19 11:27:00",
+    "scheduleEndAt": "2026-06-21 10:27:00",
+    "scheduleStatus": "blocked",
+    "scheduleDeadline": "2026-06-16 11:27:00"
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#46]",
+    "classification": "note",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-46.m4a",
+    "attachmentPaths": "[\"/files/note-46.pdf\"]"
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#47]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#48]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#49]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-23 04:27:00",
+    "scheduleEndAt": "2026-06-28 04:27:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#50]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#51]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#52]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-17 00:05:00",
+    "scheduleEndAt": "2026-07-17 16:05:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#53]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#54]",
+    "classification": "sms",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-54.m4a",
+    "attachmentPaths": "[\"/files/note-54.pdf\"]"
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#55]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-08 08:59:00",
+    "scheduleEndAt": "2026-06-09 14:59:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#56]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#57]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#58]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#59]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-15 18:47:00",
+    "scheduleEndAt": "2026-03-17 18:47:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#60]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-01 16:58:00",
+    "scheduleEndAt": "2026-07-02 03:58:00",
+    "scheduleStatus": "blocked",
+    "scheduleDeadline": "2026-06-28 16:58:00"
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#61]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-17 02:38:00",
+    "scheduleEndAt": "2026-04-20 02:38:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#62]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#63]",
+    "classification": "favourite",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-63.m4a",
+    "attachmentPaths": "[\"/files/note-63.pdf\"]",
+    "alarmClocks": "[{\"time\":\"09:00\",\"type\":\"oneShot\"}]"
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#64]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-28 18:33:00",
+    "scheduleEndAt": "2026-07-29 11:33:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#65]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#66]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-16 14:20:00",
+    "scheduleEndAt": "2026-05-16 19:20:00",
+    "scheduleStatus": "pending",
+    "scheduleDeadline": "2026-05-13 14:20:00"
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#67]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#68]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-24 16:16:00",
+    "scheduleEndAt": "2026-04-28 16:16:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#69]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#70]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-18 22:19:00",
+    "scheduleEndAt": "2026-07-20 16:19:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#71]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#72]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#73]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#74]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#75]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-12 19:13:00",
+    "scheduleEndAt": "2026-05-13 09:13:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#76]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#77]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-14 02:40:00",
+    "scheduleEndAt": "2026-03-14 20:40:00",
+    "scheduleStatus": "executing",
+    "scheduleDeadline": "2026-03-12 02:40:00"
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#78]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#79]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-22 17:45:00",
+    "scheduleEndAt": "2026-06-22 18:45:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#80]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#81]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-10 11:37:00",
+    "scheduleEndAt": "2026-03-11 15:37:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#82]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-11 11:13:00",
+    "scheduleEndAt": "2026-03-13 06:13:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#83]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#84]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#85]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-30 05:51:00",
+    "scheduleEndAt": "2026-05-01 08:51:00",
+    "scheduleStatus": "blocked",
+    "scheduleDeadline": "2026-04-27 05:51:00"
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#86]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#87]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#88]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#89]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-28 12:55:00",
+    "scheduleEndAt": "2026-04-02 12:55:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#90]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#91]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-28 07:01:00",
+    "scheduleEndAt": "2026-04-29 09:01:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#92]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#93]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-09 12:43:00",
+    "scheduleEndAt": "2026-07-10 23:43:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#94]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-06 05:37:00",
+    "scheduleEndAt": "2026-05-06 22:37:00",
+    "scheduleStatus": "cancelled",
+    "scheduleDeadline": "2026-05-03 05:37:00"
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#95]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#96]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-09 03:24:00",
+    "scheduleEndAt": "2026-07-09 16:24:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#97]",
+    "classification": "urgent",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-97.m4a",
+    "attachmentPaths": "[\"/files/note-97.pdf\"]",
+    "alarmClocks": "[{\"time\":\"09:00\",\"type\":\"oneShot\"}]"
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#98]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#99]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#100]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#101]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-24 19:20:00",
+    "scheduleEndAt": "2026-05-25 03:20:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#102]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-19 21:26:00",
+    "scheduleEndAt": "2026-05-21 18:26:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#103]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-16 21:24:00",
+    "scheduleEndAt": "2026-06-17 09:24:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#104]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-19 00:19:00",
+    "scheduleEndAt": "2026-07-20 04:19:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#105]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#106]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#107]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#108]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#109]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#110]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#111]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-30 21:19:00",
+    "scheduleEndAt": "2026-05-01 10:19:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#112]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-30 19:54:00",
+    "scheduleEndAt": "2026-07-02 01:54:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#113]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#114]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#115]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-02 03:49:00",
+    "scheduleEndAt": "2026-03-02 15:49:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#116]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#117]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#118]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-04 14:42:00",
+    "scheduleEndAt": "2026-04-06 02:42:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#119]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#120]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#121]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#122]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#123]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#124]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-03 20:17:00",
+    "scheduleEndAt": "2026-05-05 06:17:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#125]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-21 02:45:00",
+    "scheduleEndAt": "2026-06-21 20:45:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#126]",
+    "classification": "note",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-126.m4a",
+    "attachmentPaths": "[\"/files/note-126.pdf\"]"
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#127]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-07 22:09:00",
+    "scheduleEndAt": "2026-06-08 03:09:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#128]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-28 13:03:00",
+    "scheduleEndAt": "2026-06-29 16:03:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#129]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#130]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-26 12:30:00",
+    "scheduleEndAt": "2026-07-30 12:30:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#131]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-16 17:47:00",
+    "scheduleEndAt": "2026-06-18 08:47:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#132]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#133]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#134]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#135]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#136]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#137]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#138]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#139]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-18 04:55:00",
+    "scheduleEndAt": "2026-06-18 08:55:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#140]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-25 10:21:00",
+    "scheduleEndAt": "2026-06-26 11:21:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#141]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#142]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#143]",
+    "classification": "favourite",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-143.m4a",
+    "attachmentPaths": "[\"/files/note-143.pdf\"]"
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#144]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#145]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-11 00:15:00",
+    "scheduleEndAt": "2026-03-13 00:15:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#146]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-30 21:07:00",
+    "scheduleEndAt": "2026-07-01 11:07:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#147]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-03 05:38:00",
+    "scheduleEndAt": "2026-06-05 05:38:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#148]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#149]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-27 00:59:00",
+    "scheduleEndAt": "2026-07-28 20:59:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#150]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-20 02:37:00",
+    "scheduleEndAt": "2026-04-21 19:37:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#151]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#152]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#153]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#154]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-15 13:42:00",
+    "scheduleEndAt": "2026-07-16 22:42:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#155]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-16 15:06:00",
+    "scheduleEndAt": "2026-06-17 15:06:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#156]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#157]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#158]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#159]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#160]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#161]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#162]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#163]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-24 07:48:00",
+    "scheduleEndAt": "2026-06-25 23:48:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#164]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-05 10:11:00",
+    "scheduleEndAt": "2026-07-06 09:11:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#165]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-31 22:56:00",
+    "scheduleEndAt": "2026-07-31 23:56:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#166]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-01 23:26:00",
+    "scheduleEndAt": "2026-05-02 15:26:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#167]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#168]",
+    "classification": "favourite",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-168.m4a",
+    "attachmentPaths": "[\"/files/note-168.pdf\"]"
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#169]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-02 09:42:00",
+    "scheduleEndAt": "2026-05-03 16:42:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#170]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-19 10:22:00",
+    "scheduleEndAt": "2026-07-20 04:22:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "新来的实习生提交的 PR 代码质量不错，就是测试覆盖率偏低，让他补一下。 [#171]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-19 10:07:00",
+    "scheduleEndAt": "2026-04-21 07:07:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "灵感：胶囊详情页可以加一个时间线视图，把修改历史可视化出来。 [#172]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-02 08:46:00",
+    "scheduleEndAt": "2026-07-03 18:46:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "京东买的书到了，一共五本，够看一个月的了。 [#173]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "牙齿有点敏感，约了周三去看牙医，希望不用根管治疗。 [#174]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-01 05:19:00",
+    "scheduleEndAt": "2026-06-04 05:19:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "连续加了一周的班，今天终于把性能优化搞定了，QPS 提升了三倍。 [#175]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "端午节的火车票开售了，抢到了回老家的票，开心。 [#176]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "代码审查时发现了一个隐藏很深的并发安全问题，幸亏发版前发现了。 [#177]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下午要去街道办事处办居住证续期，记得带上身份证和租房合同。 [#178]",
+    "classification": "favourite",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "这次大版本升级涉及数据库 schema 变更，需要准备回滚方案。 [#179]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "下雨天最适合窝在家里写代码，放点轻音乐，效率极高。 [#180]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-14 08:55:00",
+    "scheduleEndAt": "2026-03-14 13:55:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "早上跑了五公里，配速终于进六分了，下个月目标半马。 [#181]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-14 04:09:00",
+    "scheduleEndAt": "2026-03-15 00:09:00",
+    "scheduleStatus": "pending",
+    "scheduleDeadline": "2026-03-13 04:09:00"
+  },
+  {
+    "contentText": "跟产品经理对齐了下个迭代的需求，排期有点紧，需要评估工作量。 [#182]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-15 19:38:00",
+    "scheduleEndAt": "2026-06-16 10:38:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "冰箱里的鸡蛋快过期了，今晚得做一顿蛋炒饭消灭掉。 [#183]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-22 09:55:00",
+    "scheduleEndAt": "2026-06-23 13:55:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "看到一篇讲 Go 内存管理的文章，逃逸分析那部分讲得特别好。 [#184]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "收到了信用卡账单，这个月花了有点多，得控制一下消费。 [#185]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "阳台的多肉植物长出了新芽，春天果然适合生长。 [#186]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-24 08:42:00",
+    "scheduleEndAt": "2026-04-27 08:42:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "下午三点跟后端联调用户权限接口，token 刷新逻辑要仔细测一遍。 [#187]",
+    "classification": "urgent",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-03-01 13:28:00",
+    "scheduleEndAt": "2026-03-02 20:28:00",
+    "scheduleStatus": "executing"
+  },
+  {
+    "contentText": "给老妈买了一个智能血压计，周末回去教她用。 [#188]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-05-12 22:55:00",
+    "scheduleEndAt": "2026-05-14 18:55:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "验证码：782034，您在登录 tasKapsule 管理后台，如非本人操作请忽略。 [#189]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-29 21:51:00",
+    "scheduleEndAt": "2026-07-31 01:51:00",
+    "scheduleStatus": "cancelled"
+  },
+  {
+    "contentText": "灵感：在日历上直接用拖拽来调整日程时间，交互会更直观。 [#190]",
+    "classification": "inspiration",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-08 08:52:00",
+    "scheduleEndAt": "2026-04-10 08:52:00",
+    "scheduleStatus": "blocked"
+  },
+  {
+    "contentText": "猫又吐毛球了，得买点化毛膏，顺便约一下这周末的体检。 [#191]",
+    "classification": "note",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-07-24 09:28:00",
+    "scheduleEndAt": "2026-07-28 09:28:00",
+    "scheduleStatus": "pending"
+  },
+  {
+    "contentText": "重构通知模块的时候发现消息队列有潜在的死信问题，需要加重试机制。 [#192]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "今天下班路过花店，买了一束洋桔梗，放在书桌上心情很好。 [#193]",
+    "classification": "favourite",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-193.m4a",
+    "attachmentPaths": "[\"/files/note-193.pdf\"]"
+  },
+  {
+    "contentText": "老板说下季度要启动数据迁移项目，让我先出一个技术方案。 [#194]",
+    "classification": "sms",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-06-19 23:20:00",
+    "scheduleEndAt": "2026-06-20 01:20:00",
+    "scheduleStatus": "cancelled",
+    "scheduleDeadline": "2026-06-16 23:20:00"
+  },
+  {
+    "contentText": "晚上做了一个很清晰的梦，梦里把一直卡着的 Bug 修好了，醒来试试真的可行。 [#195]",
+    "classification": "inspiration",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "紧急通知：线上服务器 SSL 证书将在三天后到期，请立即安排续期！ [#196]",
+    "classification": "note",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "看了《设计数据密集型应用》第三章，关于分布式存储的讨论启发很大。 [#197]",
+    "classification": "urgent",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "周末打算去爬山，查了一下天气，周六多云，适合户外。 [#198]",
+    "classification": "favourite",
+    "isWithSchedule": 1,
+    "scheduleStartAt": "2026-04-14 15:33:00",
+    "scheduleEndAt": "2026-04-15 09:33:00",
+    "scheduleStatus": "completed"
+  },
+  {
+    "contentText": "需要给车做保养了，里程数已经超了五百公里，这周末得去 4S 店。 [#199]",
+    "classification": "sms",
+    "isWithSchedule": 0
+  },
+  {
+    "contentText": "租房合同月底到期，中介说房东要卖房，得开始找新的房子了。 [#200]",
+    "classification": "inspiration",
+    "isWithSchedule": 0,
+    "audioPath": "/recordings/sample-200.m4a",
+    "attachmentPaths": "[\"/files/note-200.pdf\"]"
+  }
+]
