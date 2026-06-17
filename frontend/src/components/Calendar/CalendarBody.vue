@@ -138,16 +138,15 @@ function refreshCalendar(){
 
 // 格子点击事件：单击高亮、双击跳转到双栏、右键弹创建弹窗
 // 使用原生 @click / @dblclick / @contextmenu 区分，无防抖延迟
-const isSelectOtherMonth = ref<boolean>(false);
+const selectedMonthOffset = ref<number>(0);
 const selectedDay = ref<number>(今天几号.value);
 
 
 // 根据点击的格子和是否为其他月，算出标准的 YYYY-MM-DD 字符串
-function computeDate(whatDay: number, isOtherMonth: boolean): string {
+function computeDate(whatDay: number, monthOffset: number): string {
   /*const { year, month } = timeManager.getFormatted();*/
   const year = props.displayYear;
   const month = props.displayMonth;
-  const monthOffset = !isOtherMonth ? 0 : (whatDay < 15 ? 1 : -1);
   const actualMonth = month + monthOffset;
   let targetYear = 1970, targetMonth = 0;
   if (actualMonth > 11) {
@@ -166,26 +165,26 @@ function computeDate(whatDay: number, isOtherMonth: boolean): string {
 }
 
 // 单击 → 只更新选中日期的样式（高亮），不切换视图模式
-function singleClick(whatDay: number, isOtherMonth: boolean) {
-  isSelectOtherMonth.value = isOtherMonth;
+function singleClick(whatDay: number, monthOffset: number) {
+  selectedMonthOffset.value = monthOffset;
   selectedDay.value = whatDay;
-  capsuleStore.setDate(computeDate(whatDay, isOtherMonth));
+  capsuleStore.setDate(computeDate(whatDay, monthOffset));
 }
 
 // 双击 → 更新选中日期 + 通知 CapsuleShelf 切换到双栏并滚动到该日期
 // 原生 dblclick 会先触发两次 singleClick，第二次 setDate 值相同时为 no-op
-function doubleClick(whatDay: number, isOtherMonth: boolean) {
-  isSelectOtherMonth.value = isOtherMonth;
+function doubleClick(whatDay: number, monthOffset: number) {
+  selectedMonthOffset.value = monthOffset;
   selectedDay.value = whatDay;
-  const date = computeDate(whatDay, isOtherMonth);
+  const date = computeDate(whatDay, monthOffset);
   capsuleStore.setDate(date);
   setNavigateToDate(date);
 }
 
 // 右键 → 弹出创建弹窗并预填日期
-function handleRightClick(whatDay: number, isOtherMonth: boolean, event: MouseEvent) {
+function handleRightClick(whatDay: number, monthOffset: number, event: MouseEvent) {
   event.preventDefault();
-  setPendingCreateDate(computeDate(whatDay, isOtherMonth));
+  setPendingCreateDate(computeDate(whatDay,monthOffset));
 }
 
 
@@ -230,12 +229,12 @@ watch(() => props.monthOffset, (n, o) => {
           :inlineSize=cellInlineSize
           class="lastMonthTail"
           :class="{
-            'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth,
-            'cell-gray':!(上月天数 - 月初曜日 + day上月 === selectedDay && isSelectOtherMonth)
+            'cell-blue':上月天数 - 月初曜日 + day上月 === selectedDay && selectedMonthOffset === -1,
+            'cell-gray':!(上月天数 - 月初曜日 + day上月 === selectedDay && selectedMonthOffset === -1)
           }"
-          @click="singleClick(上月天数 - 月初曜日 + day上月,true)"
-          @dblclick="doubleClick(上月天数 - 月初曜日 + day上月,true)"
-          @contextmenu="handleRightClick(上月天数 - 月初曜日 + day上月,true,$event)"
+          @click="singleClick(上月天数 - 月初曜日 + day上月,-1)"
+          @dblclick="doubleClick(上月天数 - 月初曜日 + day上月,-1)"
+          @contextmenu="handleRightClick(上月天数 - 月初曜日 + day上月,-1,$event)"
       >
         <span>{{ 上月天数 - 月初曜日 + day上月 }}</span>
       </Cell>
@@ -246,15 +245,15 @@ watch(() => props.monthOffset, (n, o) => {
           :inlineSize=cellInlineSize
           class="thisMonth"
           :class="{
-            'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
+            'cell-blue': day此月 === selectedDay && selectedMonthOffset === 0,
             'cell-gray-with-shadow':
               (monthOffset === 0)
               &&
-              (day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth)),
+              (day此月 === 今天几号 && (selectedDay != 今天几号 || selectedMonthOffset != 0)),
           }"
-          @click="singleClick(day此月,false)"
-          @dblclick="doubleClick(day此月,false)"
-          @contextmenu="handleRightClick(day此月,false,$event)"
+          @click="singleClick(day此月,0)"
+          @dblclick="doubleClick(day此月,0)"
+          @contextmenu="handleRightClick(day此月,0,$event)"
       >
         <span>{{ day此月 }}</span>
       </Cell>
@@ -265,12 +264,12 @@ watch(() => props.monthOffset, (n, o) => {
           :inlineSize="cellInlineSize"
           class="nextMonthHead"
           :class="{
-            'cell-blue':day下月 === selectedDay && isSelectOtherMonth,
-            'cell-gray':!(day下月 === selectedDay && isSelectOtherMonth)
+            'cell-blue':day下月 === selectedDay && selectedMonthOffset === 1,
+            'cell-gray':!(day下月 === selectedDay && selectedMonthOffset === 1)
           }"
-          @click="singleClick(day下月,true)"
-          @dblclick="doubleClick(day下月,true)"
-          @contextmenu="handleRightClick(day下月,true,$event)"
+          @click="singleClick(day下月,1)"
+          @dblclick="doubleClick(day下月,1)"
+          @contextmenu="handleRightClick(day下月,1,$event)"
       >
         <span>{{ day下月 }}</span>
       </Cell>

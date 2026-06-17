@@ -5,7 +5,7 @@
     "name":"Comardom",
     "email": "Comardom@outlook.com"
   },
-  "version": "0.1.28",
+  "version": "0.1.39",
   "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",
