@@ -256,34 +256,63 @@ Both are bound directly to the Pinia store via `v-model`. Changes persist to loc
 
 Color spec lives at `design/color.md`. The palette uses a "fabric texture" (布料感) aesthetic — subtle alternating color pairs for a barely-perceptible linen-like grain.
 
-### Today cell highlighting
+### Cell highlighting (selected + today)
 
-Today's cell uses classes from `CalendarBody.vue`'s ternary state system:
+CalendarBody uses `selectedDay` + `selectedMonth` (absolute month number, 0‑indexed) to track the selected cell, replacing the old `isSelectOtherMonth` boolean.
+
+#### Three cell regions and their highlight conditions
+
+Each cell group in the grid checks `selectedMonth` against its absolute month:
 
 ```html
-<!-- CalendarBody.vue template: "thisMonth" cells only -->
-<Cell
-  :class="{
-    'cell-blue': day此月 === selectedDay && !isSelectOtherMonth,
-    'cell-gray-with-shadow':
-      (monthOffset === 0)
-      &&
-      (day此月 === 今天几号 && (selectedDay != 今天几号 || isSelectOtherMonth)),
-  }"
-  @click="singleClick(day此月,false)"
-  @dblclick="doubleClick(day此月,false)"
-  @contextmenu="handleRightClick(day此月,false,$event)"
->
+<!-- 上月尾巴 → 选的是上个月，且 day 在尾巴范围 -->
+'cell-blue': 上月天数 - 月初曜日 + day上月 === selectedDay
+          && selectedMonth === props.displayMonth - 1,
+
+<!-- 本月 → 选的是本月 -->
+'cell-blue': day此月 === selectedDay && selectedMonth === props.displayMonth,
+
+<!-- 下月头 → 选的是下个月，且 day 在头部范围 -->
+'cell-blue': day下月 === selectedDay && selectedMonth === props.displayMonth + 1,
 ```
 
-Three visual states:
+#### Three visual states
+
 | State | Class | Appearance |
 |---|---|---|
-| Today, no selection | (none, default `thisMonth` bg) | Normal cell |
-| Today, another day selected | `cell-gray-with-shadow` | Inset shadow (depressed) + dimmed text via `--calendar-today-unselected-bg/shadow/text` |
-| Selected day | `cell-blue` | Blue gradient (light) / pink gradient (dark) + white text |
+| Selected (任何区域) | `cell-blue` | Blue gradient (light) / pink gradient (dark) + white text |
+| Today, another day selected | `cell-gray-with-shadow` | Inset shadow (depressed) + dimmed text |
+| Default (not selected, not today) | (none) | Normal cell background |
 
-Styles use `--calendar-today-*` variables. `今天几号` is kept up-to-date by the 60s refresh loop. Interaction split: `singleClick` (select only), `doubleClick` (navigate + switch mode), `handleRightClick` (open create modal).
+#### Cross‑month corner fallback (`watch(monthKey)`)
+
+When the user scrolls to a new month and the current highlight would be invisible in the new grid, it falls back to the grid corner determined by scroll direction:
+
+```
+往前滚（未来）→ 左上角 = 
+  有上月尾巴 ? 尾巴第一天 : 本月1号
+
+往后滚（过去）→ 右下角 = 
+  有下月头 ? 头部最后一天 : 本月最后一天
+```
+
+Visibility is checked against all three regions:
+
+```ts
+可见上月尾 = selectedMonth === displayMonth - 1 && 前置 > 0 && day在尾巴内
+可见当月   = selectedMonth === displayMonth
+可见下月头 = selectedMonth === displayMonth + 1 && 后置 > 0 && day在头内
+```
+
+`lastScrollDir` records the last wheel direction (1 = forward, -1 = backward) and is consumed by `watch(monthKey)` to pick the correct corner.
+
+#### Interaction split
+
+| Event | Function | Effect |
+|---|---|---|
+| single click | `singleClick(day, month)` | Sets `selectedDay`, `selectedMonth`, `capsuleStore.selectedDate` |
+| double click | `doubleClick(day, month)` | Same + `setNavigateToDate()` → CapsuleShelf switches to dual + scroll |
+| right click | `handleRightClick(day, month, $event)` | Opens create modal with pre‑filled date |
 
 ### Theme variable inventory
 
@@ -324,6 +353,27 @@ Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class 
 | `theme` | Composition | `'app-theme'` | Dark/light mode |
 | `capsule` | Options | — | Capsule CRUD state |
 | `locale` | Composition | `'locale'`, `'timezone'` | Language + timezone |
+
+### Capsule store: `_resolveFullyLoaded` 数组模式
+
+`waitFullyLoaded()` 返回一个 Promise，在后台分页加载完成后才 resolve。由于 `CapsuleShelf.vue` 的 `navigateToDate` 可能被快速连续触发，使用**数组**存储所有 caller 的 resolver，而非单例：
+
+```ts
+_waitUnpaused: [] as (() => void)[],
+
+async waitFullyLoaded(): Promise<void> {
+  if (this.fullyLoaded) return;
+  return new Promise(resolve => {
+    this._resolveFullyLoaded.push(resolve);
+  });
+},
+
+// 加载完成时：
+for (const resolve of this._resolveFullyLoaded) resolve();
+this._resolveFullyLoaded = [];
+```
+
+避免快速双击两个日期时第一个 Promise 永久挂起。
 
 ## Known stub / deprecated components
 

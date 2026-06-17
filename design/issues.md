@@ -168,3 +168,30 @@
 | 77 | `backend/capsule.go` | 345,430 | `SELECT *` 位置映射脆弱 | ⏸️ 无迁移场景，跳过 |
 | 78 | `loadingPageController.ts` | 16 | `MAX_RETRIES = 10`，AGENTS.md 曾记为 120 | ✅ 已统一为 10 |
 | 79 | `electron/preload.ts` | 9-16 | `onBackendStatus` 监听 `backend-status-update` 但 main.ts 从不发送 | ⏸️ 保留待改造 |
+
+---
+
+# Known Issues (2026-06-17 第七轮 — 发布前扫描)
+
+## P0 — 无
+
+## P1 — 已修
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 80 | `stores/capsule.ts` | 45,88-92 | `_resolveFullyLoaded` 单例 resolver → 改为数组，防止快速双击 Promise 挂起 | ✅ 已修 |
+
+## P2 — 已修
+
+| # | 文件 | 行 | 问题 | 状态 |
+|---|---|---|---|---|
+| 81 | `backend/capsule.go` | 222 | `COUNT(*)` 的 `.Scan` 错误忽略 → 改为检查并返回 500 | ✅ 已修 |
+| 82 | `backend/capsule.go` | 382-387 | `handleUpdateCapsule` 存在性检查吞掉数据库异常 → 改为区分 `sql.ErrNoRows`(404) 和其他错误(500) | ✅ 已修 |
+
+## P3 — 保留项（不影响发布）
+
+| # | 文件 | 问题 | 状态 |
+|---|---|---|---|
+| 83 | 同第 75 | `getDateRange` DST 边界 | ⏸️ 保留 |
+| 84 | 同第 77 | Go `SELECT *` 位置映射脆弱 | ⏸️ 保留 |
+| 85 | 同第 79 | `onBackendStatus` 从未发送 | ⏸️ 保留 |

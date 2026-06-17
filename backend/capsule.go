@@ -219,7 +219,10 @@ func handleGetCapsules(w http.ResponseWriter, r *http.Request) {
 
 	// ── 总数 ──
 	var total int
-	db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total)
+	if err := db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total); err != nil {
+		writeJSON(w, 500, map[string]string{"error": "查询总数失败"})
+		return
+	}
 
 	// ── 查询 ──
 	query := `
@@ -378,11 +381,15 @@ func handleUpdateCapsule(w http.ResponseWriter, r *http.Request) {
 	// 如果 id=3 的记录存在，数据库返回一行 {1}，Scan 把 1 读到 exists 变量中。
 	// 如果不存在，QueryRow.Scan 返回一个错误（sql.ErrNoRows），这里的 .Scan(&exists)
 	// 就是我们主动调用 Scan——如果查不到记录，Scan 不会给 exists 赋值，会报错。
-	// 但我们"2 段式"简化了判断：先试一次 Scan，然后检查 exists == 0。
+	// sql.ErrNoRows → 记录不存在，返回 404
+	// 其他错误 → 真实的数据库异常，返回 500
 	var exists int
-	db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
-	if exists == 0 {
+	err = db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
+	if err == sql.ErrNoRows {
 		writeJSON(w, 404, map[string]string{"error": "胶囊不存在"})
+		return
+	} else if err != nil {
+		writeJSON(w, 500, map[string]string{"error": err.Error()})
 		return
 	}
 

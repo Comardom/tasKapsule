@@ -42,7 +42,7 @@ export const useCapsuleStore = defineStore('capsule', {
     totalCount: 0,
     initialPageLoaded: false,
     fullyLoaded: false,
-    _resolveFullyLoaded: null as (() => void) | null,
+    _resolveFullyLoaded: [] as (() => void)[],
   }),
 
   //修改数据的方法（相当于 Vue 组件的 methods）
@@ -68,8 +68,8 @@ export const useCapsuleStore = defineStore('capsule', {
       const totalPages = Math.ceil(this.totalCount / perPage);
       if (totalPages <= 1) {
         this.fullyLoaded = true;
-        this._resolveFullyLoaded?.();
-        this._resolveFullyLoaded = null;
+        for (const resolve of this._resolveFullyLoaded) resolve();
+        this._resolveFullyLoaded = [];
         return;
       }
       for (let page = 2; page <= totalPages; page++) {
@@ -82,13 +82,13 @@ export const useCapsuleStore = defineStore('capsule', {
         }
       }
       this.fullyLoaded = true;
-      this._resolveFullyLoaded?.();
-      this._resolveFullyLoaded = null;
+      for (const resolve of this._resolveFullyLoaded) resolve();
+      this._resolveFullyLoaded = [];
     },
     async waitFullyLoaded(): Promise<void> {
       if (this.fullyLoaded) return;
       return new Promise(resolve => {
-        this._resolveFullyLoaded = resolve;
+        this._resolveFullyLoaded.push(resolve);
       });
     },
     async fetchCapsules() {
