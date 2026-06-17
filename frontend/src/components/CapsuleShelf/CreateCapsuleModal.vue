@@ -88,8 +88,8 @@ async function submit() {
       <template v-if="isWithSchedule">
         <input v-model="scheduleIcon" placeholder="日程图标" />
         <input v-model="scheduleContentText" placeholder="日程内容" />
-        <input ref="startRef" v-model="scheduleStartAt" type="datetime-local" @click="openPicker(startRef)" />
-        <input ref="endRef" v-model="scheduleEndAt" type="datetime-local" @click="openPicker(endRef)" />
+        <span class="date-trigger" @click="openPicker(startRef)"><input ref="startRef" v-model="scheduleStartAt" type="datetime-local" /></span>
+        <span class="date-trigger" @click="openPicker(endRef)"><input ref="endRef" v-model="scheduleEndAt" type="datetime-local" /></span>
         <select v-model="scheduleStatus">
           <option value="pending">待完成</option>
           <option value="executing">进行中</option>
@@ -97,7 +97,7 @@ async function submit() {
           <option value="cancelled">已取消</option>
           <option value="blocked">被阻塞</option>
         </select>
-        <input ref="deadlineRef" v-model="scheduleDeadline" type="datetime-local" placeholder="截止时间" @click="openPicker(deadlineRef)" />
+        <span class="date-trigger" @click="openPicker(deadlineRef)"><input ref="deadlineRef" v-model="scheduleDeadline" type="datetime-local" placeholder="截止时间" /></span>
       </template>
       <input v-model="audioPath" placeholder="音频路径" />
       <input v-model="attachmentPaths" placeholder="附件路径" />
@@ -124,4 +124,13 @@ async function submit() {
 }
 textarea { min-block-size: 6rem; resize: vertical; }
 .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+select, label, button { cursor: pointer; }
+.date-trigger {
+  display: block;
+  cursor: pointer;
+}
+.date-trigger input[type="datetime-local"] {
+  pointer-events: none;
+  inline-size: 100%;
+}
 </style>

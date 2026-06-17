@@ -10,7 +10,12 @@
 
 
 
+## [2026-06-17] - 0.1.38
+* 优化了JSON导入导出的界面外观
+* 更新了各种文档
+* 修改时间选择器改为不可选中
 
+---
 ## [2026-06-17] - 0.1.37
 * 加入了胶囊的JSON导入和导出
 
@@ -526,8 +531,6 @@
 - 安装 pnpm：
   npm install -g pnpm
   pnpm setup
-- 安装 Vue CLI：
-  pnpm install -g @vue/cli
 
 
 ---
@@ -542,12 +545,9 @@ choco install sqlite
 
 ---
 
-## Vue 使用的功能
-- TypeScript (TS)
-- Pinia
-- Router
-
 ---
+
+
 
 ## 前端测试
 ```shell
@@ -558,35 +558,14 @@ pnpm dev
 
 ---
 
-## Vue 的 TS 配置
-```shell
-cd frontend
-pnpm add -D vue-tsc typescript
-```
-
 ---
 
+
+
 ## 打包
-根目录
+根目录：
 ```shell
-pnpm add -D electron-builder
-```
-```shell
-cd frontend
-pnpm build
-```
-```shell
-cd ../backend
-go run .
-```
-cd ../之后就要在根目录执行了！！检查路径！！！
-```shell
-cd ../
-pnpm add -D typescript @types/node
-pnpm add -D npm-run-all cross-env
-
-pnpm exec tsc -p electron/tsconfig.json
-pnpm exec tsc -p electron
-pnpm dist
-
+pnpm build:backend     # 编译 Go 后端
+pnpm dist:linux        # Linux: AppImage + deb + rpm
+pnpm dist:win          # Windows: NSIS 安装包
 ```

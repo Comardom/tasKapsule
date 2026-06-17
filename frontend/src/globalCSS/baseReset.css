@@ -17,6 +17,7 @@ a {
   text-decoration: none;/* 去掉下划线 */
   color: inherit;/* 颜色继承自父元素 */
 }
+option { cursor: pointer; }
 
 img {
   max-inline-size: 100%;/* 防止图片撑破容器 */

@@ -125,20 +125,20 @@ design/color.md 规格："阴影最深 #ADADAD，对数均匀过渡到中间 #CC
 
 | 变量 | 亮色 | 暗色 | 说明 |
 |---|---|---|---|
-| `--calendar-today-unselected-bg` | `#CCCCCC` | `#3A3A40` | 格子中心底色（浅于阴影） |
-| `--calendar-today-unselected-shadow` | `#ADADAD` | `#1E1E24` | 四周内阴影色（深于中心） |
+| `--calendar-today-unselected-bg` | `rgb(74 67 67 / 0.2)` | `#0c0e0b` | 格子中心底色（浅于阴影） |
+| `--calendar-today-unselected-shadow` | `#3c3838` | `#4c574c` | 四周内阴影色（深于中心） |
 | 文字色 | `--calendar-today-text`（`#FFFFFF`） | 同上 | 不变 |
 
 ### 追加到 `themeVariables.css`
 
 ```css
 /* 亮色 :root 末尾 */
---calendar-today-unselected-bg: #CCCCCC;
---calendar-today-unselected-shadow: #ADADAD;
+--calendar-today-unselected-bg: rgb(74 67 67 / 0.2);
+--calendar-today-unselected-shadow: #3c3838;
 
 /* 暗色 [data-theme='dark'] 末尾 */
---calendar-today-unselected-bg: #3A3A40;
---calendar-today-unselected-shadow: #1E1E24;
+--calendar-today-unselected-bg: #0c0e0b;
+--calendar-today-unselected-shadow: #4c574c;
 ```
 
 Calendar.vue 里的使用方式见 2d 节——`background-color` + `box-shadow: inset ...`，两个变量。
@@ -225,17 +225,19 @@ watch(() => capsuleStore.selectedDate, () => {
 4. `Capsule.vue` — 单个胶囊卡片组件 ✅
 5. `CapsuleShelf.vue` — 渲染 CapsuleComponent 从 `store.byCreatedAt` ✅
 
-> 实际实现与原计划不同：CapsuleShelf 没有 date watch / loading 四状态，直接渲染全部胶囊。每个胶囊独立管理展开/收起（local `expanded` ref），无需 emit 链。Centro.vue 为纯布局容器。
->
+> 实际实现与原计划不同：CapsuleShelf 没有 date watch / loading 四状态，直接渲染全部胶囊。每个胶囊独立管理展开/收起（local `expanded` ref），无需 emit 链。Centro.vue 为纯布局容器。`CalendarBody.vue` 从 Calendar.vue 中提取为独立组件；交互事件通过 `useCalendarAction` composable 向 CapsuleShelf 发送信号。
+> 
 > 后续重构：CalendarBody.vue 从 Calendar.vue 中提取为独立组件，负责网格渲染和交互事件；Clock.vue 为独立头部组件；Calendar.vue 简化为布局壳（管理 `monthOffset`、渲染 Clock + CalendarBody + tail selects）。交互事件（单击/双击/右键）实现在 CalendarBody 中，通过 composable (`useCalendarAction`) 向 CapsuleShelf 发送信号。
 
 ---
 
 ## 后续想法
 
-### 字体自定义（not started）
+### 字体自定义（partially implemented）
 
-- 新建 CSS 变量 `--app-font-family`，默认 `'Source Han Sans SC', sans-serif`
-- Pinia 新增 store 字段 `fontFamily`，`localStorage` 持久化
-- 设置 UI：开关"使用系统默认字体" → 覆盖为 `sans-serif`
-- 进阶：支持用户导入自定义字体文件
+- [x] CSS 变量 `--font-body`，已定义
+- [x] Pinia store `stores/font.ts`，`fontBody` 字段，`localStorage` 持久化
+- [x] 字体切换 UI 已在 gate-gap 中增加「字」按钮循环切换正文
+- [x] 内置字体文件：`frontend/public/SourceHanSansCN-Normal.woff2`
+- [ ] 标题字体 `--font-title`、装饰字体 `--font-deco` — 待添加
+- [ ] 用户上传自定义字体（IPC + 文件对话框 + userData/fonts/）— 待实现

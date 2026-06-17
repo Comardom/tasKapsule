@@ -4,24 +4,22 @@
 
 | 角色 | 字体 | 理由 |
 |---|---|---|
-| 正文 + 日历 | Noto Sans CJK SC（思源黑体） | 清晰易读，屏幕渲染好，开源可商用 |
-| 标题 / 装饰文字 | Noto Serif CJK SC（思源宋体） | 与思源黑体同系列，风格协调，开源可商用 |
-
-> ~~台湾新细明体（PMingLiU）~~ 是微软专有字体，不可随软件分发。改用思源宋体。
+| 正文 | Source Han Sans CN（思源黑体） | 清晰易读，屏幕渲染好，开源可商用 |
+| 标题 / 装饰文字 | （待实现） | 尚未选择 |
 
 ### 字体文件
 
-放在 `frontend/public/fonts/`：
+放在 `frontend/public/`：
 
 ```
-frontend/public/fonts/
-├── NotoSansSC-Regular.woff2
-├── NotoSansSC-Bold.woff2
-├── NotoSerifSC-Regular.woff2
-└── NotoSerifSC-Bold.woff2
+frontend/public/
+├── SourceHanSansCN-Normal.woff2
+├── SourceHanSansCN-Normal.otf
 ```
 
-CSS `@font-face` 声明 → CSS 变量 `--font-body`、`--font-title`、`--font-deco` → 各组件引用。
+CSS `@font-face` 声明 → CSS 变量 `--font-body` → 各组件引用。
+
+> 当前仅实现了 `fontBody`。`font-title`、`font-deco` 字段在 store 中不存在，待添加。
 
 ---
 
@@ -38,7 +36,7 @@ CSS `@font-face` 声明 → CSS 变量 `--font-body`、`--font-title`、`--font-
 
 桌面应用 15MB 可忽略，全量。
 
-### 流程
+### 流程（待实现）
 
 ```
 Electron 文件对话框 → 用户选择 .ttf/.otf/.woff2
@@ -49,7 +47,7 @@ Electron 文件对话框 → 用户选择 .ttf/.otf/.woff2
   → 用户选择 → 写入 localStorage + CSS 变量
 ```
 
-### IPC 接口
+### IPC 接口（待实现）
 
 | Channel | Direction | 说明 |
 |---|---|---|
@@ -63,15 +61,17 @@ Pinia `font` store，Composition API，`watchEffect` 同步到 `localStorage` + 
 
 ### 配置 Store 字段
 
+实际 store (`stores/font.ts`)：
+
 | 字段 | 默认值 | 说明 |
 |---|---|---|
-| `font-body` | `'App Sans'` | 正文+日历字体 |
-| `font-title` | `'App Serif'` | 标题字体 |
-| `font-deco` | `'App Serif'` | 装饰文字字体 |
+| `fontBody` | `'App Sans'` | 正文字体 |
+
+> `font-title`、`font-deco` 待实现。`fontBody` 默认值通过 CSS 变量 `--font-body` 应用，初始为系统无衬线字体。
 
 ### UI
 
 设置在侧边栏或独立设置页（待定）：
-- 三个下拉选择器（正文 / 标题 / 装饰），选项 = 默认字体 + 所有已安装字体
-- 「上传字体」按钮
-- 已安装字体列表 + 删除按钮
+- 一个下拉选择器（正文），选项 = 默认字体（当前仅内置 Source Han Sans CN）
+- 「上传字体」按钮（待实现）
+- 已安装字体列表 + 删除按钮（待实现）

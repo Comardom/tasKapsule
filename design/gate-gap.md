@@ -10,7 +10,7 @@
 .double-shelf (display: flex; flex-direction: row)
 ├── .timeline-column (flex: 1)        左列 — 日程胶囊
 ├── .gate-gap (inline-size: 0.125rem) 门
-│   └── .gate-btn ×3                  按钮（单 / + / ···）
+│   └── .gate-btn ×6                  按钮（单 / + / ··· / 字 / ☀️🌙 / ⇅）
 └── .unscheduled-column (flex: 1)     右列 — 无日程胶囊
 ```
 
@@ -30,34 +30,29 @@
 - 按钮组 `transform: translateY(calc(var(--hover-y) - 50%))` 固定在该位置
 - **不是** `@pointermove`，hover 期间按钮位置不变
 
-### 三个按钮
+### 六个按钮
 
 竖直排列，圆形：
 
 | 位置 | 文本 | 功能 |
 |---|---|---|
-| 上 | `单` | 切换到单列模式 |
-| 中 | `+` | 打开新建胶囊对话框 |
-| 下 | `···` | 循环筛选模式（全部 → 首尾 → 首日 → 末日） |
-
-## 单列 toolbar
-
-只保留 `+ 新建` 按钮。模式切换和筛选下拉移到门的按钮组里。
+| 1 | `单` | 切换到单列模式 |
+| 2 | `+` | 打开新建胶囊对话框 |
+| 3 | `···` | 循环筛选模式（全部 → 首尾 → 首日 → 末日） |
+| 4 | `字` | 循环切换正文字体 |
+| 5 | `☀️` / `🌙` | 切换亮色/暗色主题 |
+| 6 | `⇅` | 打开 JSON 导入/导出对话框 |
 
 ## 浮动球 FAB
 
-单列模式下，胶囊列表右下角的一个圆形浮动按钮，用于快速新建胶囊。
+单列模式下，胶囊列表右侧居中的一个圆形浮动按钮，用于快速新建胶囊。
 
 ### 位置
 
-圆心与胶囊卡片右边缘对齐（同「跑道」圆心的纵线）。位于 `.single-shelf` 右下角。
-
 ```
 .capsule-container
-├── .toolbar
 ├── .single-shelf          ← 胶囊列表（右对齐）
-│   └── (胶囊卡片右缘 = 跑道线)
-├── .fab                   ← 圆形 + 号
+├── .fab                   ← 圆形 + 号（position: absolute; left: 100%; top: 50%）
 ├── .double-shelf
 ```
 
@@ -70,37 +65,7 @@
 
 ### 动画跟随
 
-FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里：
-
-```
-单→双：.fab + .single-shelf 同时
-  x: 0 → 100dvi  0.35s power2.in, opacity: 1 → 0
-  （FAB 和胶囊同速向右飞出）
-
-双→单：.fab + .single-shelf 同时
-  从 x: 100dvi → 0  0.35s power2.out, opacity: 0 → 1
-  （FAB 和胶囊同速从右侧滑入）
-```
-
-### CSS
-
-```css
-.fab {
-  position: absolute;
-  right: 0;              /* 与胶囊右缘对齐 */
-  bottom: 1.5rem;
-  inline-size: 3rem;
-  block-size: 3rem;
-  border-radius: 50%;
-  background: var(--theme-link);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-size: 1.5rem;
-  cursor: pointer;
-  z-index: 10;
-}
-```
+FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里。单列 → 双列时一起右移淡出，双列 → 单列时从右侧滑入。
 
 ## GSAP 动画（替代 `document.startViewTransition`）
 
@@ -109,7 +74,7 @@ FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里�
 ### `switchViewMode('double')`
 
 ```
-① .single-shelf 整体 translateX(100dvi) + opacity: 0  0.35s power2.in
+① .single-shelf 整体 translateX(100dvi) + opacity: 0  0.45s power2.in
     — 动画期间 overflow: visible（飞出窗口不被裁切）
     — onComplete: overflow 恢复 + clearProps: all（清 GSAP 内联样式）
 ② store.setViewMode('double')
@@ -117,7 +82,7 @@ FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里�
 ④ 两列从门外侧滑入门（初始位置 x: ±shelfW，以 .double-shelf 宽度为准）：
     .timeline-column      x: shelfW  →  0
     .unscheduled-column   x: -shelfW →  0
-    0.45s backOut(1.2)，同时滑入
+    0.55s backOut(1.2)，同时滑入
     — overflow: hidden 裁剪门外的部分
 ```
 
@@ -127,11 +92,11 @@ FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里�
 ① 两列向门外侧滑出（目标位置 x: ±shelfW）：
     .timeline-column      x: 0  →  shelfW
     .unscheduled-column   x: 0  →  -shelfW
-    0.35s power2.in，同时滑出
-    .gate-gap opacity: 1 → 0 (0.1s)
+    0.4s power1.inOut，同时滑出
+    .gate-gap opacity: 1 → 0 (0.15s)
 ② store.setViewMode('single')
 ③ .single-shelf 在 setViewMode 前已预置 x: 100dvi, opacity: 0（避免闪白）
-④ 从 x: 100dvi → 0  0.35s power2.out
+④ 从 x: 100dvi → 0  0.45s power2.out
     — onComplete: overflow 恢复 + clearProps: all
 ```
 
@@ -145,15 +110,19 @@ FAB 在模式切换时与 `.single-shelf` 绑定在同一个 GSAP timeline 里�
 
 ## 日期选中滚动
 
+通过 `useCalendarAction` 事件总线传递 `navigateToDate` 信号。`CapsuleShelf.vue` 监听此信号：
+
 ```ts
-watch(() => store.selectedDate, async (newDate) => {
+watch(() => navigateToDate.value, async (newDate) => {
+  if (!newDate) return
   if (store.viewMode !== 'double') {
-    await switchViewMode('double')     // 等待动画完成
+    await switchViewMode('double')
   }
   await nextTick()
   // 从 timeline 列中查找 data-need-to-be-scrolled-date 元素
   // 精确匹配 → 不存在则找最近日期（等距取未来日期）
   // scrollIntoView({ behavior: 'smooth', block: 'start' })
+  setTimeout(() => { navigateToDate.value = '' })
 })
 ```
 

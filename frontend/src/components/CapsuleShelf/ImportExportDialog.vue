@@ -177,7 +177,7 @@ function resetImport() {
 .dialog {
   background: var(--theme-bg-stripe-1);
   padding: 1.5rem 2rem;
-  border-radius: 1rem;
+  /*border-radius: 1rem;*/
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -192,15 +192,15 @@ function resetImport() {
 .tab-bar button {
   padding: 0.4rem 1rem;
   border: none;
-  border-radius: 0.5rem;
-  background: transparent;
-  color: var(--theme-color);
+  /*border-radius: 0.5rem;*/
+  /*background: transparent;
+  color: var(--theme-color);*/
   cursor: pointer;
-  font-size: 0.9rem;
+  /*font-size: 0.9rem;*/
 }
 .tab-bar button.active {
-  background: var(--theme-link);
-  color: #fff;
+  /*background: var(--theme-link);
+  color: #fff;*/
 }
 .file-row {
   display: flex;
@@ -209,10 +209,10 @@ function resetImport() {
 }
 .file-btn {
   padding: 0.4rem 1rem;
-  border: 0.0625rem solid var(--calendar-grid-line);
-  border-radius: 0.5rem;
-  background: rgba(255,255,255,0.1);
-  color: var(--theme-color);
+  /*border: 0.0625rem solid var(--calendar-grid-line);*/
+  /*border-radius: 0.5rem;*/
+  /*background: rgba(255,255,255,0.1);*/
+  /*color: var(--theme-color);*/
   cursor: pointer;
 }
 .file-info {
@@ -221,7 +221,7 @@ function resetImport() {
 }
 .preview {
   background: rgba(0,0,0,0.06);
-  border-radius: 0.5rem;
+  /*border-radius: 0.5rem;*/
   padding: 0.75rem 1rem;
 }
 .preview-title {
@@ -245,7 +245,7 @@ function resetImport() {
 .preview-tag {
   font-size: 0.7rem;
   padding: 0.1rem 0.4rem;
-  border-radius: 0.25rem;
+  /*border-radius: 0.25rem;*/
   background: var(--calendar-today-bg-start, rgba(100,140,230,0.3));
   color: var(--calendar-today-text, #fff);
   flex-shrink: 0;
@@ -259,13 +259,13 @@ function resetImport() {
   position: relative;
   block-size: 1.5rem;
   background: rgba(0,0,0,0.1);
-  border-radius: 0.75rem;
+  /*border-radius: 0.75rem;*/
   overflow: hidden;
 }
 .progress-fill {
   block-size: 100%;
   background: var(--theme-link);
-  border-radius: 0.75rem;
+  /*border-radius: 0.75rem;*/
   transition: width 0.2s;
 }
 .progress-text {
@@ -306,10 +306,10 @@ function resetImport() {
 }
 .actions button {
   padding: 0.4rem 1rem;
-  border: 0.0625rem solid rgba(255,255,255,0.3);
+  /*border: 0.0625rem solid rgba(255,255,255,0.3);
   border-radius: 0.5rem;
   background: rgba(255,255,255,0.15);
-  color: var(--theme-color);
+  color: var(--theme-color);*/
   cursor: pointer;
 }
 .actions button.primary {

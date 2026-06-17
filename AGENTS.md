@@ -30,7 +30,7 @@ Backend (backend/)         →  Go / net/http / SQLite
 | `pnpm build:backend:win` | Cross-compile Windows amd64 binary (`.exe`) |
 | `pnpm build:backend:linux` | Cross-compile Linux amd64 binary |
 | `pnpm build:backend:freebsd` | Cross-compile FreeBSD amd64 binary |
-| `pnpm dist:linux` | Production build + Linux .deb / .rpm / .pkg.tar.zst |
+| `pnpm dist:linux` | Production build + Linux AppImage / .deb / .rpm |
 | `pnpm dist:win` | Production build + Windows NSIS installer |
 | `pnpm dist:freebsd` | Production build → Linux .deb (runs via FreeBSD Linuxulator) |
 
@@ -42,7 +42,7 @@ Ports are hard-wired: frontend dev on **9998**, backend on **9999**.
 
 | Path | What | Size / format |
 |---|---|---|
-| `build/icon.png` | Linux app icon (deb/rpm/pacman) | 512×512 PNG |
+| `build/icon.png` | Linux app icon (AppImage/deb/rpm) | 512×512 PNG |
 | `build/icon.ico` | Windows installer icon (NSIS) | ≥256×256 multi-res ICO |
 | `build/icon.icns` | macOS app icon (DMG) | Multi-res ICNS (16→512 PNG) |
 | `LICENSE` | License text (shown in NSIS installer) | Plain text |
@@ -53,7 +53,7 @@ Without these files, `electron-builder` will fall back to defaults or error.
 
 | Command | Output(s) | Notes |
 |---|---|---|
-| `pnpm dist:linux` | `.deb` (Debian/Ubuntu), `.rpm` (Fedora), `.pkg.tar.zst` (Arch) | |
+| `pnpm dist:linux` | AppImage, `.deb` (Debian/Ubuntu), `.rpm` (Fedora) | |
 | `pnpm dist:win` | `.exe` NSIS installer (oneClick=false, user can choose install path) | LICENSE shown during install |
 | `pnpm dist:freebsd` | `.deb` (runs under Linuxulator) | Electron has no FreeBSD binary, use the .deb |
 
@@ -77,7 +77,7 @@ They work in Chromium 108+, which the bundled Electron provides. Do NOT replace 
 
 ### Go backend reference
 
-`design/go-setup.md` covers the Go module setup, core concept mappings (Kotlin→Go), common commands, and the current database schema. Go backend is a single `main.go` + `capsule.go` + `go.mod` — no framework, no JVM.
+`design/go-setup.md` covers the Go module setup, core concept mappings (Kotlin→Go), common commands, and the current database schema. Go backend is a single `main.go` + `capsule.go` + `go.mod` — no framework, no JVM. Note: `schema.sql` was removed during cleanup — the schema is fully defined in `main.go`'s `initDB()`.
 
 ### TimeManager: all date arithmetic uses UTC
 
@@ -182,12 +182,10 @@ tasKapsule/
 ├── backend/            # Go (port 9999)
 │   ├── main.go         # Entry point + initDB + HTTP routes + CORS
 │   ├── capsule.go      # Capsule struct + 4 CRUD handlers + helpers
-│   ├── schema.sql      # IDE SQL dialect reference (not used at runtime)
 │   ├── go.mod          # Module declaration + deps
 │   └── go.sum          # Dependency checksums (auto-generated)
 ├── build/              # Platform icons (icon.png, icon.ico)
 ├── LICENSE             # License text (embedded in NSIS installer)
-├── legacy-backend-kotlin/  # Archived Kotlin/Spring Boot backend (kept for reference)
 ├── design/             # Design specs
     ├── color.md        # Calendar color reference (fabric-texture palette)
     ├── issues.md       # Known issues tracker (P0–P3 priority)
@@ -207,7 +205,7 @@ tasKapsule/
 - **Path alias**: `@/` maps to `frontend/src/` (configured in `vite.config.ts` and `tsconfig.app.json`).
 - **No linter or formatter config exists yet.** No test scripts.
 - **Production binary naming**: Linux/FreeBSD → `taskapsule-server`, Windows → `taskapsule-server.exe`. `electron/main.ts` selects by `process.platform`. `package.json` `extraResources` is split into platform blocks.
-- **Packaging**: `pnpm dist:linux` produces `.deb` + `.rpm` + `.pacman`; `pnpm dist:win` produces NSIS installer with path selection and license page. Icons in `build/`, license in `LICENSE`.
+- **Packaging**: `pnpm dist:linux` produces AppImage + `.deb` + `.rpm`; `pnpm dist:win` produces NSIS installer with path selection and license page. Icons in `build/`, license in `LICENSE`.
 
 ## i18n & timezone
 
@@ -332,10 +330,9 @@ Note: Dark mode today uses **pink** gradient (not blue). The `.cell-blue` class 
 - `CapsuleShelf/Capsule.vue` — single capsule card with independent expand/collapse toggle (local `expanded` ref), rounded rect design, text ellipsis via `inline-size: 100%` + `text-overflow: ellipsis`. ✅ done.
 - `CapsuleShelf/CapsuleShelf.vue` — renders capsule list from `store.byCreatedAt`, no date filter, no event chain. ✅ done.
 - `Calendar/Clock.vue` — receives `displayYear`/`displayMonth` as props, shows formatted year+month. ✅ done.
-- `EgoMe.vue` — empty stub, meant for personal profile page.
+- `EgoMe.vue` — empty stub, meant for personal profile page. （待实现）
 - `ClockVibe.vue` — deleted (was deprecated).
-- `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages.
-- `TestPinia.vue` — capsule store integration test page.
+- `TestPage.vue` / `TestPage1.vue` — near-duplicate test pages（已废弃，可删除）.
 
 ## Centro state
 

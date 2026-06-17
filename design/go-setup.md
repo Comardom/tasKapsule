@@ -46,7 +46,7 @@
 - [x] 字段重命名：`schedule_icons` → `schedule_icon`（单数）
 - [x] 更新 `package.json` 脚本和打包配置（`go run .` + `go build -o taskapsule-server`）
 - [x] 更新 `electron/main.ts` spawn 逻辑（Java → Go 二进制）
-- [x] 清理 Kotlin 残留（`jre/`、`gradlew`、`settings.gradle` 等已删除；`legacy-backend-kotlin/` 保留为存档）
+- [x] 清理 Kotlin 残留（`jre/`、`gradlew`、`settings.gradle` 等已删除；`legacy-backend-kotlin/` 也已删除）
 - [x] 确定 loading screen 方案（Go 不输出 `[STAGE]`，stdout 改为简单日志输出）
 
 ## 文件结构
@@ -55,7 +55,6 @@
 backend/
 ├── main.go           # 入口：initDB → 注册路由 → CORS 中间件 → ListenAndServe
 ├── capsule.go        # Capsule 结构体 + 4 个 handler + scanCapsule + writeJSON 辅助
-├── schema.sql        # IDE SQL 方言参考（仅开发辅助，非 Go 代码引用）
 ├── go.mod
 └── go.sum
 ```
