@@ -201,76 +201,70 @@ type scanner interface {
 //     查询参数（?date=）：r.URL.Query().Get("date")
 //     JSON 请求体：    json.NewDecoder(r.Body).Decode(&变量)
 
-// handleGetCapsules 返回全部胶囊列表。不按日期分组了——一次返回所有数据。
-// GET /api/v1/capsules → [{"id":1,"contentText":"买菜",...}, {...}]
-//
-// main.go 里注册时的写法：mux.HandleFunc("GET /api/v1/capsules", handleGetCapsules)
-// "GET /api/v1/capsules" 表示只处理 GET 方法的这个路径。
-// 如果是 POST 请求发到 /api/v1/capsules，会由 handleCreateCapsule 处理。
+// handleGetCapsules 返回胶囊列表，支持分页。
+// GET /api/v1/capsules          → 全部（兼容旧调用）
+// GET /api/v1/capsules?page=1&per_page=50
+//   → {"data":[...], "total":2000, "page":1, "perPage":50}
 func handleGetCapsules(w http.ResponseWriter, r *http.Request) {
 
-	// db.Query 执行一条 SELECT SQL 并返回多行结果（类型：*sql.Rows）。
-	// 反引号 `` 允许跨行写字符串——SQL 语句太长时不用拼字符串，直接换行写。
-	//
-	// SELECT 后面的列名顺序必须和 scanCapsule 里的顺序完全一致！
-	// 因为 scanCapsule 不知道每个列叫什么名字，它按照位置的顺序逐一读：
-	// 第 1 个列 → 第 1 个 &item.ID
-	// 第 2 个列 → 第 2 个 &item.CreatedAt
-	// ...依此类推
-	//
-	// ORDER BY created_at DESC：按创建时间倒序排列，后创建的排前面。
-	// TODO : 不一定是按照创建时间排序！
-	// TODO : 第一种情况：时间排序（最后写入的放在第一个）
-	// TODO : 第二种情况：按照日程日期排序的放在这边，没有日程的放在另一边按照创建时间排序
-	// TODO : 第三种情况：搜索关键词，按照创建时间排序
-	rows, err := db.Query(`
+	// ── 分页参数 ──
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	perPage, _ := strconv.Atoi(r.URL.Query().Get("per_page"))
+	if page < 1 {
+		page = 0 // 0 = 不分页，返回全部
+	}
+	if perPage < 1 {
+		perPage = 50
+	}
+
+	// ── 总数 ──
+	var total int
+	db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total)
+
+	// ── 查询 ──
+	query := `
 		SELECT id, created_at, content_text, audio_path,
 		       attachment_paths, classification, is_with_schedule,
 		       schedule_icon, schedule_content_text, schedule_start_at,
 		       schedule_end_at, schedule_status, schedule_deadline,
 		       alarm_clocks
-		FROM capsules ORDER BY created_at DESC
-	`)
+		FROM capsules ORDER BY created_at DESC`
 
-	// Go 的错误处理模式：
-	// 任何一个可能失败的函数都会返回 (结果, error)。
-	// 你必须检查 error 是不是 nil。如果不是 nil，就说明出错了。
-	// 这里的错误处理是：把错误信息写回客户端，然后 return 退出 handler。
+	var rows *sql.Rows
+	var err error
+	if page > 0 {
+		offset := (page - 1) * perPage
+		rows, err = db.Query(query+` LIMIT ? OFFSET ?`, perPage, offset)
+	} else {
+		rows, err = db.Query(query)
+	}
 	if err != nil {
 		writeJSON(w, 500, map[string]string{"error": err.Error()})
 		return
 	}
-
-	// defer 是 Go 的关键字：在当前函数 return 之前执行这个语句。
-	// rows.Close() 关闭查询结果，释放数据库连接。如果不关闭，连接池里的连接会被耗尽。
-	// 但开发者写代码时很容易忘掉 Close——所以用 defer，不管你写再多代码，函数结束时自动 Close。
 	defer rows.Close()
 
-	// ── 遍历查询结果 ──
-	// Go 没有 forEach 或 map 之类的集合操作函数。
-	// 用 for 循环手动遍历：当 rows.Next() 返回 true 时，说明还有下一条记录。
-	// rows.Next() 内部移动到下一行，准备读数据。没有下一行时返回 false，循环自动退出。
-
 	var capsules []Capsule
-	// []Capsule 是一个"Capsule 切片"——Go 的动态数组。
-	// append 往里添加元素：每次 append 出一个结果，赋值回原变量。
-	// Go 的 append 可能会创建新的底层数组（旧数组满了→新数组翻倍），所以必须 = 接住返回值。
-
 	for rows.Next() {
-		// 调用 scanCapsule 帮助函数，把当前行 SQL 结果填进 Capsule 结构体。
 		item, err := scanCapsule(rows)
 		if err != nil {
-			// 如果某一行读失败了，返回 500。
 			writeJSON(w, 500, map[string]string{"error": err.Error()})
 			return
 		}
-		// append 把 item 追加到切片末尾。
 		capsules = append(capsules, item)
 	}
 
-	// 把整个切片序列化成 JSON，写入响应体。
-	// 如果切片是空的（数据库里没有胶囊），JSON 就是 []——前端收到的是空数组而不是 null。
-	writeJSON(w, 200, capsules)
+	// ── 响应 ──
+	if page > 0 {
+		writeJSON(w, 200, map[string]any{
+			"data":    capsules,
+			"total":   total,
+			"page":    page,
+			"perPage": perPage,
+		})
+	} else {
+		writeJSON(w, 200, capsules)
+	}
 }
 
 // handleCreateCapsule 创建一个新胶囊。

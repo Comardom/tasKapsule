@@ -7,11 +7,21 @@ const api = axios.create({
   timeout: 5000
 });
 
+export interface PaginatedCapsuleResponse {
+  data: Capsule[];
+  total: number;
+  page: number;
+  perPage: number;
+}
+
 export const capsuleApi = {
-  // 获取某天的胶囊
+  // 获取全部胶囊（不分页，用于完整刷新）
   getAll() {
-    // 明确告诉请求返回的是一个数组
     return api.get<Capsule[]>('/capsules');
+  },
+  // 获取分页胶囊
+  getAllPaginated(page: number, perPage: number = 50) {
+    return api.get<PaginatedCapsuleResponse>(`/capsules?page=${page}&per_page=${perPage}`);
   },
   // 创建胶囊
   create(data: Omit<Capsule, 'id' | 'createdAt'>) {

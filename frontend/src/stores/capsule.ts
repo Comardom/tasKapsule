@@ -24,7 +24,7 @@ export interface Capsule {
   alarmClocks?: string;
 }
 
-//管理应用中所有关于“日程胶囊”的状态和行为
+//管理应用中所有关于"日程胶囊"的状态和行为
 export const useCapsuleStore = defineStore('capsule', {
   //State: 存储数据的地方（相当于 Vue 组件的 data）
   state: () => ({
@@ -39,17 +39,66 @@ export const useCapsuleStore = defineStore('capsule', {
     error: null,
     displayMode: 'all' as DisplayMode,
     viewMode: 'single' as ViewMode,
+    totalCount: 0,
+    initialPageLoaded: false,
+    fullyLoaded: false,
+    _resolveFullyLoaded: null as (() => void) | null,
   }),
 
   //修改数据的方法（相当于 Vue 组件的 methods）
   //支持异步操作，是与后端通讯的最佳场所
   actions: {
+    async loadInitialPage(perPage = 50) {
+      this.isLoading = true;
+      this.initialPageLoaded = false;
+      try {
+        const res = await capsuleApi.getAllPaginated(1, perPage);
+        this.allCapsules = res.data.data;
+        this.totalCount = res.data.total;
+        this.initialPageLoaded = true;
+      } catch (err: any) {
+        this.error = err.message || '获取数据失败';
+        console.error('Load initial page Error:', err);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async loadRemainingInBackground(perPage = 50) {
+      if (this.fullyLoaded) return;
+      const totalPages = Math.ceil(this.totalCount / perPage);
+      if (totalPages <= 1) {
+        this.fullyLoaded = true;
+        this._resolveFullyLoaded?.();
+        this._resolveFullyLoaded = null;
+        return;
+      }
+      for (let page = 2; page <= totalPages; page++) {
+        await new Promise(r => setTimeout(r, 0));
+        try {
+          const res = await capsuleApi.getAllPaginated(page, perPage);
+          this.allCapsules.push(...res.data.data);
+        } catch (err) {
+          console.error('Background page load error:', err);
+        }
+      }
+      this.fullyLoaded = true;
+      this._resolveFullyLoaded?.();
+      this._resolveFullyLoaded = null;
+    },
+    async waitFullyLoaded(): Promise<void> {
+      if (this.fullyLoaded) return;
+      return new Promise(resolve => {
+        this._resolveFullyLoaded = resolve;
+      });
+    },
     async fetchCapsules() {
       this.isLoading = true;
       this.error = null;
       try {
         const res = await capsuleApi.getAll();
         this.allCapsules = res.data || [];
+        this.totalCount = this.allCapsules.length;
+        this.fullyLoaded = true;
       } catch (err: any) {
         this.error = err.message || '获取数据失败';
         console.error('Fetch Capsules Error:', err);

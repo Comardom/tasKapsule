@@ -26,8 +26,14 @@ const store = useCapsuleStore();
 const themeStore = useThemeStore();
 const fontStore = useFontStore();
 
-onMounted(() => {
-  store.fetchCapsules();
+onMounted(async () => {
+  await store.loadInitialPage();
+  const doBg = () => store.loadRemainingInBackground();
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(doBg, { timeout: 5000 });
+  } else {
+    setTimeout(doBg, 500);
+  }
 });
 
 const props = defineProps<{
@@ -173,6 +179,7 @@ watch(() => navigateToDate.value, async (newDate) => {
   if (store.viewMode !== 'double') {
     await switchViewMode('double');
   }
+  await store.waitFullyLoaded();
   await nextTick()
   const timelineCol = document.querySelector('.timeline-column')
   if (!timelineCol) { navigateToDate.value = ''; return }
