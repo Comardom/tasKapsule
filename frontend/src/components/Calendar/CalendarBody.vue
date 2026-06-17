@@ -103,6 +103,9 @@ watch(()=>props.localeStore.timeZone,(newTz)=>{
 
 
 const wheelLocked = ref<boolean>(false);
+// 记录最后一次滚轮的方向：1 = 往前（下个月/朝未来），-1 = 往后（上个月/朝过去）
+// 翻月后高亮落在网格角落时要用它来决定是左上角还是右下角
+const lastScrollDir = ref<1 | -1>(1);
 
 
 const 今天几号 = ref<number>(props.timeManager.get今天几号());
@@ -193,12 +196,68 @@ function onWheel(e: WheelEvent) {
   e.preventDefault();
   if (wheelLocked.value) return;
   wheelLocked.value = true;
-  emit('wheel', e.deltaY > 0 ? 1 : -1);
+  // 记录本次滚动方向，给下面 watch(monthKey) 里的角落落点用
+  lastScrollDir.value = e.deltaY > 0 ? 1 : -1;
+  emit('wheel', lastScrollDir.value);
   setTimeout(() => { wheelLocked.value = false; }, 600);
   nextTick(() => setCalendarHeight());
 }
 
+// 当 displayYear 或 displayMonth 变化时，monthKey 的字面量会变，触发下面的 watch
 const monthKey = computed(() => `${props.displayYear}-${props.displayMonth}`)
+
+// ── 翻月后高亮自适应 ──
+// 每次月份切换后检查 (selectedDay, selectedMonth) 是否落在新网格的可见区域内。
+//   - 可见 → 保持原高亮不动
+//   - 不可见 → 按滚动方向落在网格的最角落
+watch(monthKey, () => {
+  // 等 DOM 完成过渡，这样 月初曜日/当月天数 等 computed 已经指向新月份
+  nextTick(() => {
+    // ① 新网格的布局参数
+    const 上月尾天数 = 月初曜日.value
+    //    ↑ 本月1号是周几（0=周日…6=周六），也等于上月尾巴要显示几天
+    const 下月头天数 = 6 - 月末曜日.value
+    //    ↑ 下月头要显示几天。当月最后一天是周X，用 6 - X 就是需要补的下月天数
+    const 上月总天数 = props.timeManager.get此月天数ByYM(props.displayYear, props.displayMonth - 1)
+    //    ↑ 用来判断 selectedDay 是否落在上月尾的范围内
+
+    // ② 检查当前高亮在三个区域中是否可见
+    // 条件A：选的是上月、且网格有上月尾巴、且 day 在尾巴范围内
+    const is选中上月尾某天 = selectedMonth.value === props.displayMonth - 1
+      && 上月尾天数 > 0
+      && selectedDay.value >= 上月总天数 - 上月尾天数 + 1
+      && selectedDay.value <= 上月总天数
+
+    // 条件B：选的就是本月（不管 day 是多少，只要 month 对上即可）
+    const is选中当月某天 = selectedMonth.value === props.displayMonth
+
+    // 条件C：选的是下月、且网格有下月头、且 day 在头部范围内
+    const is下月头某天 = selectedMonth.value === props.displayMonth + 1
+      && 下月头天数 > 0
+      && selectedDay.value >= 1
+      && selectedDay.value <= 下月头天数
+
+    // 三种情况任一成立 → 高亮在网格里，不动它
+    if (is选中上月尾某天 || is选中当月某天 || is下月头某天) return
+
+    // ③ 不可见 → 按滚动方向把高亮落在网格最角落
+    if (lastScrollDir.value > 0) {
+      // 往前翻（未来）→ 左上角
+      //   如果网格有上月尾巴，左上角就是尾巴的第一个格子（上月的某天）
+      //   如果网格直接是本月1号开头，左上角就是本月1号
+      selectedDay.value = 上月尾天数 === 0 ? 1 : 上月总天数 - 上月尾天数 + 1
+      selectedMonth.value = 上月尾天数 === 0 ? props.displayMonth : props.displayMonth - 1
+    } else {
+      // 往后翻（过去）→ 右下角
+      //   如果网格有下月头，右下角就是头部的最后一个格子（下月的某天）
+      //   如果网格没有下月头，右下角就是本月的最后一天
+      selectedDay.value = 下月头天数 === 0 ? 当月天数.value : 下月头天数
+      selectedMonth.value = 下月头天数 === 0 ? props.displayMonth : props.displayMonth + 1
+    }
+    // 同步更新 store，让其他组件（CapsuleShelf 等）知道日期变了
+    capsuleStore.setDate(computeDate(selectedDay.value, selectedMonth.value))
+  })
+})
 
 const transitionDirection = ref<1 | -1>(1)
 watch(() => props.monthOffset, (n, o) => {
