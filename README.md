@@ -6,7 +6,21 @@
 
 
 # 更新
-## [2026-06-17] - 0.2.1
+## [2026-06-19] - 0.2.2
+* 删除了electron文件夹
+* 清理了package.json
+* 前端不再需要Axios
+* 前端删掉了Electron通信接口文件
+* 删除env.d.ts的Electron部分
+### 重大告知
+* PKGBUILD的写作高度依赖于对Electron的理解
+* 且Electron之笨重复杂弊病忍受已久
+* 项目的外壳框架将从Electron迁移到Wails
+* Electron项目开发无限期停滞，转移到[tasKapsule-electron](https://github.com/Comardom/tasKapsule-electron.git)
+* 此仓库不设置主、次分支，master将会逐步转向Wails，清除Electron内容
+
+---
+## [2026-06-18] - 0.2.1
 * 更新了针对Arch的PKGBUILD
 * 调整了gitignore以适配Arch软件包打包
 
