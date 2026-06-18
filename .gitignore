@@ -2,8 +2,6 @@
 node_modules/
 frontend/node_modules/
 electron/node_modules/
-pnpm-lock.yaml
-package-lock.json
 yarn.lock
 
 # Frontend build output
