@@ -1,30 +1,28 @@
-import type { Capsule } from '@/stores/capsule.ts'
+import {
+  CreateCapsule,
+  DeleteCapsule,
+  GetCapsules,
+  UpdateCapsule,
+} from '../../bindings/github.com/comardom/taskapsule/backend/capsuleservice'
+import type { Capsule, CapsulesResponse } from '../../bindings/github.com/comardom/taskapsule/backend'
 
-const $Call = window.wails.Call
-
-export interface PaginatedCapsuleResponse {
-  data: Capsule[]
-  total: number
-  page: number
-  perPage: number
-}
+export type { Capsule, CapsulesResponse }
 
 export const capsuleApi = {
   async getAll(page = 0, perPage = 0): Promise<Capsule[]> {
-    const res = await $Call.ByName('main.CapsuleService.GetCapsules', page, perPage)
+    const res = await (GetCapsules(page, perPage) as Promise<CapsulesResponse>)
     return res.data
   },
-  async getAllPaginated(page: number, perPage = 50): Promise<PaginatedCapsuleResponse> {
-    const res = await $Call.ByName('main.CapsuleService.GetCapsules', page, perPage)
-    return { data: res.data, total: res.total, page: res.page, perPage: res.perPage }
+  async getAllPaginated(page: number, perPage = 50): Promise<CapsulesResponse> {
+    return await (GetCapsules(page, perPage) as Promise<CapsulesResponse>)
   },
   async create(data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return await $Call.ByName('main.CapsuleService.CreateCapsule', data)
+    return await (CreateCapsule(data as Capsule) as Promise<Capsule>)
   },
   async update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return await $Call.ByName('main.CapsuleService.UpdateCapsule', id, data)
+    return await (UpdateCapsule(id, data as Capsule) as Promise<Capsule>)
   },
   async delete(id: number): Promise<void> {
-    await $Call.ByName('main.CapsuleService.DeleteCapsule', id)
+    await (DeleteCapsule(id) as Promise<void>)
   },
 }

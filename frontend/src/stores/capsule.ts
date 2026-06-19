@@ -1,28 +1,11 @@
 import { defineStore } from 'pinia';
+import type { Capsule } from '@/utils/apiService.ts'
 import { capsuleApi } from '@/utils/apiService.ts';
 
 export type Classification = 'note' | 'urgent' | 'favourite' | 'sms' | 'inspiration';
 export type ScheduleStatus = 'pending' | 'executing' | 'completed' | 'cancelled' | 'blocked';
 export type DisplayMode = 'all' | 'first-last' | 'first' | 'last';
 export type ViewMode = 'single' | 'double';
-
-// 定义实体接口，提高开发效率,让 IDE 知道一个胶囊对象里有哪些字段
-export interface Capsule {
-  id: number;
-  createdAt: string;
-  contentText: string;
-  audioPath?: string;
-  attachmentPaths?: string;
-  classification: Classification;
-  isWithSchedule: number;  // 0 | 1
-  scheduleIcon?: string;
-  scheduleContentText?: string;
-  scheduleStartAt?: string;  // "YYYY-MM-DD HH:mm:ss"
-  scheduleEndAt?: string;    // "YYYY-MM-DD HH:mm:ss"
-  scheduleStatus?: ScheduleStatus;
-  scheduleDeadline?: string;
-  alarmClocks?: string;
-}
 
 //管理应用中所有关于"日程胶囊"的状态和行为
 export const useCapsuleStore = defineStore('capsule', {

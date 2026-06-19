@@ -6,6 +6,13 @@
 
 
 # 更新
+## [2026-06-19] - 0.2.6
+* 优化了apiServices.ts
+* 修复了capsule.ts的Capsule类型冲突
+* 修正了loadingPageController.ts的虚假后端检测
+* 删除了后端旧文件
+
+---
 ## [2026-06-19] - 0.2.5
 * 简化frontend/vite.config.ts
 * 修正capsule.go
