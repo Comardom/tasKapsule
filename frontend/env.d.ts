@@ -1,23 +1,17 @@
 /// <reference types="vite/client" />
-interface GetCapsulesResult {
-  Data: any[]
-  Total: number
-  Page: number
-  PerPage: number
+
+type CancellablePromise<T> = Promise<T>
+
+interface WailsRuntime {
+  Call: {
+    ByID<T = any>(methodID: number, ...args: any[]): CancellablePromise<T>
+    ByName<T = any>(methodName: string, ...args: any[]): CancellablePromise<T>
+  }
 }
 
 declare global {
   interface Window {
-    go: {
-      main: {
-        App: {
-          GetCapsules(page: number, perPage: number): Promise<GetCapsulesResult>
-          CreateCapsule(data: any): Promise<any>
-          UpdateCapsule(id: number, data: any): Promise<any>
-          DeleteCapsule(id: number): Promise<void>
-        }
-      }
-    }
+    wails: WailsRuntime
   }
 }
 

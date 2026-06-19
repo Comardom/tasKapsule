@@ -1,0 +1,26 @@
+# Wails v3 build configuration
+# See: https://wails.io/docs/next/reference/project-config
+
+version: 3
+
+# Application name
+name: "taskapsule"
+
+# Binary output name
+binaryName: "taskapsule"
+
+# Asset directory (frontend dist output)
+assetDir: "frontend/dist"
+
+# Dev server URL (used in dev mode)
+devServerUrl: "http://localhost:5173"
+
+# Frontend configuration
+frontend:
+  dir: "frontend"
+  install:
+    - pnpm install
+  build:
+    - pnpm run build
+  dev:
+    - pnpm run dev

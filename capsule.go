@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
-)
+	"os"
+	"path/filepath"
 
-var db *sql.DB
+	"github.com/wailsapp/wails/v3/pkg/application"
+	_ "modernc.org/sqlite"
+)
 
 type Capsule struct {
 	ID                    int64   `json:"id"`
@@ -54,7 +58,50 @@ const capsuleQuery = `
 	       alarm_clocks
 	FROM capsules`
 
-func (a *App) GetCapsules(page, perPage int) (CapsulesResponse, error) {
+type CapsuleService struct {
+	db *sql.DB
+}
+
+func (s *CapsuleService) ServiceStartup(ctx context.Context, opts application.ServiceOptions) error {
+	home, _ := os.UserHomeDir()
+	dbDir := filepath.Join(home, ".taskapsule", "data")
+	os.MkdirAll(dbDir, 0755)
+	dbPath := filepath.Join(dbDir, "app.db")
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS capsules (
+		id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+		created_at          TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+		content_text        TEXT NOT NULL DEFAULT '',
+		audio_path          TEXT,
+		attachment_paths    TEXT,
+		classification      TEXT NOT NULL DEFAULT 'note',
+		is_with_schedule    INTEGER NOT NULL DEFAULT 0,
+		schedule_icon         TEXT,
+		schedule_content_text TEXT,
+		schedule_start_at     TEXT,
+		schedule_end_at       TEXT,
+		schedule_status       TEXT,
+		schedule_deadline     TEXT,
+		alarm_clocks        TEXT
+	)`)
+	if err != nil {
+		return err
+	}
+	s.db = db
+	return nil
+}
+
+func (s *CapsuleService) ServiceShutdown(ctx context.Context) error {
+	if s.db != nil {
+		return s.db.Close()
+	}
+	return nil
+}
+
+func (s *CapsuleService) GetCapsules(page, perPage int) (CapsulesResponse, error) {
 	if page < 1 {
 		page = 0
 	}
@@ -63,7 +110,7 @@ func (a *App) GetCapsules(page, perPage int) (CapsulesResponse, error) {
 	}
 
 	var total int
-	if err := db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total); err != nil {
+	if err := s.db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total); err != nil {
 		return CapsulesResponse{}, err
 	}
 
@@ -72,9 +119,9 @@ func (a *App) GetCapsules(page, perPage int) (CapsulesResponse, error) {
 	var err error
 	if page > 0 {
 		offset := (page - 1) * perPage
-		rows, err = db.Query(query+` LIMIT ? OFFSET ?`, perPage, offset)
+		rows, err = s.db.Query(query+` LIMIT ? OFFSET ?`, perPage, offset)
 	} else {
-		rows, err = db.Query(query)
+		rows, err = s.db.Query(query)
 	}
 	if err != nil {
 		return CapsulesResponse{}, err
@@ -98,8 +145,8 @@ func (a *App) GetCapsules(page, perPage int) (CapsulesResponse, error) {
 	}, nil
 }
 
-func (a *App) CreateCapsule(item Capsule) (Capsule, error) {
-	res, err := db.Exec(`
+func (s *CapsuleService) CreateCapsule(item Capsule) (Capsule, error) {
+	res, err := s.db.Exec(`
 		INSERT INTO capsules (
 			content_text, audio_path, attachment_paths,
 			classification, is_with_schedule,
@@ -119,7 +166,7 @@ func (a *App) CreateCapsule(item Capsule) (Capsule, error) {
 	}
 
 	newID, _ := res.LastInsertId()
-	row := db.QueryRow(capsuleQuery+" WHERE id = ?", newID)
+	row := s.db.QueryRow(capsuleQuery+" WHERE id = ?", newID)
 	created, err := scanCapsule(row)
 	if err != nil {
 		return Capsule{}, err
@@ -128,16 +175,16 @@ func (a *App) CreateCapsule(item Capsule) (Capsule, error) {
 	return created, nil
 }
 
-func (a *App) UpdateCapsule(id int, item Capsule) (Capsule, error) {
+func (s *CapsuleService) UpdateCapsule(id int, item Capsule) (Capsule, error) {
 	var exists int
-	err := db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
+	err := s.db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
 	if err == sql.ErrNoRows {
 		return Capsule{}, sql.ErrNoRows
 	} else if err != nil {
 		return Capsule{}, err
 	}
 
-	_, err = db.Exec(`
+	_, err = s.db.Exec(`
 		UPDATE capsules SET
 			content_text=?, audio_path=?, attachment_paths=?,
 			classification=?, is_with_schedule=?,
@@ -157,7 +204,7 @@ func (a *App) UpdateCapsule(id int, item Capsule) (Capsule, error) {
 		return Capsule{}, err
 	}
 
-	row := db.QueryRow(capsuleQuery+" WHERE id = ?", id)
+	row := s.db.QueryRow(capsuleQuery+" WHERE id = ?", id)
 	updated, err := scanCapsule(row)
 	if err != nil {
 		return Capsule{}, err
@@ -166,15 +213,15 @@ func (a *App) UpdateCapsule(id int, item Capsule) (Capsule, error) {
 	return updated, nil
 }
 
-func (a *App) DeleteCapsule(id int) error {
+func (s *CapsuleService) DeleteCapsule(id int) error {
 	var exists int
-	err := db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
+	err := s.db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
 	if err == sql.ErrNoRows {
 		return sql.ErrNoRows
 	} else if err != nil {
 		return err
 	}
 
-	_, err = db.Exec("DELETE FROM capsules WHERE id = ?", id)
+	_, err = s.db.Exec("DELETE FROM capsules WHERE id = ?", id)
 	return err
 }

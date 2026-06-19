@@ -8,12 +8,7 @@
   "version": "0.2.0",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",
-    "dev:backend": "cd backend_disabled && go run .",
-    "build:frontend": "cd frontend && pnpm build",
-    "build:backend": "cd backend_disabled && go build -o taskapsule-server",
-    "build:backend:win": "cd backend_disabled && set GOOS=windows&& set GOARCH=amd64&& go build -o taskapsule-server.exe",
-    "build:backend:linux": "cd backend_disabled && GOOS=linux GOARCH=amd64 go build -o taskapsule-server",
-    "build:backend:freebsd": "cd backend_disabled && GOOS=freebsd GOARCH=amd64 go build -o taskapsule-server"
+    "build:frontend": "cd frontend && pnpm build"
   },
   "devDependencies": {
   }

@@ -1,197 +1,80 @@
-# Known Issues (2026-05-10 scan)
+# Known Issues (2026-06-19 第八轮 — Wails v3 全面扫描)
 
 ## P0 — 会导致崩溃或数据错误
 
-| # | 文件 | 行 | 问题 | 状态 |
+| # | 文件 | 行 | 问题 | 建议修改 |
 |---|---|---|---|---|
-| 1 | `backend/build.gradle.kts` | 38 | Jackson 坐标 `tools.jackson.module` 非标准 namespace，虽然当前可解析但建议改为 `com.fasterxml.jackson.module` | 待改 |
-| 2 | `electron/main.ts` | 129 | 生产模式检测到 JAR/Java 缺失后弹出错误框但**仍执行 spawn()**，应 return | ✅ 已修 |
-| 3 | `CapsuleController.kt` | 35 | `getAllByDate` 用 `catch (e: Exception)` 吞掉所有异常返回空列表+200 | ✅ 已加 logger |
-| 4 | `HomeController.kt` | 34 | `/health` 的 `"database": "SQLite (Connected)"` 是硬编码 | ✅ 已删 |
+| 86 | `design/AGENTS.md` | 全文件 | 记录了 Electron 架构（`electron/main.ts`、`ipcRenderer`、端口 9998/9999、`pnpm dev` 命令、electron-builder 打包），项目已迁移到 Wails v3，所有开发命令和架构描述全部错误 | 重写整个文件为 Wails v3 架构（`wails3 dev`、Go 嵌入式前端、`window.wails.Call` IPC） |
+| 87 | `capsule.go` | 168 | `newID, _ := res.LastInsertId()` 静默忽略错误。如果失败 `newID` 为 0，后续 `QueryRow("... WHERE id = ?", 0)` 可能返回错误数据或空行 | 改为 `newID, err := res.LastInsertId(); if err != nil { return Capsule{}, err }` |
+| 88 | `frontend/src/utils/loadingPageController.ts` | 8 | 硬编码 `setTimeout(resolve, 1500)` 不做后端健康检查。迁移后删除了真正的 backend-ready 检测，如果 Wails/Go 启动失败，用户永远看到加载画面 | 改回真实的健康检查轮询（调用 `window.wails.Call` 探针），带超时上限 |
+| 89 | `PKGBUILD` | 全文件 | 仍编译 Electron（`electron/main.ts` → `electron/dist/main.js`）、依赖 `depends=('electron')`、启动脚本用 `/usr/bin/electron`。这些文件全部不存在 | 重写为 Wails v3 打包：Go 交叉编译 → 单个二进制 → 桌面入口 |
 
 ## P1 — 功能不正确或有明显缺陷
 
-| # | 文件 | 行 | 问题 | 状态 |
+| # | 文件 | 行 | 问题 | 建议修改 |
 |---|---|---|---|---|
-| 5 | `loadingPageController.ts` | 21 | `while (!ready)` 无超时上限 | ✅ 已修 |
-| 6 | `Calendar.vue` | 95→221 | `timeZoneOptions` 约 20+ 个重复 value，改 `:key` 唯一 + 数据外推到 `data/timezones.ts` | ✅ 已修 |
-| 7 | `Calendar.vue` | 327 | `block-size: var(--this-month-height-in-dvi)` 缺 fallback | ✅ 已修 |
-| 8 | `electron/main.ts` | 119 | `console.error('RROFS',err)` 拼写错误且无条件执行 | ✅ 已修 |
-| 9 | `electron/main.ts` | 82 | 开发模式 jarPath 错误 → 被 P1-12 连带解决 | ✅ 已修 |
-| 10 | `Capsule.kt` | 34 | `status` 裸 String → 改为 `enum class CapsuleStatus` + `@Enumerated(STRING)` | ✅ 已修 |
-| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY NULL FIRST → 挪到 P2 | ⏸️ 延后 |
-| 12 | `electron/main.ts` + `pnpm dev` | — | dev 双后端冲突 → 加 `if (!isProd) return` 跳过 spawn | ✅ 已修 |
+| 90 | `frontend/src/utils/apiService.ts` | 1-30 | 手动调用 `window.wails.Call.ByName('main.CapsuleService.方法名', ...)` 绕过自动生成的类型安全绑定。`frontend/bindings/.../capsuleservice.ts` 已提供了 `CreateCapsule()`、`GetCapsules()` 等带类型的导出版本，却完全未被使用 | 删除 apiService.ts，改为直接引入 `capsuleservice.ts` 的导出函数；或至少改用 `$Call.ByID()` + 生成的类型 |
+| 91 | `capsule.go` | 104-146 | CRUD 方法对 `classification`、`scheduleStatus` 无枚举校验，任意字符串均可入库。前端也不校验 | 在 CreateCapsule / UpdateCapsule 开头加 `if !validClassification(item.Classification) { return ... }`；同样校验 scheduleStatus |
+| 92 | `frontend/index.html` | 18 | `<script type="module" src="/wails/runtime.js">` 假设 runtime.js 是 ES 模块。Wails v3 runtime 在 dev 模式注入方式不同，此处可能失效 | 确认 Wails v3 dev/prod 模式下 runtime 加载方式，必要时改为 `<script src="/wails/runtime.js">` |
+| 93 | `frontend/src/utils/apiService.ts` | 3 | `const $Call = window.wails.Call` 在模块顶层执行。若 runtime.js 加载延迟（module 脚本异步），`window.wails` 可能为 undefined，所有调用静默失败 | 将引用移入函数内部或添加 guard：`const $Call = () => window.wails?.Call` |
+| 94 | `capsule.go` | 113 | `SELECT COUNT(*) FROM capsules` 在每次分页请求都全表扫描一次。5000 条胶囊时每翻一页两次扫描 | 将 total 缓存 30 秒，或仅在 page=1 时查 COUNT |
+| 95 | `capsule.go` | 74-89 | 胶囊表除主键外无任何索引。`WHERE is_with_schedule=1`、按 `classification` 过滤、按 `schedule_start_at` 排序均全表扫描 | 加索引：`CREATE INDEX IF NOT EXISTS idx_capsules_is_schedule ON capsules(is_with_schedule)` 等 |
+| 96 | `frontend/src/stores/capsule.ts` | 10-25 | 手动定义的 Capsule 接口与 `bindings/.../models.ts` 自动生成的 Capsule 类并存，字段定义可能漂移 | 移除手动接口，统一从 bindings/models.ts 导入 Capsule 类型 |
 
 ## P2 — 代码质量 / 体验问题
 
-| # | 文件 | 行 | 问题 | 状态 |
+| # | 文件 | 行 | 问题 | 建议修改 |
 |---|---|---|---|---|
-| 11 | `CapsuleRepository.kt` | 9 | `startTime` nullable，ORDER BY 默认 NULL FIRST | ✅ 已修 |
-| 13 | `TimeManager.ts` | 42–47 | `\|\|` 把 0 当 falsy，应用 `??` | ✅ 已修 |
-| 14 | `apiService.ts` | 11–13 | 所有 API 返回值是 `any[]`/`any`，无类型安全 | ✅ 已修 |
-| 15 | `backendHealthCheck.ts` | 5 | `axios.get` 无 timeout | ✅ 已修 |
-| 16 | `Calendar.vue` | 21,23 | `当天曜日` 和 `月末曜日` 两个 ref 从未被读取 | ✅ 保留（加注） |
-| 17 | `index.html` + `theme.ts` | 8 / 18 | `.dark` class 在 CSS 中没有使用 → 已删 | ✅ 已修 |
-| 18 | `router/index.ts` | — | 无 404 兜底路由；7 条中 5 条是 test/stub/deprecated | ✅ 已修 |
-| 19 | `CapsuleController.kt` | — | 无 Update/PUT，CRUD 不完整 | ✅ 已修 |
-| 20 | `Capsule.kt` | 27 | `targetDate` 无 `@Index`，每次全表扫描 | ✅ 已修 |
-| 21 | `BackendApplicationTests.kt` | — | `contextLoads()` 无断言 | ✅ 已修 |
+| 97 | `frontend/vite.config.ts` | 5 | `import vueDevTools from 'vite-plugin-vue-devtools'` 导入了但 plugins 数组里没加 | 实际加入插件或删除导入 + 从 package.json 移除依赖 |
+| 98 | `frontend/wailsjs/` | 整个目录 | Wails v2 运行时残留（`runtime.js`、`App.js`、`models.ts` 等 4 个文件），项目已迁 v3，这些文件多余且造成混淆 | 删除 `frontend/wailsjs/` 目录（若不再用于 v2 兼容） |
+| 99 | `frontend/src/stores/capsule.ts` | 94-108 | `fetchCapsules()` 方法用 page=0 无分页拉全量，从未被调用。若被误用，大数据量下可能 OOM | 删除此方法，或改名为 `fetchAllCapsulesUnsafe` 并加注释警告 |
+| 100 | `frontend/src/main.ts` | 13 | `console.log('--- [Main.ts] 脚本开始加载 ---')` 生产环境调试日志 | 删除或改为 `if (import.meta.env.DEV) console.log(...)` |
+| 101 | `frontend/index.html` | 4-10 | 反 FOUC 内联脚本缺 dark 回退，而 `theme.ts:7` 用 `|| 'dark'` 兜底。若 localStorage 为空，HTML 无主题，等 Vue 挂载后才添加 dark，有可见闪烁 | 内联脚本加回退：`const theme = localStorage.getItem('app-theme') || 'dark'` |
+| 102 | `package.json` | 3 | `"description": "Task management app with Electron + Vue + Go"` — Electron 已移除 | 改为 `"description": "A capsule-based task management app"`（与 wails.json 对齐） |
+| 103 | `pnpm-workspace.yaml` | 3-4 | `allowBuilds:` 和 `minimumReleaseAgeExclude:` 下面没有值，YAML 语法不完整 | 删除这两行，或补全为合法值（如 `allowBuilds: []`） |
+| 104 | `capsule.go` | 66 | `home, _ := os.UserHomeDir()` 错误被忽略。极端情况下 home 为空字符串，数据库会建在相对路径 | 检查 err：`if err != nil { return fmt.Errorf("cannot find home dir: %w", err) }` |
+| 105 | `main.go` | 29 | `MinHeight: 520` 正确拼写应为 `MinHeight`（实际是 `MinHeight` 没错） | 核实 Wails v3 的字段名是否真的是 `MinHeight`，目前是正确拼写，无需修改 |
+| 106 | `capsule.go` | 97 | `ServiceStartup` 中未设置 SQLite pragma（WAL 模式、busy_timeout、foreign_keys） | 建表后执行 `db.Exec("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;")` |
 
 ## P3 — 可清理的杂物
 
-| # | 文件 | 问题 | 状态 |
+| # | 文件 | 问题 | 建议修改 |
 |---|---|---|---|
-| 22 | `themeVariables.css` | `--camera-border` / `--camera-corner` 从未使用 | ✅ 已删 |
-| 23 | `fileHandleFunctions.ts` | 全文件未导出未调用 | ⏸️ 保留 |
-| 24 | `TestPage.vue` + `TestPage1.vue` | 几乎一样 | ⏸️ 保留 |
-| 25 | `CapsuleShelf.vue` / `EgoMe.vue` | 空壳 | ⏸️ 保留 |
-| 26 | `index.html` | `lang=""` / `title` | ✅ 已修 |
-| 27 | `Calendar.vue` | 空 div | ⏸️ 保留 |
-| 28 | `main.ts` | IIFE + 调试注释 | ✅ 已修 |
-| 29 | `App.vue` | 测试导航栏 | ⏸️ 保留 |
-| 30 | `DatabaseConfig.kt` | 死分支 | ✅ 已修 |
+| 107 | `backend_disabled/` | 旧 Electron 时代的 Go HTTP 后端（`main.go.disabled` 205 行 + `capsule.go.disabled` 471 行），已被根目录的 Wails v3 `capsule.go` 替代 | 删除 `backend_disabled/` 目录（内容已在 git 历史中） |
+| 108 | `release/` | 旧 Electron-builder 产物（AppImage、.deb、.rpm、.snap、.exe），已不适用 | 删除 `release/` 目录，更新 .gitignore 移除相关规则 |
+| 109 | `pkg/` | 旧 Arch 包构建输出（编译过的 Electron main/preload/killPort.js、app.asar） | 删除 `pkg/` 目录 |
+| 110 | `.SRCINFO` | AUR 元数据：`depends=('electron')`，项目已不用 Electron | 更新 `depends` 为实际依赖，或删除此文件 |
+| 111 | `frontend/src/components/TestPage.vue` + `TestPage1.vue` | 近乎重复的测试页面，AGENTS.md 标注"已废弃，可删除" | 删除两个文件，从 router 移除对应路由 |
+| 112 | `frontend/src/components/GlassTest.vue` + `NewGlassTest.vue` | 玻璃态 CSS 实验组件，生产无用 | 删除（若 TestPage 删除后无引用） |
+| 113 | `frontend/src/components/EgoMe.vue` | 空存根，无实现 | 删除或实现，从 router 移除 `/ego-me` 路由 |
+| 114 | `frontend/src/App.vue` | 内有调试导航栏 `v-show="false"`，包含到测试页面的链接 | 删除调试导航栏，或加 `v-if="import.meta.env.DEV"` |
+| 115 | `frontend/src/utils/apiService.ts` | 若 #90 采用直接导入模式，此文件可删除 | 删除 apiService.ts |
 
 ---
 
-# Known Issues (2026-05-12 第二轮扫描)
+## 修改优先级建议
 
-## P1 — 功能不正确
+```
+第一轮（P0，发布阻塞）：
+  #86  AGENTS.md 重写
+  #87  LastInsertId 错误处理
+  #88  加载页面恢复健康检查
+  #89  PKGBUILD 重写
 
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 31 | `electron/main.ts` | 115 | 权限位掩码 `100`（十进制）应为 `0o100`（八进制） | ✅ 已修 |
-| 32 | `electron/main.ts` | 156 | stdout 正则一次只匹配一行，多行 `[STAGE]` 只取第一条 | ✅ 已修 |
-| 33 | `electron/main.ts` | 139 vs 188 | `spawn()` 在 `createWindow()` 之前，早期消息被丢弃 | ✅ 已修 |
-| 34 | `Calendar.vue` | 42 | `setInterval` 顶层创建 → 移入 `onMounted` | ✅ 已修 |
-| 35 | `TimeManager.ts` | 9 | 构造函数用 `\|\|` 而非 `??` | ✅ 已修 |
-| 36 | `TimeManager.ts` | 110–113 | `setTimeZone()` 不刷新 `this.date` | ⏸️ 不修 |
-| 37 | `CapsuleController.kt` | 58–75 | PUT 部分更新改 `Map<String, Any?>` + `?.let` | ✅ 已修 |
-| 38 | `CapsuleController.kt` | 42–44 | `createdAt` 缺 `insertable = false` | ✅ 已修 |
-| 39 | `DatabaseConfig.kt` | 24–28 | 目录检查加 else 分支 + `mkdirs()` 降级 | ✅ 已修 |
+第二轮（P1，功能缺陷）：
+  #90  使用自动生成的类型绑定
+  #91  后端输入校验
+  #94  COUNT 缓存/优化
+  #95  数据库索引
+  #96  统一 Capsule 类型
 
-## P2 — 防御性 / 边缘情况
+第三轮（P2，代码质量）：
+  #97  删除未使用的 devTools 导入
+  #98  删除 wailsjs/ v2 残留
+  #101  FOUC 回退修复
+  #104  UserHomeDir 错误处理
+  #106  SQLite pragma 设置
 
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 40 | `TimeManager.ts` | 43 | `month` 后备值 `(?? 1) - 1` = 一月 | ✅ 已修 |
-| 41 | `TimeManager.ts` | 44 | `day` 后备值 `?? 1` | ✅ 已修 |
-| 42 | `loadingPageController.ts` | 24–28 | 死 `catch (e)` 分支 | ✅ 已修 |
-| 43 | `capsule.ts` | 62–68 | 请求前 `this.capsules = []` 清空旧数据 | ✅ 已修 |
-| 44 | `electron/preload.ts` | 9–11 | `return () => removeListener(...)` 单条取消 | ✅ 已修 |
-
----
-
-# Known Issues (2026-05-12 第三轮扫描)
-
-## P1 — 功能不正确
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 45 | `electron/main.ts` | 142 | `spawn()` 之后缺少 `backendProcess.on('error', ...)` 监听器 | ✅ 已修 |
-| 46 | `electron/killPort.ts` | 14 | Windows `findstr :9999` 子串命中 `:99990` | ✅ 已修 |
-| 47 | `capsule.ts` | 24 | `toISOString()` 用 UTC → 改为 `toLocaleDateString('sv-SE')` | ✅ 已修 |
-| 48 | `Calendar.vue` | 137/146/156 | 三组 `v-for` key 加 `prev-`/`curr-`/`next-` 前缀 | ✅ 已修 |
-| 50 | `CapsuleController.kt` | 44 | POST `capsule.id = null` 防客户端注入 id | ✅ 已修 |
-| 51 | `CapsuleController.kt` | 66–70 | PUT nullable 字段改用 `containsKey`，可清空为 null | ✅ 已修 |
-| 52 | `CapsuleController.kt` | 69–72 | PUT 加 try/catch，提前 return 避类型推断，返回 400 | ✅ 已修 |
-
----
-
-# Known Issues (2026-05-13 第四轮扫描)
-
-## P1 — 功能不正确
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 53 | `TestPinia.vue` | 37-39 | 错误消息和空状态同时显示 | ✅ 已修 |
-| 54 | `Calendar.vue` | 34,60-62 | 换时区月中高度不重算 | ⏸️ 不是 bug |
-| 55 | `CapsuleController.kt` | 44-48 | POST 返回客户端注入的 `createdAt` | ✅ 已修 |
-| 56 | `electron/main.ts` | 109,132 | macOS 错误框关闭后进程残留 | ⏸️ 跳过 |
-
-## P2 — 防御性 / 边缘情况
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 57 | `CapsuleController.kt` | 79,81 | PUT `toString()` 损坏结构化 JSON → `ObjectMapper.writeValueAsString()` | ✅ 已修 |
-| 58 | `BackendApplication.kt` | 16 | `mkdirs()` 返回值忽略 | ⏸️ 跳过 |
-| 59 | `electron/killPort.ts` | 13-15 | `netstat`/`lsof` 匹配主动出站连接 | ⏸️ 跳过 |
-| 60 | `electron/killPort.ts` | 19 | `execSync` 无超时 | ⏸️ 跳过 |
-
----
-
-# Known Issues (2026-05-16 第五轮 — Go 迁移待办)
-
-## P0 — 不迁移则无法打包 ✅ 全部完成
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 61 | `package.json` | 9,14-15 | `dev:backend` 仍指向 Gradle → 改为 `go run .`；删除 `dev:backend:win` | ✅ 已修 |
-| 62 | `package.json` | 17-18 | `dist`/`dist:win` 引 Gradle build → 改为 `go build -o taskapsule-server` | ✅ 已修 |
-| 63 | `package.json` | 28-68 | `extraResources` 引 `backend.jar` + 三个平台 JRE → 改为 `taskapsule-server`，删 JRE | ✅ 已修 |
-| 64 | `electron/main.ts` | 70-136 | Java/JRE/JAR 路径检查逻辑 → 改为 Go 二进制 spawn | ✅ 已修 |
-| 65 | `electron/main.ts` | 158-167 | stdout `[STAGE]` 正则监听 → 改为简单 stdout 日志（A 方案） | ✅ 已修 |
-
-## P3 — 可清理 ✅ 全部完成
-
-| # | 文件 | 问题 | 状态 |
-|---|---|---|---|
-| 66 | `jre/` | 整个目录废弃（Go 不需要 JRE），约 100MB | ✅ 已不存在 |
-| 67 | Kotlin 残留 | `gradlew`、`gradlew.bat`、`gradle/`、`settings.gradle`、`build.gradle.kts` | ✅ 已删除（`legacy-backend-kotlin/` 保留作为存档） |
-| 68 | `backend/schema.sql` | IDE 已配真实数据库后不再需要 | ✅ 已不存在 |
-| 69 | `package.json` | `"description": "...Spring Boot"` → 去掉 Spring Boot | ✅ 已正确 |
-
----
-
-# Known Issues (2026-05-22 第六轮扫描)
-
-## P0 — 会导致崩溃或数据错误
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 70 | `Calendar.vue` | 109-117 | `cellClicked` 其他月份日期未调整月份/年份 | ✅ 已修 |
-| 71 | `electron/main.ts` | 111-123 | stdout/stderr 监听器内部嵌套 `on('data')`，每次输出添加新监听 | ✅ 已修 |
-
-## P1 — 功能不正确
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 72 | `CapsuleShelf.vue` | 179 | `min-inline-size: calc(65dvi - 7.5rem)` 在 flex 布局中挤压日历 | ✅ 已改 inline-size |
-| 73 | `Cell.vue` | 38 | `overflow: hidden` 裁剪 box-shadow 溢出 | ✅ 已删 |
-| 74 | `locale.ts` | 4 | `export default` 与其他 Pinia store 的 `export const` 不一致 | ✅ 已改 named export |
-
-## P2 — 代码质量 / 体验问题
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 75 | `capsule.ts` | 126-135 | `getDateRange()` 本地时区 + `toISOString()` UTC 偏移 | ⏸️ 仅显示用，无需修改 |
-| 76 | `Calendar.vue` | 66 | `--this-month-height-in-dvi` 用 `dvi` 而非 `dvb` | ⏸️ 故意保留 |
-| 77 | `backend/capsule.go` | 345,430 | `SELECT *` 位置映射脆弱 | ⏸️ 无迁移场景，跳过 |
-| 78 | `loadingPageController.ts` | 16 | `MAX_RETRIES = 10`，AGENTS.md 曾记为 120 | ✅ 已统一为 10 |
-| 79 | `electron/preload.ts` | 9-16 | `onBackendStatus` 监听 `backend-status-update` 但 main.ts 从不发送 | ⏸️ 保留待改造 |
-
----
-
-# Known Issues (2026-06-17 第七轮 — 发布前扫描)
-
-## P0 — 无
-
-## P1 — 已修
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 80 | `stores/capsule.ts` | 45,88-92 | `_resolveFullyLoaded` 单例 resolver → 改为数组，防止快速双击 Promise 挂起 | ✅ 已修 |
-
-## P2 — 已修
-
-| # | 文件 | 行 | 问题 | 状态 |
-|---|---|---|---|---|
-| 81 | `backend/capsule.go` | 222 | `COUNT(*)` 的 `.Scan` 错误忽略 → 改为检查并返回 500 | ✅ 已修 |
-| 82 | `backend/capsule.go` | 382-387 | `handleUpdateCapsule` 存在性检查吞掉数据库异常 → 改为区分 `sql.ErrNoRows`(404) 和其他错误(500) | ✅ 已修 |
-
-## P3 — 保留项（不影响发布）
-
-| # | 文件 | 问题 | 状态 |
-|---|---|---|---|
-| 83 | 同第 75 | `getDateRange` DST 边界 | ⏸️ 保留 |
-| 84 | 同第 77 | Go `SELECT *` 位置映射脆弱 | ⏸️ 保留 |
-| 85 | 同第 79 | `onBackendStatus` 从未发送 | ⏸️ 保留 |
+第四轮（P3，清理）：
+  #107-115  删除废弃文件和目录
+```

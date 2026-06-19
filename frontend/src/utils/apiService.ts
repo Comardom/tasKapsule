@@ -1,5 +1,6 @@
-// src/utils/apiService.ts
 import type { Capsule } from '@/stores/capsule.ts'
+
+const $Call = window.wails.Call
 
 export interface PaginatedCapsuleResponse {
   data: Capsule[]
@@ -9,21 +10,21 @@ export interface PaginatedCapsuleResponse {
 }
 
 export const capsuleApi = {
-  async getAll(): Promise<Capsule[]> {
-    const res = await window.go.main.App.GetCapsules(0, 0)
-    return res.Data
+  async getAll(page = 0, perPage = 0): Promise<Capsule[]> {
+    const res = await $Call.ByName('main.CapsuleService.GetCapsules', page, perPage)
+    return res.data
   },
   async getAllPaginated(page: number, perPage = 50): Promise<PaginatedCapsuleResponse> {
-    const res = await window.go.main.App.GetCapsules(page, perPage)
-    return { data: res.Data, total: res.Total, page: res.Page, perPage: res.PerPage }
+    const res = await $Call.ByName('main.CapsuleService.GetCapsules', page, perPage)
+    return { data: res.data, total: res.total, page: res.page, perPage: res.perPage }
   },
   async create(data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return await window.go.main.App.CreateCapsule(data)
+    return await $Call.ByName('main.CapsuleService.CreateCapsule', data)
   },
   async update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return await window.go.main.App.UpdateCapsule(id, data)
+    return await $Call.ByName('main.CapsuleService.UpdateCapsule', id, data)
   },
   async delete(id: number): Promise<void> {
-    await window.go.main.App.DeleteCapsule(id)
+    await $Call.ByName('main.CapsuleService.DeleteCapsule', id)
   },
 }
