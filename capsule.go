@@ -3,8 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	_ "modernc.org/sqlite"
@@ -59,11 +63,25 @@ const capsuleQuery = `
 	FROM capsules`
 
 type CapsuleService struct {
-	db *sql.DB
+	db          *sql.DB
+	countCache  int
+	countCacheAt time.Time
+	countMu     sync.Mutex
+}
+
+var validClassifications = map[string]bool{
+	"note": true, "urgent": true, "favourite": true, "sms": true, "inspiration": true,
+}
+
+var validScheduleStatuses = map[string]bool{
+	"pending": true, "executing": true, "completed": true, "cancelled": true, "blocked": true,
 }
 
 func (s *CapsuleService) ServiceStartup(ctx context.Context, opts application.ServiceOptions) error {
-	home, _ := os.UserHomeDir()
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("cannot find home directory: %w", err)
+	}
 	dbDir := filepath.Join(home, ".taskapsule", "data")
 	os.MkdirAll(dbDir, 0755)
 	dbPath := filepath.Join(dbDir, "app.db")
@@ -87,9 +105,14 @@ func (s *CapsuleService) ServiceStartup(ctx context.Context, opts application.Se
 		schedule_deadline     TEXT,
 		alarm_clocks        TEXT
 	)`)
-	if err != nil {
+		if err != nil {
 		return err
 	}
+	_, _ = db.Exec("PRAGMA journal_mode=WAL")
+	_, _ = db.Exec("PRAGMA busy_timeout=5000")
+	_, _ = db.Exec(`CREATE INDEX IF NOT EXISTS idx_capsules_classification ON capsules(classification)`)
+	_, _ = db.Exec(`CREATE INDEX IF NOT EXISTS idx_capsules_is_with_schedule ON capsules(is_with_schedule)`)
+	_, _ = db.Exec(`CREATE INDEX IF NOT EXISTS idx_capsules_schedule_start ON capsules(schedule_start_at)`)
 	s.db = db
 	return nil
 }
@@ -109,10 +132,16 @@ func (s *CapsuleService) GetCapsules(page, perPage int) (CapsulesResponse, error
 		perPage = 50
 	}
 
-	var total int
-	if err := s.db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&total); err != nil {
-		return CapsulesResponse{}, err
+	s.countMu.Lock()
+	if time.Since(s.countCacheAt) > 30*time.Second {
+		if err := s.db.QueryRow("SELECT COUNT(*) FROM capsules").Scan(&s.countCache); err != nil {
+			s.countMu.Unlock()
+			return CapsulesResponse{}, err
+		}
+		s.countCacheAt = time.Now()
 	}
+	total := s.countCache
+	s.countMu.Unlock()
 
 	query := capsuleQuery + " ORDER BY created_at DESC"
 	var rows *sql.Rows
@@ -146,6 +175,12 @@ func (s *CapsuleService) GetCapsules(page, perPage int) (CapsulesResponse, error
 }
 
 func (s *CapsuleService) CreateCapsule(item Capsule) (Capsule, error) {
+	if !validClassifications[item.Classification] {
+		return Capsule{}, errors.New("invalid classification")
+	}
+	if item.ScheduleStatus != nil && !validScheduleStatuses[*item.ScheduleStatus] {
+		return Capsule{}, errors.New("invalid scheduleStatus")
+	}
 	res, err := s.db.Exec(`
 		INSERT INTO capsules (
 			content_text, audio_path, attachment_paths,
@@ -165,7 +200,10 @@ func (s *CapsuleService) CreateCapsule(item Capsule) (Capsule, error) {
 		return Capsule{}, err
 	}
 
-	newID, _ := res.LastInsertId()
+	newID, err := res.LastInsertId()
+	if err != nil {
+		return Capsule{}, err
+	}
 	row := s.db.QueryRow(capsuleQuery+" WHERE id = ?", newID)
 	created, err := scanCapsule(row)
 	if err != nil {
@@ -176,6 +214,12 @@ func (s *CapsuleService) CreateCapsule(item Capsule) (Capsule, error) {
 }
 
 func (s *CapsuleService) UpdateCapsule(id int, item Capsule) (Capsule, error) {
+	if !validClassifications[item.Classification] {
+		return Capsule{}, errors.New("invalid classification")
+	}
+	if item.ScheduleStatus != nil && !validScheduleStatuses[*item.ScheduleStatus] {
+		return Capsule{}, errors.New("invalid scheduleStatus")
+	}
 	var exists int
 	err := s.db.QueryRow("SELECT 1 FROM capsules WHERE id = ?", id).Scan(&exists)
 	if err == sql.ErrNoRows {

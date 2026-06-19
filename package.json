@@ -1,6 +1,6 @@
 {
   "name": "taskapsule",
-  "description": "Task management app with Electron + Vue + Go",
+  "description": "A capsule-based task management app",
   "author": {
     "name":"Comardom",
     "email": "Comardom@outlook.com"

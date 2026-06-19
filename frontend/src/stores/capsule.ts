@@ -91,21 +91,6 @@ export const useCapsuleStore = defineStore('capsule', {
         this._resolveFullyLoaded.push(resolve);
       });
     },
-    async fetchCapsules() {
-      this.isLoading = true;
-      this.error = null;
-      try {
-        const res = await capsuleApi.getAll();
-        this.allCapsules = res || [];
-        this.totalCount = this.allCapsules.length;
-        this.fullyLoaded = true;
-      } catch (err: any) {
-        this.error = err.message || '获取数据失败';
-        console.error('Fetch Capsules Error:', err);
-      } finally {
-        this.isLoading = false;
-      }
-    },
     setDate(date: string) {
       if (this.selectedDate !== date) {
         this.selectedDate = date;

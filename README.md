@@ -6,6 +6,14 @@
 
 
 # 更新
+## [2026-06-19] - 0.2.5
+* 简化frontend/vite.config.ts
+* 修正capsule.go
+* 移除Wails2的残留wailsjs
+* 简化pnpm-workspace.yaml
+* 删除frontend/src/stores/capsule.ts的fetchCapsules函数
+
+---
 ## [2026-06-19] - 0.2.4
 * 向Wails3进行迁移过渡
 
