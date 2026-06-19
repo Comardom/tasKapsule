@@ -1,5 +1,15 @@
+.gate-gap,
+.gate-gap *,
+.capsule,
+.single-shelf-mode,
+.double-shelf-mode .left-column,
+.double-shelf-mode .right-column {
+  will-change: transform, opacity;
+}
+
+
 #app-all {
-    font-family: var(--font-body);
+    font-family: var(--font-body), monospace;
     background: repeating-linear-gradient(
             to right,
             var(--theme-bg-stripe-1),

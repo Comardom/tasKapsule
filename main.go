@@ -2,7 +2,7 @@ package main
 
 import (
 	"embed"
-
+	"os"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -11,6 +11,8 @@ var assets embed.FS
 
 func main() {
 	capsuleService := &CapsuleService{}
+
+	os.Setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "0")
 
 	app := application.New(application.Options{
 		Name: "tasKapsule",

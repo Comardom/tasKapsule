@@ -30,13 +30,13 @@ function openPicker(el: HTMLInputElement | undefined) {
 onMounted(() => {
   if (props.editCapsule) {
     contentText.value = props.editCapsule.contentText;
-    classification.value = props.editCapsule.classification;
+    classification.value = props.editCapsule.classification as Classification;
     isWithSchedule.value = props.editCapsule.isWithSchedule === 1;
     scheduleIcon.value = props.editCapsule.scheduleIcon ?? '';
     scheduleContentText.value = props.editCapsule.scheduleContentText ?? '';
     scheduleStartAt.value = props.editCapsule.scheduleStartAt ?? '';
     scheduleEndAt.value = props.editCapsule.scheduleEndAt ?? '';
-    scheduleStatus.value = props.editCapsule.scheduleStatus ?? 'pending';
+    scheduleStatus.value = (props.editCapsule.scheduleStatus ?? 'pending') as ScheduleStatus;
     scheduleDeadline.value = props.editCapsule.scheduleDeadline ?? '';
     audioPath.value = props.editCapsule.audioPath ?? '';
     attachmentPaths.value = props.editCapsule.attachmentPaths ?? '';
@@ -59,7 +59,7 @@ async function submit() {
     scheduleEndAt: isWithSchedule.value ? scheduleEndAt.value || undefined : undefined,
     scheduleStatus: isWithSchedule.value ? scheduleStatus.value || undefined : undefined,
     scheduleDeadline: isWithSchedule.value ? scheduleDeadline.value || undefined : undefined,
-    audioPath: audioPath.value || undefined,
+    audioPath: audioPath.value || null,
     attachmentPaths: attachmentPaths.value || undefined,
     alarmClocks: alarmClocks.value || undefined,
   };
@@ -68,7 +68,7 @@ async function submit() {
   } else {
     await capsuleApi.create(data);
   }
-  await store.fetchCapsules();
+  await store.loadInitialPage()
   emit('close');
 }
 </script>

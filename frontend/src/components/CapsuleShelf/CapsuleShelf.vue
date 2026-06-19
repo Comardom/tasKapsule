@@ -219,7 +219,7 @@ async function confirmDelete() {
   const id = deletingCapsule.value.id
   deletingCapsule.value = null
   await capsuleApi.delete(id)
-  await store.fetchCapsules()
+  await store.loadInitialPage()
 }
 
 

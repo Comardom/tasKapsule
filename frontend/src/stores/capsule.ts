@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import type { Capsule } from '@/utils/apiService.ts'
+export type { Capsule }
 import { capsuleApi } from '@/utils/apiService.ts';
 
 export type Classification = 'note' | 'urgent' | 'favourite' | 'sms' | 'inspiration';
