@@ -20,4 +20,7 @@ export const capsuleApi = {
   async delete(id: number): Promise<void> {
     await $Call().ByName('main.CapsuleService.DeleteCapsule', id)
   },
+  async deleteAll(): Promise<number> {
+    return await $Call().ByName('main.CapsuleService.DeleteAllCapsules')
+  },
 }

@@ -157,7 +157,7 @@ func (s *CapsuleService) GetCapsules(page, perPage int) (CapsulesResponse, error
 	}
 	defer rows.Close()
 
-	var capsules []Capsule
+	capsules := make([]Capsule, 0)
 	for rows.Next() {
 		item, err := scanCapsule(rows)
 		if err != nil {

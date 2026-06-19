@@ -19,6 +19,7 @@ const showCreateModal= ref<boolean>(false);
 const showImportExport = ref(false);
 const editingCapsule = ref<Capsule | null>(null);
 const deletingCapsule = ref<Capsule | null>(null);
+const deletingAll = ref(false);
 // 从事件总线读取导航信号和创建信号；Calendar 双击→navigateToDate，右键→pendingCreateDate
 const { navigateToDate, pendingCreateDate, setPendingCreateDate } = useCalendarAction();
 
@@ -222,6 +223,13 @@ async function confirmDelete() {
   await store.loadInitialPage()
 }
 
+async function confirmDeleteAll() {
+  const count = await capsuleApi.deleteAll()
+  deletingAll.value = false
+  await store.loadInitialPage()
+  console.log(`已删除 ${count} 个胶囊`)
+}
+
 
 // 在日期数组中查找与 target 最接近的日期（按毫秒差）；等距时取未来日期
 function findNearestDate(target: string, dates: string[]): string | null {
@@ -313,6 +321,7 @@ function findNearestDate(target: string, dates: string[]): string | null {
           <button class="gate-btn" @click="nextFont">字</button>
           <button class="gate-btn" @click="themeStore.toggleTheme">{{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}</button>
           <button class="gate-btn" @click="showImportExport = true">⇅</button>
+          <button class="gate-btn" @click.stop="deletingAll = true" title="删除全部胶囊">🗑️</button>
         </div>
       </div>
 
@@ -357,6 +366,12 @@ function findNearestDate(target: string, dates: string[]): string | null {
   <ImportExportDialog
     v-if="showImportExport"
     @close="showImportExport = false"
+  />
+  <ConfirmDialog
+    v-if="deletingAll"
+    message="确定要删除所有胶囊？此操作不可恢复。"
+    @confirm="confirmDeleteAll"
+    @cancel="deletingAll = false"
   />
 </template>
 
