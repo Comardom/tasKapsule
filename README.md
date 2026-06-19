@@ -6,6 +6,17 @@
 
 
 # 更新
+## [2026-06-19] - 0.2.3
+* 将go文件搬运到根目录
+* 大幅度修改go文件
+* 加入wails.json
+* 简化了frontend/vite.config.ts
+* 简化了frontend/src/utils/apiService.ts
+* 简化了frontend/src/utils/loadingPageController.ts
+* 删除了frontend/src/utils/backendHealthCheck.ts
+* 补全了env.d.ts
+
+---
 ## [2026-06-19] - 0.2.2
 * 删除了electron文件夹
 * 清理了package.json

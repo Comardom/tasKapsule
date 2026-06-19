@@ -53,8 +53,8 @@ export const useCapsuleStore = defineStore('capsule', {
       this.initialPageLoaded = false;
       try {
         const res = await capsuleApi.getAllPaginated(1, perPage);
-        this.allCapsules = res.data.data;
-        this.totalCount = res.data.total;
+        this.allCapsules = res.data;
+        this.totalCount = res.total;
         this.initialPageLoaded = true;
       } catch (err: any) {
         this.error = err.message || '获取数据失败';
@@ -76,7 +76,7 @@ export const useCapsuleStore = defineStore('capsule', {
         await new Promise(r => setTimeout(r, 0));
         try {
           const res = await capsuleApi.getAllPaginated(page, perPage);
-          this.allCapsules.push(...res.data.data);
+          this.allCapsules.push(...res.data);
         } catch (err) {
           console.error('Background page load error:', err);
         }
@@ -96,7 +96,7 @@ export const useCapsuleStore = defineStore('capsule', {
       this.error = null;
       try {
         const res = await capsuleApi.getAll();
-        this.allCapsules = res.data || [];
+        this.allCapsules = res || [];
         this.totalCount = this.allCapsules.length;
         this.fullyLoaded = true;
       } catch (err: any) {

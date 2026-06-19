@@ -1,37 +1,29 @@
 // src/utils/apiService.ts
-import axios from 'axios';
-import type { Capsule } from '@/stores/capsule.ts';
-
-const api = axios.create({
-  baseURL: 'http://localhost:9999/api/v1',
-  timeout: 5000
-});
+import type { Capsule } from '@/stores/capsule.ts'
 
 export interface PaginatedCapsuleResponse {
-  data: Capsule[];
-  total: number;
-  page: number;
-  perPage: number;
+  data: Capsule[]
+  total: number
+  page: number
+  perPage: number
 }
 
 export const capsuleApi = {
-  // 获取全部胶囊（不分页，用于完整刷新）
-  getAll() {
-    return api.get<Capsule[]>('/capsules');
+  async getAll(): Promise<Capsule[]> {
+    const res = await window.go.main.App.GetCapsules(0, 0)
+    return res.Data
   },
-  // 获取分页胶囊
-  getAllPaginated(page: number, perPage: number = 50) {
-    return api.get<PaginatedCapsuleResponse>(`/capsules?page=${page}&per_page=${perPage}`);
+  async getAllPaginated(page: number, perPage = 50): Promise<PaginatedCapsuleResponse> {
+    const res = await window.go.main.App.GetCapsules(page, perPage)
+    return { data: res.Data, total: res.Total, page: res.Page, perPage: res.PerPage }
   },
-  // 创建胶囊
-  create(data: Omit<Capsule, 'id' | 'createdAt'>) {
-    return api.post('/capsules', data);
+  async create(data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
+    return await window.go.main.App.CreateCapsule(data)
   },
-  update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>) {
-    return api.put(`/capsules/${id}`, data);
+  async update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
+    return await window.go.main.App.UpdateCapsule(id, data)
   },
-  // 删除胶囊
-  delete(id: number) {
-    return api.delete(`/capsules/${id}`);
-  }
-};
+  async delete(id: number): Promise<void> {
+    await window.go.main.App.DeleteCapsule(id)
+  },
+}

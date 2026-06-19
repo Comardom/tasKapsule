@@ -15,9 +15,9 @@ release/
 *.dmg
 
 # Backend / Gradle
-backend/build/
-backend/.gradle/
-backend/out/
+backend_disabled/build/
+backend_disabled/.gradle/
+backend_disabled/out/
 .gradle/
 
 # IDE / Editor
