@@ -1,26 +1,41 @@
-import type { Capsule, CapsulesResponse } from '../../bindings/github.com/comardom/taskapsule/backend'
-export type { Capsule, CapsulesResponse }
+// src/utils/apiService.ts
+import axios from 'axios';
+import type { Capsule } from '@/stores/capsule.ts';
 
-const $Call = () => window.wails.Call
+const api = axios.create({
+  baseURL: 'http://localhost:9999/api/v1',
+  timeout: 5000
+});
+
+export interface PaginatedCapsuleResponse {
+  data: Capsule[];
+  total: number;
+  page: number;
+  perPage: number;
+}
 
 export const capsuleApi = {
-  async getAll(page = 0, perPage = 0): Promise<Capsule[]> {
-    const res: CapsulesResponse = await $Call().ByName('main.CapsuleService.GetCapsules', page, perPage)
-    return res.data
+  // 获取全部胶囊（不分页，用于完整刷新）
+  getAll() {
+    return api.get<Capsule[]>('/capsules');
   },
-  async getAllPaginated(page: number, perPage = 50): Promise<CapsulesResponse> {
-    return $Call().ByName('main.CapsuleService.GetCapsules', page, perPage);
+  // 获取分页胶囊
+  getAllPaginated(page: number, perPage: number = 50) {
+    return api.get<PaginatedCapsuleResponse>(`/capsules?page=${page}&per_page=${perPage}`);
   },
-  async create(data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return $Call().ByName('main.CapsuleService.CreateCapsule', data);
+  // 创建胶囊
+  create(data: Omit<Capsule, 'id' | 'createdAt'>) {
+    return api.post('/capsules', data);
   },
-  async update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>): Promise<Capsule> {
-    return $Call().ByName('main.CapsuleService.UpdateCapsule', id, data);
+  update(id: number, data: Omit<Capsule, 'id' | 'createdAt'>) {
+    return api.put(`/capsules/${id}`, data);
   },
-  async delete(id: number): Promise<void> {
-    await $Call().ByName('main.CapsuleService.DeleteCapsule', id)
+  // 删除胶囊
+  delete(id: number) {
+    return api.delete(`/capsules/${id}`);
   },
-  async deleteAll(): Promise<number> {
-    return await $Call().ByName('main.CapsuleService.DeleteAllCapsules')
-  },
-}
+  // 删除所有胶囊
+  deleteAll() {
+    return api.delete('/capsules');
+  }
+};

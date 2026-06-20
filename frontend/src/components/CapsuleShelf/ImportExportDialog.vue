@@ -76,7 +76,7 @@ async function startImport() {
     importProgress.value++
   }
 
-  await store.loadInitialPage()
+  await store.fetchCapsules()
   importResult.value = `导入完成：成功 ${success} 条，失败 ${failed} 条`
   isImporting.value = false
 }

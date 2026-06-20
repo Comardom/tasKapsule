@@ -1,12 +1,28 @@
 import { defineStore } from 'pinia';
-import type { Capsule } from '@/utils/apiService.ts'
-export type { Capsule }
 import { capsuleApi } from '@/utils/apiService.ts';
 
 export type Classification = 'note' | 'urgent' | 'favourite' | 'sms' | 'inspiration';
 export type ScheduleStatus = 'pending' | 'executing' | 'completed' | 'cancelled' | 'blocked';
 export type DisplayMode = 'all' | 'first-last' | 'first' | 'last';
 export type ViewMode = 'single' | 'double';
+
+// 定义实体接口，提高开发效率,让 IDE 知道一个胶囊对象里有哪些字段
+export interface Capsule {
+  id: number;
+  createdAt: string;
+  contentText: string;
+  audioPath?: string;
+  attachmentPaths?: string;
+  classification: Classification;
+  isWithSchedule: number;  // 0 | 1
+  scheduleIcon?: string;
+  scheduleContentText?: string;
+  scheduleStartAt?: string;  // "YYYY-MM-DD HH:mm:ss"
+  scheduleEndAt?: string;    // "YYYY-MM-DD HH:mm:ss"
+  scheduleStatus?: ScheduleStatus;
+  scheduleDeadline?: string;
+  alarmClocks?: string;
+}
 
 //管理应用中所有关于"日程胶囊"的状态和行为
 export const useCapsuleStore = defineStore('capsule', {
@@ -37,8 +53,8 @@ export const useCapsuleStore = defineStore('capsule', {
       this.initialPageLoaded = false;
       try {
         const res = await capsuleApi.getAllPaginated(1, perPage);
-        this.allCapsules = res.data;
-        this.totalCount = res.total;
+        this.allCapsules = res.data.data;
+        this.totalCount = res.data.total;
         this.initialPageLoaded = true;
       } catch (err: any) {
         this.error = err.message || '获取数据失败';
@@ -60,7 +76,7 @@ export const useCapsuleStore = defineStore('capsule', {
         await new Promise(r => setTimeout(r, 0));
         try {
           const res = await capsuleApi.getAllPaginated(page, perPage);
-          this.allCapsules.push(...res.data);
+          this.allCapsules.push(...res.data.data);
         } catch (err) {
           console.error('Background page load error:', err);
         }
@@ -74,6 +90,21 @@ export const useCapsuleStore = defineStore('capsule', {
       return new Promise(resolve => {
         this._resolveFullyLoaded.push(resolve);
       });
+    },
+    async fetchCapsules() {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const res = await capsuleApi.getAll();
+        this.allCapsules = res.data || [];
+        this.totalCount = this.allCapsules.length;
+        this.fullyLoaded = true;
+      } catch (err: any) {
+        this.error = err.message || '获取数据失败';
+        console.error('Fetch Capsules Error:', err);
+      } finally {
+        this.isLoading = false;
+      }
     },
     setDate(date: string) {
       if (this.selectedDate !== date) {

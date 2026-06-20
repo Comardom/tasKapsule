@@ -1,15 +1,81 @@
 {
   "name": "taskapsule",
-  "description": "A capsule-based task management app",
+  "description": "Task management app with Electron + Vue + Go",
   "author": {
     "name":"Comardom",
     "email": "Comardom@outlook.com"
   },
-  "version": "0.3.0",
+  "version": "0.2.0",
+  "main": "electron/dist/main.js",
   "scripts": {
     "dev:frontend": "cd frontend && pnpm dev",
-    "build:frontend": "cd frontend && pnpm build"
+    "dev:backend": "cd backend && go run .",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev": "run-p dev:frontend dev:backend dev:electron",
+    "build:frontend": "cd frontend && pnpm build",
+    "build:backend": "cd backend && go build -o taskapsule-server",
+    "build:electron": "tsc -p electron",
+    "dist": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend && pnpm build:electron && electron-builder",
+    "build:backend:win": "cd backend && set GOOS=windows&& set GOARCH=amd64&& go build -o taskapsule-server.exe",
+    "build:backend:linux": "cd backend && GOOS=linux GOARCH=amd64 go build -o taskapsule-server",
+    "build:backend:freebsd": "cd backend && GOOS=freebsd GOARCH=amd64 go build -o taskapsule-server",
+    "dist:linux": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:linux && pnpm build:electron && electron-builder --linux",
+    "dist:win": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:win && pnpm build:electron && electron-builder --win",
+    "dist:win:x64": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:win && pnpm build:electron && electron-builder --win --x64",
+    "dist:win:ia32": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:win && pnpm build:electron && electron-builder --win --ia32",
+    "dist:win:arm64": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:win && pnpm build:electron && electron-builder --win --arm64",
+    "dist:freebsd": "cross-env NODE_ENV=production pnpm build:frontend && pnpm build:backend:freebsd && pnpm build:electron && electron-builder --linux"
+  },
+  "build": {
+    "appId": "xyz.taskapsule",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/dist/**/*"
+    ],
+    "icon": "build/icon.png",
+    "extraResources": [
+      {
+        "from": "frontend/dist",
+        "to": "frontend/dist"
+      }
+    ],
+    "mac": {
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": ["AppImage","deb", "rpm"],
+      "category": "Utility",
+      "extraResources": [
+        {
+          "from": "backend/taskapsule-server",
+          "to": "taskapsule-server"
+        }
+      ]
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "build/icon.ico",
+      "extraResources": [
+        {
+          "from": "backend/taskapsule-server.exe",
+          "to": "taskapsule-server.exe"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE"
+    }
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "cross-env": "^10.1.0",
+    "electron": "^42.3.3",
+    "electron-builder": "^26.8.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^6.0.3"
   }
 }

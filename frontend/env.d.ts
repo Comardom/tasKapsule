@@ -1,18 +1,17 @@
 /// <reference types="vite/client" />
-
-type CancellablePromise<T> = Promise<T>
-
-interface WailsRuntime {
-  Call: {
-    ByID<T = any>(methodID: number, ...args: any[]): CancellablePromise<T>
-    ByName<T = any>(methodName: string, ...args: any[]): CancellablePromise<T>
-  }
+export interface IElectronAPI {
+    onBackendStatus: (callback: (text: string) => void) => void;
+    removeBackendListeners: () => void;
 }
-
 declare global {
-  interface Window {
-    wails: WailsRuntime
-  }
+    interface Window {
+        api: {
+            openFile: () => Promise<string | null>
+            saveFile: (content: string) => Promise<boolean | null>
+        }
+        // 对应 preload.ts 中的 electronAPI
+        electronAPI: IElectronAPI
+    }
 }
 
 export {}

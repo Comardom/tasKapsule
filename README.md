@@ -6,6 +6,17 @@
 
 
 # 更新
+## [2026-06-20] - 0.3.1
+* 迁移回Electron
+* 修复了无胶囊状态下假死的问题
+* 加入了一键删除所有胶囊的功能
+### 重大告知
+* 由于Wails3未出正式版，且无法在Linux环境下成功开启GPU加速
+* 则同时维护两个仓库，主仓库改回Electron
+* Wails3仓库地址为[tasKapsule-wails3](https://github.com/Comardom/tasKapsule-wails3.git)
+* Linux采用Electron，Windows采用Wails3
+
+---
 ## [2026-06-19] - 0.3.0
 * 完全迁移到Wails3
 

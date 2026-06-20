@@ -103,7 +103,6 @@ const displayMonth = computed(() => {
 
 <style scoped>
 .calendar{
-  transform: translateZ(0);
   --cell-transition-duration: 0.25s;
   --full-block-size : 100dvb;
   --full-inline-size : 35dvi;
