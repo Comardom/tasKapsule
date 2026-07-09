@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {computed, nextTick, ref} from "vue";
 import { timeZoneOptions } from '@/data/timezones.ts'
 import {TimeManager} from '@/utils/TimeManager.ts'
 import {useLocaleStore} from "@/stores/locale.ts";
@@ -37,6 +37,19 @@ const displayMonth = computed(() => {
   const { month } = timeManager.getFormatted();
   return ((month + monthOffset.value) % 12 + 12) % 12;
 });
+
+// 这里是绑定ref，确保可以调用子组件的函数
+const calendarBodyRef = ref<InstanceType<typeof CalendarBody> | null>(null);
+async function clickedToToday(): Promise<void> {
+  // 回到本月
+  monthOffset.value = 0;
+  // 千万要注意！没有这个等待会出bug
+  await nextTick();
+  if(calendarBodyRef.value)
+  {
+    calendarBodyRef.value.clickedToToday();
+  }
+}
 </script>
 
 <template>
@@ -45,6 +58,7 @@ const displayMonth = computed(() => {
       <Clock
           :display-year="displayYear"
           :display-month="displayMonth"
+          @clicked-to-today="clickedToToday"
       />
 
     </div>
@@ -56,6 +70,7 @@ const displayMonth = computed(() => {
         :monthOffset="monthOffset"
         :localeStore="localeStore"
         :timeManager="timeManager"
+        ref="calendarBodyRef"
     />
 
     <div class="calendar-tail">

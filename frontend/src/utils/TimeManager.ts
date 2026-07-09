@@ -99,6 +99,10 @@ export class TimeManager {
         return new Date(Date.UTC(formatted.year, formatted.month, 0)).getUTCDate();
     }
 
+    //获取本月是哪月
+    get本月(): number {
+        return this.getFormatted().month;
+    }
 
     // 更新时间
     update() {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import Placeholder from "@/components/Placeholder.vue";
 
 interface Props {
   displayYear: number;
@@ -20,7 +21,8 @@ onMounted(() => {
     const h = String(d.getHours()).padStart(2, '0')
     const m = String(d.getMinutes()).padStart(2, '0')
     const s = String(d.getSeconds()).padStart(2, '0')
-    realNow.value = `${y}/${M}/${D} ${h}:${m}:${s}`
+    // 使用ISO表示法
+    realNow.value = `${y}-${M}-${D} ${h}:${m}:${s}`
   }
   update()
   timer = setInterval(update, 1000)
@@ -31,7 +33,14 @@ onUnmounted(() => clearInterval(timer))
 <template>
   <div class="calendar-header">
     <span class="month-label">{{ displayYear }}.{{ displayMonth + 1 }}</span>
-    <span class="real-time">{{ realNow }}</span>
+    <placeholder width="1dvi" h="1dvb" />
+<!--    单击回到今天，先向上层发射信号，Calendar接收信号以后操作其他组件-->
+    <span
+        class="real-time"
+        @click="$emit('clickedToToday')"
+    >
+      {{ realNow }}
+    </span>
   </div>
 </template>
 
@@ -58,5 +67,6 @@ onUnmounted(() => clearInterval(timer))
   font-size: 0.75rem;
   opacity: 0.7;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
 </style>

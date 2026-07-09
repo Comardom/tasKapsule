@@ -108,6 +108,7 @@ const wheelLocked = ref<boolean>(false);
 const lastScrollDir = ref<1 | -1>(1);
 
 
+const 本月 = ref<number>(props.timeManager.get本月());
 const 今天几号 = ref<number>(props.timeManager.get今天几号());
 /*const 当月天数 = ref<number>(timeManager.get当月天数());*/
 const 当月天数 = computed(() => props.timeManager.get此月天数ByYM(props.displayYear, props.displayMonth));
@@ -172,6 +173,15 @@ function singleClick(whatDay: number, month: number) {
   selectedMonth.value = month;
   selectedDay.value = whatDay;
   capsuleStore.setDate(computeDate(whatDay, month));
+}
+
+// 回到今天
+function clickedToToday(){
+  // 直接按TimeManager的来
+  selectedMonth.value = 本月.value;
+  selectedDay.value = 今天几号.value;
+  // 给状态管理传入参数，保证和单击的行为一致
+  capsuleStore.setDate(computeDate(今天几号.value, 本月.value));
 }
 
 // 双击 → 更新选中日期 + 通知 CapsuleShelf 切换到双栏并滚动到该日期
@@ -263,6 +273,13 @@ const transitionDirection = ref<1 | -1>(1)
 watch(() => props.monthOffset, (n, o) => {
   if (n !== o) transitionDirection.value = n > o ? 1 : -1
 })
+
+//暴露函数给父组件使用
+defineExpose(
+    {
+      clickedToToday,
+    }
+);
 </script>
 
 <template>
