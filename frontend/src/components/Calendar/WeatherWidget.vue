@@ -75,7 +75,7 @@ watch([selectedDate, () => props.daily, displayCode, displayTemp], () => {
       v-if="!dayWeather && displayCode === null && !loading"
       class="weather-na"
     >--°</span>
-    <span class="weather-location" title="Click to change city" @click="handleLocationClick">
+    <span class="weather-location" title="点击切换城市" @click="handleLocationClick">
       {{ locationName }}
     </span>
     <Teleport to="body">
