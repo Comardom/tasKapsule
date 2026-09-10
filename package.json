@@ -11,7 +11,7 @@
     "dev:frontend": "cd frontend && pnpm dev",
     "dev:backend": "cd backend && go run .",
     "dev:electron": "cross-env NODE_ENV=development electron .",
-    "dev": "run-p dev:frontend dev:backend dev:electron",
+    "dev": "run-p dev:frontend dev:backend",
     "build:frontend": "cd frontend && pnpm build",
     "build:backend": "cd backend && go build -o taskapsule-server",
     "build:electron": "tsc -p electron",

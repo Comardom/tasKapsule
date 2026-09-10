@@ -315,12 +315,16 @@ function findNearestDate(target: string, dates: string[]): string | null {
           @pointerleave="onGatePointerLeave"
       >
         <div class="gate-btn-group" :style="{ '--hover-y': gateHoverY + 'px' }">
-          <button class="gate-btn" @click="switchViewMode('single')">单</button>
-          <button class="gate-btn" @click="showCreateModal = true">+</button>
-          <button class="gate-btn" @click="nextDisplayMode">···</button>
-          <button class="gate-btn" @click="nextFont">字</button>
-          <button class="gate-btn" @click="themeStore.toggleTheme">{{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}</button>
-          <button class="gate-btn" @click="showImportExport = true">⇅</button>
+          <button class="gate-btn" @click="switchViewMode('single')" title="切换到单列模式">单</button>
+          <button class="gate-btn" @click="showCreateModal = true" title="添加一个新胶囊">+</button>
+          <button class="gate-btn" @click="nextDisplayMode" title="切换胶囊显示模式">···</button>
+          <button class="gate-btn" @click="nextFont" title="切换字体">字</button>
+          <button class="gate-btn" @click="themeStore.toggleTheme"
+                  :title="`切换到${themeStore.theme === 'dark' ? '浅色' : '深色'}模式`"
+          >
+            {{ themeStore.theme === 'dark' ? '☀️' : '🌙' }}
+          </button>
+          <button class="gate-btn" @click="showImportExport = true" title="导入和导出胶囊数据">⇅</button>
           <button class="gate-btn" @click.stop="deletingAll = true" title="删除全部胶囊">🗑️</button>
         </div>
       </div>
