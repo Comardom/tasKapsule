@@ -13,6 +13,8 @@ const props = defineProps<{
 }>();
 
 const capsuleRef = ref<HTMLElement | null>(null);
+const topSpacerRef = ref<HTMLElement | null>(null);
+const bottomSpacerRef = ref<HTMLElement | null>(null);
 const contentRef = ref<HTMLElement | null>(null);
 let animCtx: gsap.core.Timeline | null = null;
 
@@ -20,8 +22,10 @@ watch(expanded, async (newVal) => {
   const prevWidth = capsuleRef.value?.offsetWidth || 0;
   const prevHeight = capsuleRef.value?.offsetHeight || 0;
 
-  const topPlaceholder = capsuleRef.value?.firstElementChild as HTMLElement;
-  const prevTopHeight = topPlaceholder?.offsetHeight || 0;
+  const topSpacer = topSpacerRef.value;
+  const bottomSpacer = bottomSpacerRef.value;
+  const prevTopHeight = topSpacer?.offsetHeight || 0;
+  const prevBottomHeight = bottomSpacer?.offsetHeight || 0;
   const prevContentHeight = contentRef.value?.offsetHeight || 0;
 
   await nextTick();
@@ -37,12 +41,14 @@ watch(expanded, async (newVal) => {
 
   gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
   if (mainText) gsap.set(mainText, { clearProps: "all" });
-  if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity" });
+  if (topSpacer) gsap.set(topSpacer, { clearProps: "height,opacity" });
+  if (bottomSpacer) gsap.set(bottomSpacer, { clearProps: "height,opacity" });
   if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity" });
 
   if (newVal) {
     // ==================== 展开动画 ====================
-    const targetTopHeight = topPlaceholder?.offsetHeight || 0;
+    const targetTopHeight = topSpacer?.offsetHeight || 0;
+    const targetBottomHeight = bottomSpacer?.offsetHeight || 0;
     const targetContentHeight = contentRef.value?.offsetHeight || 0;
     const targetHeight = capsuleRef.value.offsetHeight;
 
@@ -53,13 +59,15 @@ watch(expanded, async (newVal) => {
         : `${capsuleRef.value.offsetWidth}px`;
 
     gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
-    if (topPlaceholder) gsap.set(topPlaceholder, { opacity: 0, height: 0, overflow: "hidden" });
-    if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, y: -8, height: 0, overflow: "hidden" });
+    if (topSpacer) gsap.set(topSpacer, { opacity: 0, height: 0, overflow: "hidden" });
+    if (bottomSpacer) gsap.set(bottomSpacer, { opacity: 0, height: 0, overflow: "hidden" });
+    if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, height: 0, overflow: "hidden" });
 
     animCtx = gsap.timeline({
       onComplete: () => {
         gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
-        if (topPlaceholder) gsap.set(topPlaceholder, { clearProps: "height,opacity,overflow" });
+        if (topSpacer) gsap.set(topSpacer, { clearProps: "height,opacity,overflow" });
+        if (bottomSpacer) gsap.set(bottomSpacer, { clearProps: "height,opacity,overflow" });
         if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity,overflow" });
       }
     });
@@ -81,18 +89,23 @@ watch(expanded, async (newVal) => {
         0
     );
 
-    if (topPlaceholder) {
-      animCtx.to(topPlaceholder, { height: targetTopHeight, opacity: 1, duration: 0.4, ease: "backOut(0.3)" }, 0);
+    if (topSpacer) {
+      animCtx.to(topSpacer, { height: targetTopHeight, opacity: 1, duration: 0.4, ease: "backOut(0.3)" }, 0);
+    }
+
+    if (bottomSpacer) {
+      animCtx.to(bottomSpacer, { height: targetBottomHeight, opacity: 1, duration: 0.4, ease: "backOut(0.3)" }, 0);
     }
 
     if (contentRef.value) {
-      animCtx.to(contentRef.value, { height: targetContentHeight, opacity: 1, y: 0, duration: 0.4, ease: "backOut(0.3)" }, 0);
+      animCtx.to(contentRef.value, { height: targetContentHeight, opacity: 1, duration: 0.4, ease: "backOut(0.3)" }, 0);
     }
   } else {
     // ==================== 收缩动画 ====================
     animCtx = gsap.timeline({
       onComplete: () => {
-        if (topPlaceholder) gsap.set(topPlaceholder, { display: "none", clearProps: "height,opacity" });
+        if (topSpacer) gsap.set(topSpacer, { display: "none", clearProps: "height,opacity" });
+        if (bottomSpacer) gsap.set(bottomSpacer, { display: "none", clearProps: "height,opacity" });
         if (contentRef.value) gsap.set(contentRef.value, { display: "none", clearProps: "height,opacity" });
         gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
       }
@@ -102,15 +115,21 @@ watch(expanded, async (newVal) => {
 
     gsap.set(capsuleRef.value, { overflow: "hidden" });
 
-    if (topPlaceholder) {
-      gsap.set(topPlaceholder, { display: "block", opacity: 1, height: prevTopHeight });
-      animCtx.to(topPlaceholder, { opacity: 0, duration: 0.15 }, 0);
-      animCtx.to(topPlaceholder, { height: 0, duration: 0.35, ease: "power2.inOut" }, 0);
+    if (topSpacer) {
+      gsap.set(topSpacer, { display: "block", opacity: 1, height: prevTopHeight });
+      animCtx.to(topSpacer, { opacity: 0, duration: 0.15 }, 0.15);
+      animCtx.to(topSpacer, { height: 0, duration: 0.2, ease: "power2.inOut" }, 0.15);
+    }
+
+    if (bottomSpacer) {
+      gsap.set(bottomSpacer, { display: "block", opacity: 1, height: prevBottomHeight });
+      animCtx.to(bottomSpacer, { opacity: 0, duration: 0.15 }, 0.15);
+      animCtx.to(bottomSpacer, { height: 0, duration: 0.2, ease: "power2.inOut" }, 0.15);
     }
 
     if (contentRef.value) {
       gsap.set(contentRef.value, { display: "block", opacity: 1, height: prevContentHeight });
-      animCtx.to(contentRef.value, { opacity: 0, y: -8, duration: 0.15 }, 0);
+      animCtx.to(contentRef.value, { opacity: 0, duration: 0.15 }, 0);
       animCtx.to(contentRef.value, { height: 0, duration: 0.35, ease: "power2.inOut" }, 0);
     }
 
@@ -145,14 +164,31 @@ watch(expanded, async (newVal) => {
       ]"
       @click="expanded = !expanded"
   >
-    <Placeholder v-show="expanded" height='2svb' width="25dvi" />
+    <div ref="topSpacerRef" v-show="expanded" class="capsule-spacer"></div>
     <span class="txt-box main-text">{{ props.capsule.contentText }}</span>
+    <div ref="bottomSpacerRef" v-show="expanded" class="capsule-spacer"></div>
+
 
     <div ref="contentRef" class="expanded-content" v-show="expanded">
-      <Placeholder height='2svb' width="25dvi" />
+      <!--
+      <div class="classification-dots">
+        <span class="classification-dot"></span>
+        <span class="classification-dot"></span>
+        <span class="classification-dot"></span>
+        <span class="classification-dot"></span>
+        <span class="classification-dot"></span>
+      </div>
+      -->
+      <div class="classification-stripes">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <div class="details">
         <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
-        <p class="txt-box">分类: {{ props.capsule.classification }}</p>
+<!--        <p class="txt-box">分类: {{ props.capsule.classification }}</p>-->
         <p class="txt-box">有日程: {{ props.capsule.isWithSchedule === 1 ? '是' : '否' }}</p>
         <p class="txt-box" v-if="props.capsule.scheduleIcon">日程图标: {{ props.capsule.scheduleIcon }}</p>
         <p class="txt-box" v-if="props.capsule.scheduleContentText">日程内容: {{ props.capsule.scheduleContentText }}</p>
@@ -178,6 +214,48 @@ watch(expanded, async (newVal) => {
   overflow: hidden;
   width: 100%;
 }
+.capsule-spacer {
+  inline-size: 25dvi;
+  block-size: 2svb;
+}
+/*
+.classification-dots {
+  inline-size: 20dvi;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 2fr 5fr) 2fr 2fr;
+  align-items: center;
+}
+.classification-dot {
+  grid-column: span 1;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #000;
+}
+.classification-dot:nth-child(1) { grid-column: 2; }
+.classification-dot:nth-child(2) { grid-column: 4; }
+.classification-dot:nth-child(3) { grid-column: 6; }
+.classification-dot:nth-child(4) { grid-column: 8; }
+.classification-dot:nth-child(5) { grid-column: 10; }
+.classification-dot:nth-child(1) { background: rgb(104 144 237); }
+.classification-dot:nth-child(2) { background: rgb(248 102 102); }
+.classification-dot:nth-child(3) { background: rgb(255 167 78); }
+.classification-dot:nth-child(4) { background: rgb(96 209 77); }
+.classification-dot:nth-child(5) { background: rgb(165 100 222); }
+*/
+.classification-stripes {
+  inline-size: 100%;
+  block-size: 0.75svb;
+  display: flex;
+}
+.classification-stripes span {
+  flex: 1;
+}
+.classification-stripes span:nth-child(1) { background: rgb(104 144 237); }
+.classification-stripes span:nth-child(2) { background: rgb(248 102 102); }
+.classification-stripes span:nth-child(3) { background: rgb(255 167 78); }
+.classification-stripes span:nth-child(4) { background: rgb(96 209 77); }
+.classification-stripes span:nth-child(5) { background: rgb(165 100 222); }
 
 .small, .big {
   will-change: opacity;
