@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Capsule } from '@/stores/capsule.ts';
+import type { Capsule, Classification } from '@/stores/capsule.ts';
 import { useCapsuleStore } from '@/stores/capsule.ts';
+import { capsuleApi } from '@/utils/apiService.ts';
 import { nextTick, onMounted, ref, watch } from "vue";
 import Placeholder from "@/components/Placeholder.vue";
 import gsap from "gsap";
@@ -11,6 +12,14 @@ const expanded = ref(false);
 const props = defineProps<{
   capsule: Capsule;
 }>();
+
+async function changeClassification(classification: Classification) {
+  if (classification === props.capsule.classification) return;
+
+  const { id, createdAt, ...data } = props.capsule;
+  await capsuleApi.update(id, { ...data, classification });
+  await store.fetchCapsules();
+}
 
 const capsuleRef = ref<HTMLElement | null>(null);
 const topSpacerRef = ref<HTMLElement | null>(null);
@@ -179,12 +188,29 @@ watch(expanded, async (newVal) => {
         <span class="classification-dot"></span>
       </div>
       -->
-      <div class="classification-stripes">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+      <div class="classification-stripe-area">
+        <div class="classification-stripes">
+          <button
+              title="切换为笔记"
+              @click.stop="changeClassification('note')"
+          ><span></span></button>
+          <button
+              title="切换为紧急"
+              @click.stop="changeClassification('urgent')"
+          ><span></span></button>
+          <button
+              title="切换为收藏"
+              @click.stop="changeClassification('favourite')"
+          ><span></span></button>
+          <button
+              title="切换为短信"
+              @click.stop="changeClassification('sms')"
+          ><span></span></button>
+          <button
+              title="切换为灵感"
+              @click.stop="changeClassification('inspiration')"
+          ><span></span></button>
+        </div>
       </div>
       <div class="details">
         <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
@@ -243,19 +269,43 @@ watch(expanded, async (newVal) => {
 .classification-dot:nth-child(4) { background: rgb(96 209 77); }
 .classification-dot:nth-child(5) { background: rgb(165 100 222); }
 */
+.classification-stripe-area {
+  position: relative;
+  block-size: 0.35svb;
+}
 .classification-stripes {
   inline-size: 100%;
-  block-size: 0.75svb;
+  block-size: 4svb;
   display: flex;
+  position: absolute;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
 }
-.classification-stripes span {
+.classification-stripes button {
   flex: 1;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
 }
-.classification-stripes span:nth-child(1) { background: rgb(104 144 237); }
-.classification-stripes span:nth-child(2) { background: rgb(248 102 102); }
-.classification-stripes span:nth-child(3) { background: rgb(255 167 78); }
-.classification-stripes span:nth-child(4) { background: rgb(96 209 77); }
-.classification-stripes span:nth-child(5) { background: rgb(165 100 222); }
+.classification-stripes button span {
+  inline-size: 100%;
+  block-size: 0.35svb;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.classification-stripes button:nth-child(1) span { background: rgb(104 144 237); }
+.classification-stripes button:nth-child(2) span { background: rgb(248 102 102); }
+.classification-stripes button:nth-child(3) span { background: rgb(255 167 78); }
+.classification-stripes button:nth-child(4) span { background: rgb(96 209 77); }
+.classification-stripes button:nth-child(5) span { background: rgb(165 100 222); }
+.classification-stripes button:hover span {
+  opacity: 1;
+  filter: brightness(1.15);
+}
 
 .small, .big {
   will-change: opacity;
