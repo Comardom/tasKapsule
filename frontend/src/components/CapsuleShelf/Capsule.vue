@@ -240,6 +240,9 @@ watch(expanded, async (newVal) => {
   overflow: hidden;
   width: 100%;
 }
+.big .expanded-content {
+  overflow: visible;
+}
 .capsule-spacer {
   inline-size: 25dvi;
   block-size: 2svb;
