@@ -4,8 +4,8 @@
   color-scheme: light;
   --font-body: 'App Sans', system-ui, sans-serif;
   /* 亮色模式变量 */
-  --theme-bg-stripe-1: #f0f0f0;
-  --theme-bg-stripe-2: #ffffff;
+  --theme-bg-stripe-1: #e8e8e8;
+  --theme-bg-stripe-2: #f8f8f8;
   --stripe-width: 0.125rem;
   --theme-color: #222222;
   --theme-link: #0066cc;

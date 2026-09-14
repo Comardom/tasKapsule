@@ -297,8 +297,8 @@ watch(expanded, async (newVal) => {
 .classification-stripes button span {
   inline-size: 100%;
   block-size: 0.35svb;
-  opacity: 0.55;
-  transition: opacity 0.15s ease;
+  opacity: 0.8;
+  transition: opacity 0.15s ease, filter 0.15s ease, transform 0.15s ease;
 }
 .classification-stripes button:nth-child(1) span { background: rgb(104 144 237); }
 .classification-stripes button:nth-child(2) span { background: rgb(248 102 102); }
@@ -307,7 +307,18 @@ watch(expanded, async (newVal) => {
 .classification-stripes button:nth-child(5) span { background: rgb(165 100 222); }
 .classification-stripes button:hover span {
   opacity: 1;
-  filter: brightness(1.15);
+}
+:global(:root:not([data-theme='dark']) .classification-stripes button:hover span) {
+  filter: saturate(1.4) brightness(0.82);
+  transform: scaleY(2);
+}
+:global([data-theme='dark'] .classification-stripes button span) {
+  opacity: 0.5;
+}
+:global([data-theme='dark'] .classification-stripes button:hover span) {
+  opacity: 1;
+  filter: saturate(1.3) brightness(1.25);
+  box-shadow: 0 0 0.3rem rgb(255 255 255 / 0.25);
 }
 
 .small, .big {
@@ -340,6 +351,16 @@ watch(expanded, async (newVal) => {
       inset 0 0 1.2rem rgba(255, 255, 255, 0.3);
   border: 0.0625rem solid rgba(255, 255, 255, 0.4);
   border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.2);
+}
+
+:global(:root:not([data-theme='dark'])) .capsule {
+  border-color: color-mix(in srgb, var(--capsule-accent) 58%, white);
+  border-bottom-color: color-mix(in srgb, var(--capsule-accent) 42%, white);
+  box-shadow:
+      inset 0 0.0625rem 0 rgb(255 255 255 / 0.7),
+      inset 0 -0.0625rem 0 rgb(30 30 30 / 0.08),
+      inset 0 0 1rem rgb(255 255 255 / 0.2),
+      0 0.35rem 0.9rem rgb(30 35 45 / 0.14);
 }
 
 /* 双列布局防线 */
@@ -431,30 +452,35 @@ watch(expanded, async (newVal) => {
 }
 
 .note{
+  --capsule-accent: rgb(104 144 237);
   background-color: rgb(104 144 237 / 0.3);
 }
 .note :slotted(span), .note span{
   font-size: 1.125rem;
 }
 .urgent{
+  --capsule-accent: rgb(248 102 102);
   background-color: rgb(248 102 102 / 0.3);
 }
 .urgent :slotted(span), .urgent span{
   font-size: 1.125rem;
 }
 .favourite{
+  --capsule-accent: rgb(255 167 78);
   background-color: rgb(255 167 78 / 0.3);
 }
 .favourite :slotted(span), .favourite span{
   font-size: 1.125rem;
 }
 .sms{
+  --capsule-accent: rgb(96 209 77);
   background-color: rgb(96 209 77 / 0.3);
 }
 .sms :slotted(span), .sms span{
   font-size: 1.125rem;
 }
 .inspiration{
+  --capsule-accent: rgb(165 100 222);
   background-color: rgb(165 100 222 / 0.3);
 }
 .inspiration :slotted(span), .inspiration span{
