@@ -21,6 +21,17 @@ async function changeClassification(classification: Classification) {
   await store.fetchCapsules();
 }
 
+async function copyToClipboard() {
+  try {
+    await navigator.clipboard.writeText(props.capsule.contentText);
+    console.log('复制成功');
+    // ElMessage.success('复制成功');
+  } catch (err) {
+    console.error('复制失败:', err);
+    // fallbackCopy(props.capsule.contentText);
+  }
+}
+
 const capsuleRef = ref<HTMLElement | null>(null);
 const topSpacerRef = ref<HTMLElement | null>(null);
 const bottomSpacerRef = ref<HTMLElement | null>(null);
@@ -212,9 +223,17 @@ watch(expanded, async (newVal) => {
           ><span></span></button>
         </div>
       </div>
-      <div class="details">
+      <Placeholder height='2svb' width="25dvi" />
+      <div class="core-btns">
+        <button class="core-btn" @click="copyToClipboard()">复制</button>
+<!--        <span>|</span>-->
+        <button class="core-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
+<!--        <span>|</span>-->
+        <button class="core-btn" @click.stop="emit('delete', props.capsule)">删除</button>
+      </div>
+<!--      <div class="details">
         <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
-<!--        <p class="txt-box">分类: {{ props.capsule.classification }}</p>-->
+        &lt;!&ndash;        <p class="txt-box">分类: {{ props.capsule.classification }}</p>&ndash;&gt;
         <p class="txt-box">有日程: {{ props.capsule.isWithSchedule === 1 ? '是' : '否' }}</p>
         <p class="txt-box" v-if="props.capsule.scheduleIcon">日程图标: {{ props.capsule.scheduleIcon }}</p>
         <p class="txt-box" v-if="props.capsule.scheduleContentText">日程内容: {{ props.capsule.scheduleContentText }}</p>
@@ -225,11 +244,11 @@ watch(expanded, async (newVal) => {
         <p class="txt-box" v-if="props.capsule.audioPath">音频: {{ props.capsule.audioPath }}</p>
         <p class="txt-box" v-if="props.capsule.attachmentPaths">附件: {{ props.capsule.attachmentPaths }}</p>
         <p class="txt-box" v-if="props.capsule.alarmClocks">闹钟: {{ props.capsule.alarmClocks }}</p>
-      </div>
-      <div class="capsule-actions">
+      </div>-->
+<!--      <div class="capsule-actions">
         <button class="action-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
         <button class="action-btn" @click.stop="emit('delete', props.capsule)">删除</button>
-      </div>
+      </div>-->
       <Placeholder height='1svb' width="25dvi" />
     </div>
   </div>
@@ -449,6 +468,26 @@ watch(expanded, async (newVal) => {
 .action-btn:hover {
   background: var(--theme-bg-button-hover);
   color: var(--theme-color-button);
+}
+
+.core-btns{
+  display: grid;
+  align-items: center;
+  position: relative;
+  /*flex-direction: row;*/
+  justify-content: center;
+  place-items: center;
+  grid-template-columns: repeat(3, 1fr);
+}
+.core-btn{
+  display: flex;
+  background: transparent;
+  color: var(--theme-color);
+  border: none;
+  flex-direction: row;
+  justify-content: center;
+  font-size: 0.875rem;
+  column-gap: 1rem;
 }
 
 .note{
