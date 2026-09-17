@@ -33,8 +33,6 @@ async function copyToClipboard() {
 }
 
 const capsuleRef = ref<HTMLElement | null>(null);
-const topSpacerRef = ref<HTMLElement | null>(null);
-const bottomSpacerRef = ref<HTMLElement | null>(null);
 const contentRef = ref<HTMLElement | null>(null);
 let animCtx: gsap.core.Timeline | null = null;
 
@@ -42,8 +40,8 @@ watch(expanded, async (newVal) => {
   const prevWidth = capsuleRef.value?.offsetWidth || 0;
   const prevHeight = capsuleRef.value?.offsetHeight || 0;
 
-  const topSpacer = topSpacerRef.value;
-  const bottomSpacer = bottomSpacerRef.value;
+  const topSpacer = capsuleRef.value?.querySelector<HTMLElement>('.capsule-spacer--top') ?? null;
+  const bottomSpacer = capsuleRef.value?.querySelector<HTMLElement>('.capsule-spacer--bottom') ?? null;
   const prevTopHeight = topSpacer?.offsetHeight || 0;
   const prevBottomHeight = bottomSpacer?.offsetHeight || 0;
   const prevContentHeight = contentRef.value?.offsetHeight || 0;
@@ -59,11 +57,11 @@ watch(expanded, async (newVal) => {
     animCtx = null;
   }
 
-  gsap.set(capsuleRef.value, { clearProps: "width,height,alignItems,overflow" });
-  if (mainText) gsap.set(mainText, { clearProps: "all" });
-  if (topSpacer) gsap.set(topSpacer, { clearProps: "height,opacity" });
-  if (bottomSpacer) gsap.set(bottomSpacer, { clearProps: "height,opacity" });
-  if (contentRef.value) gsap.set(contentRef.value, { clearProps: "height,opacity" });
+  await gsap.set(capsuleRef.value, {clearProps: "width,height,alignItems,overflow"});
+  if (mainText) await gsap.set(mainText, {clearProps: "all"});
+  if (topSpacer) await gsap.set(topSpacer, {clearProps: "height,opacity"});
+  if (bottomSpacer) await gsap.set(bottomSpacer, {clearProps: "height,opacity"});
+  if (contentRef.value) await gsap.set(contentRef.value, {clearProps: "height,opacity"});
 
   if (newVal) {
     // ==================== 展开动画 ====================
@@ -78,10 +76,10 @@ watch(expanded, async (newVal) => {
         ? "100%"
         : `${capsuleRef.value.offsetWidth}px`;
 
-    gsap.set(capsuleRef.value, { alignItems: "flex-start", overflow: "hidden" });
-    if (topSpacer) gsap.set(topSpacer, { opacity: 0, height: 0, overflow: "hidden" });
-    if (bottomSpacer) gsap.set(bottomSpacer, { opacity: 0, height: 0, overflow: "hidden" });
-    if (contentRef.value) gsap.set(contentRef.value, { opacity: 0, height: 0, overflow: "hidden" });
+    await gsap.set(capsuleRef.value, {alignItems: "flex-start", overflow: "hidden"});
+    if (topSpacer) await gsap.set(topSpacer, {opacity: 0, height: 0, overflow: "hidden"});
+    if (bottomSpacer) await gsap.set(bottomSpacer, {opacity: 0, height: 0, overflow: "hidden"});
+    if (contentRef.value) await gsap.set(contentRef.value, {opacity: 0, height: 0, overflow: "hidden"});
 
     animCtx = gsap.timeline({
       onComplete: () => {
@@ -133,22 +131,22 @@ watch(expanded, async (newVal) => {
 
     const targetWidth = capsuleRef.value.offsetWidth;
 
-    gsap.set(capsuleRef.value, { overflow: "hidden" });
+    await gsap.set(capsuleRef.value, {overflow: "hidden"});
 
     if (topSpacer) {
-      gsap.set(topSpacer, { display: "block", opacity: 1, height: prevTopHeight });
+      await gsap.set(topSpacer, {display: "block", opacity: 1, height: prevTopHeight});
       animCtx.to(topSpacer, { opacity: 0, duration: 0.15 }, 0.15);
       animCtx.to(topSpacer, { height: 0, duration: 0.2, ease: "power2.inOut" }, 0.15);
     }
 
     if (bottomSpacer) {
-      gsap.set(bottomSpacer, { display: "block", opacity: 1, height: prevBottomHeight });
+      await gsap.set(bottomSpacer, {display: "block", opacity: 1, height: prevBottomHeight});
       animCtx.to(bottomSpacer, { opacity: 0, duration: 0.15 }, 0.15);
       animCtx.to(bottomSpacer, { height: 0, duration: 0.2, ease: "power2.inOut" }, 0.15);
     }
 
     if (contentRef.value) {
-      gsap.set(contentRef.value, { display: "block", opacity: 1, height: prevContentHeight });
+      await gsap.set(contentRef.value, {display: "block", opacity: 1, height: prevContentHeight});
       animCtx.to(contentRef.value, { opacity: 0, duration: 0.15 }, 0);
       animCtx.to(contentRef.value, { height: 0, duration: 0.35, ease: "power2.inOut" }, 0);
     }
@@ -184,72 +182,100 @@ watch(expanded, async (newVal) => {
       ]"
       @click="expanded = !expanded"
   >
-    <div ref="topSpacerRef" v-show="expanded" class="capsule-spacer"></div>
+    <!--    <div ref="topSpacerRef" v-show="expanded" class="capsule-spacer"></div>-->
+    <Placeholder
+        v-show="expanded"
+        class="capsule-spacer capsule-spacer--top"
+        height="2svb"
+        width="25dvi"
+    />
+
     <span class="txt-box main-text">{{ props.capsule.contentText }}</span>
-    <div ref="bottomSpacerRef" v-show="expanded" class="capsule-spacer"></div>
+    <Placeholder
+        v-show="expanded"
+        class="capsule-spacer capsule-spacer--bottom"
+        height="3svb"
+        width="25dvi"
+    />
+    <!--    <div ref="bottomSpacerRef" v-show="expanded" class="capsule-spacer"></div>-->
 
 
     <div ref="contentRef" class="expanded-content" v-show="expanded">
-      <!--
-      <div class="classification-dots">
-        <span class="classification-dot"></span>
-        <span class="classification-dot"></span>
-        <span class="classification-dot"></span>
-        <span class="classification-dot"></span>
-        <span class="classification-dot"></span>
-      </div>
-      -->
       <div class="classification-stripe-area">
         <div class="classification-stripes">
           <button
               title="切换为笔记"
               @click.stop="changeClassification('note')"
-          ><span></span></button>
+          >
+            <span />
+          </button>
           <button
               title="切换为紧急"
               @click.stop="changeClassification('urgent')"
-          ><span></span></button>
+          >
+            <span />
+          </button>
           <button
               title="切换为收藏"
               @click.stop="changeClassification('favourite')"
-          ><span></span></button>
+          >
+            <span />
+          </button>
           <button
               title="切换为短信"
               @click.stop="changeClassification('sms')"
-          ><span></span></button>
+          >
+            <span />
+          </button>
           <button
               title="切换为灵感"
               @click.stop="changeClassification('inspiration')"
-          ><span></span></button>
+          >
+            <span />
+          </button>
         </div>
       </div>
-      <Placeholder height='2svb' width="25dvi" />
+      <Placeholder height='3svb' width="25dvi" />
       <div class="core-btns">
-        <button class="core-btn" @click="copyToClipboard()">复制</button>
-<!--        <span>|</span>-->
-        <button class="core-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
-<!--        <span>|</span>-->
-        <button class="core-btn" @click.stop="emit('delete', props.capsule)">删除</button>
+        <button
+            class="core-btn copy"
+            @click.stop="copyToClipboard()"
+        >
+          复制
+        </button>
+        <button
+            class="core-btn edit"
+            @click.stop="emit('edit', props.capsule)"
+        >
+          编辑
+        </button>
+        <button
+            class="core-btn delete"
+            @click.stop="emit('delete', props.capsule)"
+        >
+          删除
+        </button>
       </div>
-<!--      <div class="details">
-        <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
-        &lt;!&ndash;        <p class="txt-box">分类: {{ props.capsule.classification }}</p>&ndash;&gt;
-        <p class="txt-box">有日程: {{ props.capsule.isWithSchedule === 1 ? '是' : '否' }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleIcon">日程图标: {{ props.capsule.scheduleIcon }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleContentText">日程内容: {{ props.capsule.scheduleContentText }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleStartAt">开始: {{ props.capsule.scheduleStartAt }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleEndAt">结束: {{ props.capsule.scheduleEndAt }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleStatus">状态: {{ props.capsule.scheduleStatus }}</p>
-        <p class="txt-box" v-if="props.capsule.scheduleDeadline">截止: {{ props.capsule.scheduleDeadline }}</p>
-        <p class="txt-box" v-if="props.capsule.audioPath">音频: {{ props.capsule.audioPath }}</p>
-        <p class="txt-box" v-if="props.capsule.attachmentPaths">附件: {{ props.capsule.attachmentPaths }}</p>
-        <p class="txt-box" v-if="props.capsule.alarmClocks">闹钟: {{ props.capsule.alarmClocks }}</p>
-      </div>-->
-<!--      <div class="capsule-actions">
-        <button class="action-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
-        <button class="action-btn" @click.stop="emit('delete', props.capsule)">删除</button>
-      </div>-->
-      <Placeholder height='1svb' width="25dvi" />
+      <Placeholder height='2svb' width="25dvi" />
+      <!--      <div class="details">
+              <p class="txt-box">创建时间: {{ props.capsule.createdAt }}</p>
+              &lt;!&ndash;        <p class="txt-box">分类: {{ props.capsule.classification }}</p>&ndash;&gt;
+              <p class="txt-box">有日程: {{ props.capsule.isWithSchedule === 1 ? '是' : '否' }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleIcon">日程图标: {{ props.capsule.scheduleIcon }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleContentText">日程内容: {{ props.capsule.scheduleContentText }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleStartAt">开始: {{ props.capsule.scheduleStartAt }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleEndAt">结束: {{ props.capsule.scheduleEndAt }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleStatus">状态: {{ props.capsule.scheduleStatus }}</p>
+              <p class="txt-box" v-if="props.capsule.scheduleDeadline">截止: {{ props.capsule.scheduleDeadline }}</p>
+              <p class="txt-box" v-if="props.capsule.audioPath">音频: {{ props.capsule.audioPath }}</p>
+              <p class="txt-box" v-if="props.capsule.attachmentPaths">附件: {{ props.capsule.attachmentPaths }}</p>
+              <p class="txt-box" v-if="props.capsule.alarmClocks">闹钟: {{ props.capsule.alarmClocks }}</p>
+            </div>-->
+      <!--      <div class="capsule-actions">
+              <button class="action-btn" @click.stop="emit('edit', props.capsule)">编辑</button>
+              <button class="action-btn" @click.stop="emit('delete', props.capsule)">删除</button>
+            </div>-->
+
     </div>
   </div>
 </template>
@@ -262,35 +288,6 @@ watch(expanded, async (newVal) => {
 .big .expanded-content {
   overflow: visible;
 }
-.capsule-spacer {
-  inline-size: 25dvi;
-  block-size: 2svb;
-}
-/*
-.classification-dots {
-  inline-size: 20dvi;
-  margin-inline: auto;
-  display: grid;
-  grid-template-columns: 2fr repeat(4, 2fr 5fr) 2fr 2fr;
-  align-items: center;
-}
-.classification-dot {
-  grid-column: span 1;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #000;
-}
-.classification-dot:nth-child(1) { grid-column: 2; }
-.classification-dot:nth-child(2) { grid-column: 4; }
-.classification-dot:nth-child(3) { grid-column: 6; }
-.classification-dot:nth-child(4) { grid-column: 8; }
-.classification-dot:nth-child(5) { grid-column: 10; }
-.classification-dot:nth-child(1) { background: rgb(104 144 237); }
-.classification-dot:nth-child(2) { background: rgb(248 102 102); }
-.classification-dot:nth-child(3) { background: rgb(255 167 78); }
-.classification-dot:nth-child(4) { background: rgb(96 209 77); }
-.classification-dot:nth-child(5) { background: rgb(165 100 222); }
-*/
 .classification-stripe-area {
   position: relative;
   block-size: 0.35svb;
@@ -372,7 +369,7 @@ watch(expanded, async (newVal) => {
   border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.2);
 }
 
-:global(:root:not([data-theme='dark'])) .capsule {
+:global(:root:not([data-theme='dark']) .capsule) {
   border-color: color-mix(in srgb, var(--capsule-accent) 58%, white);
   border-bottom-color: color-mix(in srgb, var(--capsule-accent) 42%, white);
   box-shadow:
@@ -474,7 +471,6 @@ watch(expanded, async (newVal) => {
   display: grid;
   align-items: center;
   position: relative;
-  /*flex-direction: row;*/
   justify-content: center;
   place-items: center;
   grid-template-columns: repeat(3, 1fr);
@@ -487,8 +483,17 @@ watch(expanded, async (newVal) => {
   flex-direction: row;
   justify-content: center;
   font-size: 0.875rem;
-  column-gap: 1rem;
 }
+
+.core-btn:hover {
+  background: transparent;
+}
+
+
+/* 按功能覆盖 */
+.core-btn.copy  { cursor: copy; }
+.core-btn.edit  { cursor: pointer; }
+.core-btn.delete{ cursor: pointer; }
 
 .note{
   --capsule-accent: rgb(104 144 237);

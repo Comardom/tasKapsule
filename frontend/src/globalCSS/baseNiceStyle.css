@@ -24,8 +24,10 @@
 /* 针对特定文本元素添加动画 */
 h1, h2, h3, p, span, a, .record-link, small {
     transition: color 0.4s ease;
+    margin: 0;
 }
 button {
+    padding: 0;
     cursor: pointer;
     vertical-align: middle;
 }
